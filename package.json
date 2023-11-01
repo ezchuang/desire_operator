@@ -6,7 +6,7 @@
   "scripts": {
     "start": "NODE_PATH=./build node build/app.js",
     "build": "tsc -p .",
-    "dev": "nodemon src/index.ts"
+    "dev": "nodemon src/app.ts"
   },
   "keywords": [],
   "author": "",
