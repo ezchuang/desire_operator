@@ -13,7 +13,7 @@ export interface Condition {
 
 
 // 主要 interfaces
-export interface CreateDBObj {
+export interface CreateDbObj {
     dbName: string;
     creatorUsername: string;
 }
@@ -24,9 +24,8 @@ export interface CreateObj {
     columns: TableColumn[];
 }
 
-export interface ReadDBsAndTablesObj {
+export interface ReadDbsAndTablesObj {
     dbName?: string;
-    creatorUsername: string;
 }
 
 export interface ReadObj {

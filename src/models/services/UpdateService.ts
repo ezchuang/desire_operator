@@ -1,5 +1,4 @@
-// import { Pool } from 'mysql2';
-import DBServiceBase from './DBServiceBase ';
+import DBServiceBase from './DbServiceBase';
 import { UpdateObj } from 'models/interfaces/QueryObjInterfaces';
 
 class UpdateService extends DBServiceBase {

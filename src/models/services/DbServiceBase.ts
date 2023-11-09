@@ -1,6 +1,6 @@
 import { Pool, PoolConnection } from 'mysql2';
 
-class DatabaseServiceBase {
+class DbServiceBase {
     private pool: Pool;
 
     constructor(pool: Pool) {
@@ -16,7 +16,7 @@ class DatabaseServiceBase {
         });
     }
     
-    protected async execute(queryStr: string, values: string[]) {
+    protected async execute(queryStr: string, values: any[]) {
         const connection = await this.getConnection();
         try {
             const result = await new Promise((resolve, reject) => {
@@ -32,4 +32,4 @@ class DatabaseServiceBase {
     }
 }
 
-export default DatabaseServiceBase;
+export default DbServiceBase;

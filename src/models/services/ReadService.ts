@@ -1,9 +1,8 @@
-// import { Pool } from 'mysql2';
-import DBServiceBase from './DBServiceBase ';
-import { ReadDBsAndTablesObj, ReadObj } from 'models/interfaces/QueryObjInterfaces';
+import DBServiceBase from './DbServiceBase';
+import { ReadDbsAndTablesObj, ReadObj } from 'models/interfaces/QueryObjInterfaces';
 
 class ReadService extends DBServiceBase {
-    async readDBsAndTables(obj: ReadDBsAndTablesObj) {
+    async readDBsAndTables(obj: ReadDbsAndTablesObj) {
         const { dbName } = obj;
         let queryStr = 'SHOW '
 

@@ -1,5 +1,4 @@
-// import { Pool } from 'mysql2';
-import DBServiceBase from './DBServiceBase ';
+import DBServiceBase from './DbServiceBase';
 import { DeleteObj } from 'models/interfaces/QueryObjInterfaces';
 
 class DeleteService extends DBServiceBase {

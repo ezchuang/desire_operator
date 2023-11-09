@@ -3,17 +3,17 @@ import http from 'http';
 
 // import multer from 'multer';
 // import s3Connector from './models/s3Connector'; // 暫時用不到
-import { CreateDBObj, CreateObj, ReadDBsAndTablesObj, ReadObj, UpdateObj, DeleteObj } from 'models/interfaces/QueryObjInterfaces';
-import apiRoute from './controllers/routes/api';
-import Database from './models/base/DBConstructor';
-import CreateService from './models/services/CreateService'
+import createApi from 'controllers/routes/createApi';
+import readApi from 'controllers/routes/readApi';
+import updateApi from 'controllers/routes/updateApi';
+import deleteApi from 'controllers/routes/deleteApi';
+import Database from 'models/base/DbConstructor';
 
 
 const app: Express = express();
-const port: number = 5252
+const port: number = 5252;
 const server = http.createServer(app);
-const db = new Database();
-const createService = new CreateService(db.getPool())
+export const db = new Database();
 
 // 測試區
 // const testObj: CreateObj = {
@@ -39,7 +39,10 @@ app.use(express.urlencoded({ extended: true }));
 
 
 // Routers
-app.use('/api', apiRoute);
+app.use('/api', createApi);
+app.use('/api', readApi);
+app.use('/api', updateApi);
+app.use('/api', deleteApi);
 
 
 app.get('/', (req: Request, res: Response) => {
