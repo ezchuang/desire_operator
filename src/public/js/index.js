@@ -1,57 +1,53 @@
-const fileInput = document.querySelector('#imgFile');
-const imgDescInput = document.querySelector('#imgDesc');
-const form = document.querySelector('form');
-
+const fileInput = document.querySelector("#imgFile");
+const imgDescInput = document.querySelector("#imgDesc");
+const form = document.querySelector("form");
 
 function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
 
-form.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    
-    const formData = new FormData();
+  const formData = new FormData();
 
-    formData.append('imgDesc', imgDescInput.value); 
-    formData.append('imgFile', fileInput.files[0]);
+  formData.append("imgDesc", imgDescInput.value);
+  formData.append("imgFile", fileInput.files[0]);
 
-    // fetch('/newPost', {
-    //     method: 'POST',
-    //     body: formData
-    // })
-    // .then(response => {
-    //     if (response.status === 200) {
-    //         return response.json();
-    //     } else {
-    //         throw new Error('upload fail');
-    //     }
-    // })
-    // .then(async data => {
-    //     console.log('upload success', data);
-    //     await sleep(1000)
-    //     window.location.href = "/"
-    // })
-    // .catch(error => {
-    //      console.error('upload fail', error);
-    // });
+  // fetch('/newPost', {
+  //     method: 'POST',
+  //     body: formData
+  // })
+  // .then(response => {
+  //     if (response.status === 200) {
+  //         return response.json();
+  //     } else {
+  //         throw new Error('upload fail');
+  //     }
+  // })
+  // .then(async data => {
+  //     console.log('upload success', data);
+  //     await sleep(1000)
+  //     window.location.href = "/"
+  // })
+  // .catch(error => {
+  //      console.error('upload fail', error);
+  // });
 });
 
-
 async function loadin() {
-    try {
-        const response = await fetch("/api/test");
-        if (!response.ok) {
-            throw new Error("Failed to fetch data");
-        }
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error("Error fetching data:", error);
-        return [];
+  try {
+    const response = await fetch("/api/test");
+    if (!response.ok) {
+      throw new Error("Failed to fetch data");
     }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return [];
+  }
 }
-
 
 // function createReactTree(data) {
 //     return data.map((item, i) => {
@@ -72,19 +68,18 @@ async function loadin() {
 //     });
 // }
 
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const data = await loadin();
+    console.log(data);
 
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        const data = await loadin();
-        console.log(data);
+    // const reactTree = createReactTree(data.data);
 
-        // const reactTree = createReactTree(data.data);
-
-        // ReactDOM.render(
-        //     React.createElement('div', null, reactTree),
-        //     document.getElementById('root')
-        // );
-    } catch (error) {
-        console.error('An error occurred:', error);
-    }
+    // ReactDOM.render(
+    //     React.createElement('div', null, reactTree),
+    //     document.getElementById('root')
+    // );
+  } catch (error) {
+    console.error("An error occurred:", error);
+  }
 });
