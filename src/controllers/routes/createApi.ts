@@ -1,12 +1,15 @@
 import express, { Request, Response, IRouter } from "express";
-import { CreateDbObj, CreateObj } from "models/interfaces/QueryObjInterfaces";
+import {
+  CreateDbObj,
+  CreateObj,
+} from "../../models/interfaces/QueryObjInterfaces";
 import rootPool from "../../models/getPool/rootPool";
 import userPool from "../../models/getPool/userPool";
 import CreateService from "../../models/services/CreateService";
 
 const createApi: IRouter = express.Router();
 
-// const rootCreateService = new CreateService(rootPool);
+const rootCreateService = new CreateService(rootPool);
 const userCreateService = new CreateService(userPool);
 
 /* 寫一個 middleware 驗證使用者 */
@@ -21,7 +24,7 @@ createApi.post("/createDb", async (req: Request, res: Response) => {
       dbName: req.body.dbName,
       creatorUsername: userID,
     };
-    const data = await userCreateService.createDb(params); // true or error
+    const data = await rootCreateService.createDb(params); // true or error
 
     return res.status(200).json({ data: data });
   } catch (err) {

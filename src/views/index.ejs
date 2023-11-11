@@ -1,40 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Log Bot</title>
-    <link rel="stylesheet" type="text/css" href="/css/cssreset.css"/>
-    <link href="/dist/output.css" rel="stylesheet">
-</head>
-<body>
-    <div class="outerFrame">
-        <div class="center bg-white">
-            
-            <!-- <div class="titleBlock">
-                <h1 class="title">發表一篇圖文</h1>
-            </div>
-            <div class="functionBlock">
-                <form class="functionForm" action="/newPost" method="POST" enctype="multipart/form-data">
-                    <div class="imgDescFrame">
-                        <label for="imgDesc" class="imgDesc">文字內容</label>
-                        <input type="text" id="imgDesc" name="imgDesc"/>
-                    </div>
-                    <div class="imgFileFrame">
-                        <label for="imgFile" class="imgFile">圖片檔案</label>
-                        <input type="file" id="imgFile" name="imgFile"/>
-                    </div>
-                    <button class="functionBlockSummit">送出</button>
-                </form>
+    <link rel="stylesheet" type="text/css" href="/css/cssreset.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    />
+    <link href="/css/output.css" rel="stylesheet" />
+    <!-- <link href="../dist/output.css" rel="stylesheet" /> -->
+  </head>
+  <body class="h-full">
+    <div class="flex w-full min-h-full h-screen bg-orange-200">
+      <div class="flex flex-col justify-center bg-black w-full h-1/2">
+        <!-- <div id="root">
             </div> -->
-            <!-- <hr> -->
-            <!-- <div id="root">
-            </div> -->
-        </div>
+      </div>
     </div>
     <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
     <!-- <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script> -->
-    <script src="/js/index.js"></script>
-</body>
+    <script src="/js/index.tsx"></script>
+  </body>
 </html>

@@ -6,12 +6,14 @@
   "scripts": {
     "start": "NODE_PATH=./build node build/app.js",
     "build": "tsc -p .",
-    "dev": "nodemon src/app.ts"
+    "dev": "nodemon src/app.ts",
+    "renewcss": "npx tailwindcss -i ./src/public/css/index.css  -o ./src/public/css/output.css"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@material-ui/core": "^4.12.4",
     "aws-sdk": "^2.1486.0",
     "dotenv": "^16.3.1",
     "ejs": "^3.1.9",

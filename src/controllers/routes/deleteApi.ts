@@ -1,5 +1,6 @@
 import express, { Request, Response, IRouter } from "express";
 import { DeleteObj } from "../../models/interfaces/QueryObjInterfaces";
+// import rootPool from "../../models/getPool/rootPool";
 import userPool from "../../models/getPool/userPool";
 import DeleteService from "../../models/services/DeleteService";
 

@@ -1,11 +1,12 @@
 import express, { Request, Response, IRouter } from "express";
-import { UpdateObj } from "models/interfaces/QueryObjInterfaces";
-import { db } from "app";
-import UpdateService from "models/services/UpdateService";
+import { UpdateObj } from "../../models/interfaces/QueryObjInterfaces";
+// import rootPool from "../../models/getPool/rootPool";
+import userPool from "../../models/getPool/userPool";
+import UpdateService from "../../models/services/UpdateService";
 
 const updateApi: IRouter = express.Router();
 
-const updateService = new UpdateService(db.getPool());
+const updateService = new UpdateService(userPool);
 
 /* 寫一個 middleware 驗證使用者 */
 /* 多寫一個 model 用來檢測使用者 */

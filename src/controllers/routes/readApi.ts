@@ -3,12 +3,13 @@ import {
   ReadDbsAndTablesObj,
   ReadObj,
 } from "../../models/interfaces/QueryObjInterfaces";
-import { db } from "app";
+// import rootPool from "../../models/getPool/rootPool";
+import userPool from "../../models/getPool/userPool";
 import ReadService from "../../models/services/ReadService";
 
 const readApi: IRouter = express.Router();
 
-const readService = new ReadService(db.getPool());
+const readService = new ReadService(userPool);
 
 /* 寫一個 middleware 驗證使用者 */
 /* 多寫一個 model 用來檢測使用者 */
