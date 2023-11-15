@@ -1,10 +1,7 @@
-import DBServiceBase from "./DbServiceBase";
-import {
-  ReadDbsAndTablesObj,
-  ReadObj,
-} from "models/interfaces/QueryObjInterfaces";
+import DBUtilityBase from "./DbUtilityBase";
+import { ReadDbsAndTablesObj, ReadObj } from "models/base/QueryObjInterfaces";
 
-class ReadService extends DBServiceBase {
+class ReadUtility extends DBUtilityBase {
   async readDBsAndTables(obj: ReadDbsAndTablesObj) {
     const { dbName } = obj;
     let queryStr = "SHOW ";
@@ -14,7 +11,7 @@ class ReadService extends DBServiceBase {
     } else {
       queryStr += "DATABASES";
     }
-
+    console.log(queryStr);
     return await this.execute(queryStr, []);
   }
 
@@ -24,7 +21,10 @@ class ReadService extends DBServiceBase {
     const values: any[] = [];
     let queryStr = "SELECT ";
 
-    if (select) {
+    console.log(obj);
+    console.log(dbName, table, select, where, orderBy, orderDirection, limit);
+
+    if (select && select.length > 0) {
       queryStr += select.join(", ");
     } else {
       queryStr += "*";
@@ -52,8 +52,18 @@ class ReadService extends DBServiceBase {
       values.push(limit);
     }
 
+    console.log(queryStr);
+
     return await this.execute(queryStr, values);
+  }
+
+  async readTableStructures(obj: ReadObj) {
+    const { dbName, table } = obj;
+    let queryStr = `SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?`;
+
+    console.log(queryStr);
+    return await this.execute(queryStr, [dbName, table]);
   }
 }
 
-export default ReadService;
+export default ReadUtility;

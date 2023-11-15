@@ -14,21 +14,19 @@
     />
     <link href="/css/output.css" rel="stylesheet" />
   </head>
-  <body class="bg-orange-100 min-h-screen">
+  <body class="bg-gray-100">
     <div class="flex flex-col">
       <!-- NAV -->
       <nav class="bg-blue-500 p-4 text-white fixed w-full z-30">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
           <!-- Content for NAV -->
           <div class="font-bold text-2xl">MySQL Speaker</div>
-          <div class="w-auto">
-            <div
-              id="userInfo"
-              class="bg-purple-600 w-8 h-8 rounded-full cursor-pointer"
-              title="用户名全名"
-            ></div>
-          </div>
           <div>Navigation Items</div>
+          <div
+            id="userInfo"
+            class="bg-purple-600 w-8 h-8 rounded-full cursor-pointer"
+            title="用户名全名"
+          ></div>
         </div>
       </nav>
 
@@ -49,30 +47,49 @@
             <!-- Placeholder for React Table Component -->
             <div id="mainTable"><!-- React Table --></div>
           </div>
+
+          <!-- RIGHT SIDE PANEL -->
+          <div
+            class="lg:w-1/4 flex flex-col gap-4 mt-0 relative z-20"
+            id="shortcutPanel"
+          >
+            <!-- USER -->
+            <!-- <div
+              class="bg-white shadow-lg p-4 mb-4 overflow-auto lg:block hidden"
+              id="userInfo"
+            > -->
+            <!-- User Content -->
+            <!-- <div>User Information</div>
+            </div> -->
+
+            <!-- SHORTCUT -->
+            <button
+              id="toggleShortcut"
+              class="bg-white shadow-lg p-2 lg:hidden w-12 rounded-full"
+            >
+              Shortcut
+            </button>
+            <div
+              class="bg-white shadow-lg p-4 mb-4 overflow-auto lg:block hidden"
+              id="shortcutLinks"
+            >
+              <!-- Shortcut Content -->
+              <div>Shortcut Links</div>
+            </div>
+          </div>
         </div>
 
         <!-- QUERY COMBINE -->
         <div class="bg-white shadow-lg p-4 mb-4 overflow-auto max-h-screen">
           <!-- Content for QUERY COMBINE -->
-          <div id="queryCombineTool"><!-- React Table --></div>
+          <div>Query Combine Tools</div>
         </div>
 
         <!-- HISTORY -->
         <div class="bg-white shadow-lg p-4 mb-4 overflow-auto max-h-screen">
           <!-- Content for HISTORY -->
-          <div id="historyTable"><!-- React Table --></div>
+          <div>History Logs</div>
         </div>
-      </div>
-    </div>
-    <div class="floating-container">
-      <button id="toggleShortcut" class="floating-btn text-white">
-        Shortcut
-      </button>
-      <div
-        class="bg-white shadow-lg p-4 mb-4 overflow-auto hidden floating-panel"
-        id="shortcutLinks"
-      >
-        <div id="shortCutTable"><!-- React Table --></div>
       </div>
     </div>
     <script src="/js/index.js"></script>

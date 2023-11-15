@@ -22,6 +22,19 @@ export interface DatabaseConfigObj {
   queueLimit?: number;
 }
 
+export interface CreateUserObj {
+  userMail: string;
+  userPw: string;
+  userName: string;
+  invitationCode?: string;
+  groupName?: string;
+}
+
+export interface getUserDbObj {
+  userMail: string;
+  userPw: string;
+}
+
 export interface CreateDbObj {
   dbName: string;
   creatorUsername: string;

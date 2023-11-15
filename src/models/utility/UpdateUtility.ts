@@ -1,7 +1,7 @@
-import DBServiceBase from "./DbServiceBase";
-import { UpdateObj } from "models/interfaces/QueryObjInterfaces";
+import DBUtilityBase from "./DbUtilityBase";
+import { UpdateObj } from "models/base/QueryObjInterfaces";
 
-class UpdateService extends DBServiceBase {
+class UpdateUtility extends DBUtilityBase {
   async update(obj: UpdateObj) {
     const { dbName, table, data, where } = obj;
     const values: any[] = [];
@@ -26,4 +26,4 @@ class UpdateService extends DBServiceBase {
   }
 }
 
-export default UpdateService;
+export default UpdateUtility;

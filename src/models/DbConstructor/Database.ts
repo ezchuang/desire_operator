@@ -1,14 +1,12 @@
 // 尚未寫到 ? 針對 column type 的 驗證
-import * as dotenv from "dotenv";
 import mysql2, { Pool } from "mysql2";
-import { DatabaseConfigObj } from "models/interfaces/QueryObjInterfaces";
-
-dotenv.config();
+import { DatabaseConfigObj } from "models/base/QueryObjInterfaces";
 
 class Database {
   private pool: Pool;
 
   constructor(config: DatabaseConfigObj) {
+    console.log(config);
     this.pool = mysql2.createPool({
       user: config.user,
       password: config.password,
@@ -23,6 +21,10 @@ class Database {
 
   getPool(): Pool {
     return this.pool;
+  }
+
+  closePool(): void {
+    return this.pool.end();
   }
 }
 

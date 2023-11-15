@@ -1,46 +1,27 @@
 import express, { Request, Response, IRouter } from "express";
-import { UpdateObj } from "../../models/interfaces/QueryObjInterfaces";
-// import rootPool from "../../models/getPool/rootPool";
-import userPool from "../../models/getPool/userPool";
-import UpdateService from "../../models/services/UpdateService";
+import { UpdateObj } from "../../models/base/QueryObjInterfaces";
+// import rootDb from "../../models/getDb/rootDb";
+import userDb from "../../models/DbConstructor/userDb";
+import UpdateUtility from "../../models/utility/UpdateUtility";
 
-const updateApi: IRouter = express.Router();
+export default async function updateApiInit() {
+  const updateApi: IRouter = express.Router();
 
-const updateService = new UpdateService(userPool);
+  const updateUtility = new UpdateUtility(await userDb);
 
-/* 寫一個 middleware 驗證使用者 */
-/* 多寫一個 model 用來檢測使用者 */
+  updateApi.post("/updateData", async (req: Request, res: Response) => {
+    try {
+      const params: UpdateObj = {
+        dbName: req.body.dbName,
+        table: req.body.table,
+        data: req.body.columns,
+      };
+      const data = await updateUtility.update(params);
 
-// createApi.post('/createDb', async (req: Request, res: Response) => {
-//     try {
-//         /* 做 token 轉換後，未完成 */
-//         const userID = req.body.creatorUsername
-
-//         const params: UpdateObj = {
-//             dbName : req.body.dbName,
-//             creatorUsername : userID,
-//         }
-//         const data = await updateService.update(params); // true or error
-
-//         return res.status(200).json({ 'data': data });
-//     } catch(err) {
-//         return res.status(500).json({ 'error': err });
-//     }
-// });
-
-updateApi.post("/updateData", async (req: Request, res: Response) => {
-  try {
-    const params: UpdateObj = {
-      dbName: req.body.dbName,
-      table: req.body.table,
-      data: req.body.columns,
-    };
-    const data = await updateService.update(params);
-
-    return res.status(200).json({ data: data });
-  } catch (err) {
-    return res.status(500).json({ error: err });
-  }
-});
-
-export default updateApi;
+      return res.status(200).json({ data: data });
+    } catch (err) {
+      return res.status(500).json({ error: err });
+    }
+  });
+  return updateApi;
+}

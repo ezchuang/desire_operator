@@ -1,3 +1,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.floating-container {
+  position: fixed;
+  right: 10px;
+  bottom: 10px;
+  z-index: 1000;
+}
+
+.floating-btn {
+  /* 添加適畜的樣式，比如大小、顏色等 */
+  border-radius: 10px;
+  padding: 4px;
+  background-color: rgb(2, 142, 142);
+}
+
+.floating-panel {
+  display: none; /* 預設不顯示 */
+  position: absolute;
+  bottom: 100%; /* 使其顯示在按鈕的上方 */
+  right: 0;
+  /* 其他樣式根據需要添加 */
+}

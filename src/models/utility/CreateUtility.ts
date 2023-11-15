@@ -1,7 +1,7 @@
-import DbServiceBase from "./DbServiceBase";
-import { CreateDbObj, CreateObj } from "models/interfaces/QueryObjInterfaces";
+import DbUtilityBase from "./DbUtilityBase";
+import { CreateDbObj, CreateObj } from "models/base/QueryObjInterfaces";
 
-class CreateService extends DbServiceBase {
+class CreateUtility extends DbUtilityBase {
   // 需求權限等級較高，所以從比較前面開始做 SQL injection 預防，避免使用者異常嫁接指令
   async createDb(obj: CreateDbObj) {
     const { dbName, creatorUsername } = obj;
@@ -39,4 +39,4 @@ class CreateService extends DbServiceBase {
   }
 }
 
-export default CreateService;
+export default CreateUtility;

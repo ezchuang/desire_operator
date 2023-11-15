@@ -1,7 +1,7 @@
-import DBServiceBase from "./DbServiceBase";
-import { DeleteObj } from "models/interfaces/QueryObjInterfaces";
+import DBUtilityBase from "./DbUtilityBase";
+import { DeleteObj } from "models/base/QueryObjInterfaces";
 
-class DeleteService extends DBServiceBase {
+class DeleteUtility extends DBUtilityBase {
   async delete(obj: DeleteObj) {
     const { dbName, table, where } = obj;
     const values: any[] = [];
@@ -19,4 +19,4 @@ class DeleteService extends DBServiceBase {
   }
 }
 
-export default DeleteService;
+export default DeleteUtility;
