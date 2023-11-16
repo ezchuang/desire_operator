@@ -91,11 +91,11 @@ class UserUtility extends DbUtilityBase {
   async getUserDb(userObj: getUserDbObj): Promise<Database> {
     const { userMail, userPw } = userObj;
     const getUserInfoQuery =
-      "SELECT users.user_name AS userName, user_groups.signin_user AS dbUser, user_groups.signin_pw AS dbPw\
+      "SELECT user_groups.signin_user AS dbUser, user_groups.signin_pw AS dbPw\
       FROM user_info.user_groups LEFT JOIN user_info.user_groups_to_users ON user_groups.id = user_groups_to_users.user_groups_id \
       LEFT JOIN user_info.users ON users.id = user_groups_to_users.users_id \
       WHERE users.user_mail = ? AND users.user_pw = ?";
-    const { userName, dbUser, dbPw } = (
+    const { dbUser, dbPw } = (
       await this.execute(getUserInfoQuery, [userMail, userPw])
     )[0][0];
     const config: DatabaseConfigObj = {
@@ -104,6 +104,16 @@ class UserUtility extends DbUtilityBase {
     };
     const userDb = new Database(config);
     return userDb;
+  }
+
+  async getUserInfo(userObj: getUserDbObj): Promise<string[]> {
+    const { userMail, userPw } = userObj;
+    const getUserInfoQuery =
+      "SELECT users.id AS userId users.user_name AS userName FROM user_info.users WHERE users.user_mail = ? AND users.user_pw = ?";
+    const { userId, userName } = (
+      await this.execute(getUserInfoQuery, [userMail, userPw])
+    )[0][0];
+    return [userId, userName];
   }
 }
 

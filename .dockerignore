@@ -145,3 +145,9 @@ lerna-debug.log
 # System Files
 .DS_Store
 Thumbs.db
+
+# VSCodeCounter
+.VSCodeCounter
+
+# SQL Data
+*.sql

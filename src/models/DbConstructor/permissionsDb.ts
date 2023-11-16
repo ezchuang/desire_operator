@@ -4,12 +4,12 @@ import { DatabaseConfigObj } from "../base/QueryObjInterfaces";
 
 dotenv.config();
 
-const userConfig: DatabaseConfigObj = {
+const permissionsConfig: DatabaseConfigObj = {
   user: process.env.USERDB_ADMIN!,
   password: process.env.USERDB_PW!,
   host: process.env.USERDB_HOST!,
 };
 
-const rightDb = new Database(userConfig);
+const permissionsDb = new Database(permissionsConfig);
 
-export default rightDb;
+export default permissionsDb;

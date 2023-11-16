@@ -1,7 +1,7 @@
 // 要做在 DB Name 上
 export async function fetchDbsAndTables(
   element: HTMLElement
-): Promise<[any[], any[]]> {
+): Promise<[any, any]> {
   try {
     // 若 dbmame 為空則取值為 null
     const data: Object = { dbName: element.getAttribute("dbName") || null };
@@ -14,18 +14,20 @@ export async function fetchDbsAndTables(
     });
 
     const result = await response.json();
-    const [rowData, columnData] = [result.data, result.structure]; // 分解數據和列結構
-    console.log("rowData: ", rowData);
-    console.log("columnData: ", columnData);
-    return [rowData, columnData];
+
+    console.log("rowData: ", result.data);
+    console.log("columnData: ", result.structure);
+    return [result.data, result.structure];
   } catch (err) {
     console.error("There was an error fetching the DBs and Tables: ", err);
-    throw err; // 或者你可以返回一個錯誤指示，如：return [null, null];
+    throw err;
   }
 }
 
 // 要做在 DB Name 上
-export async function fetchTableData(element: HTMLElement) {
+export async function fetchTableData(
+  element: HTMLElement
+): Promise<[any, any]> {
   const data: Object = {
     dbName: element.getAttribute("dbName"),
     table: element.getAttribute("table"),
@@ -34,7 +36,7 @@ export async function fetchTableData(element: HTMLElement) {
     groupBy: null,
     orderBy: null,
     orderDirection: null,
-    limit: 10,
+    limit: Number(element.getAttribute("limit")) || 10,
   };
 
   const response = await fetch("/api/readData", {
@@ -45,8 +47,8 @@ export async function fetchTableData(element: HTMLElement) {
     }),
   });
   const result = await response.json();
-  // const [rowData, columnData] = [result.data, result.structure]; // 分解數據和列結構
-  // console.log("rowData: ", rowData);
-  // console.log("columnData: ", columnData);
+  console.log(result.data);
+  console.log(result.structure);
+
   return [result.data, result.structure];
 }

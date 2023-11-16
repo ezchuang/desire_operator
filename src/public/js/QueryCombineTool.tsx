@@ -25,11 +25,11 @@ const useStyles = makeStyles({
     width: "100%",
   },
   container: {
-    maxHeight: 408,
+    maxHeight: 118,
   },
 });
 
-export default function MainTable() {
+export default function QueryCombineTool() {
   const classes = useStyles();
   const [data, setData] = useState([]);
   const [columns, setColumns] = useState<Column[]>([]);
@@ -40,6 +40,7 @@ export default function MainTable() {
         const data: HTMLElement = document.createElement("div");
         data.setAttribute("dbName", "website_taipei");
         data.setAttribute("table", "attractions");
+        data.setAttribute("limit", "2");
 
         const [rowData, columnData] = await fetchTableData(data); // fetch 數據修改的地方
 

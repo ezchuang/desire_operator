@@ -8,7 +8,7 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 
-import { fetchTableData } from "./fetchDataButton";
+import { fetchDbsAndTables } from "./fetchDataButton";
 
 interface Column {
   id: string;
@@ -25,11 +25,11 @@ const useStyles = makeStyles({
     width: "100%",
   },
   container: {
-    maxHeight: 408,
+    maxHeight: "60vh",
   },
 });
 
-export default function MainTable() {
+export default function ShortCutTable() {
   const classes = useStyles();
   const [data, setData] = useState([]);
   const [columns, setColumns] = useState<Column[]>([]);
@@ -37,11 +37,12 @@ export default function MainTable() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // 未完成
+        //
         const data: HTMLElement = document.createElement("div");
         data.setAttribute("dbName", "website_taipei");
-        data.setAttribute("table", "attractions");
 
-        const [rowData, columnData] = await fetchTableData(data); // fetch 數據修改的地方
+        const [rowData, columnData] = await fetchDbsAndTables(data); // fetch 數據修改的地方
 
         setData(rowData);
 
