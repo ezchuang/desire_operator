@@ -9,6 +9,7 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 
 import { fetchTableData } from "./fetchDataButton";
+import { useData } from "./DataContext";
 
 interface Column {
   id: string;
@@ -29,20 +30,21 @@ const useStyles = makeStyles({
   },
 });
 
-export default function MainTable() {
+const dataElementOrigin: HTMLElement = document.createElement("div");
+dataElementOrigin.setAttribute("dbName", "website_taipei");
+dataElementOrigin.setAttribute("table", "attractions");
+// dataElementOrigin.setAttribute("table", "cats");
+
+export const MainTable = () => {
   const classes = useStyles();
   const [data, setData] = useState([]);
   const [columns, setColumns] = useState<Column[]>([]);
+  const { dataElement } = useData();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data: HTMLElement = document.createElement("div");
-        data.setAttribute("dbName", "website_taipei");
-        data.setAttribute("table", "attractions");
-
-        const [rowData, columnData] = await fetchTableData(data); // fetch 數據修改的地方
-
+        const [rowData, columnData] = await fetchTableData(dataElement); // fetch 數據修改的地方
         setData(rowData);
 
         const dynamicColumns = columnData.map((column: any) => {
@@ -61,7 +63,7 @@ export default function MainTable() {
     };
 
     fetchData();
-  }, []); // 空數組表示這個effect只在組件掛載時運行一次
+  }, [dataElement.dbName, dataElement.table]);
 
   return (
     <Paper className={classes.root}>
@@ -107,4 +109,4 @@ export default function MainTable() {
       </TableContainer>
     </Paper>
   );
-}
+};

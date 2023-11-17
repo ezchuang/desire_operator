@@ -17,7 +17,6 @@ interface Column {
   minWidth?: number;
   padding?: number;
   align?: "right";
-  // format?: (value: number) => string;
 }
 
 const useStyles = makeStyles({
@@ -29,7 +28,7 @@ const useStyles = makeStyles({
   },
 });
 
-export default function ShortCutTable() {
+export const ShortCutTable = () => {
   const classes = useStyles();
   const [data, setData] = useState([]);
   const [columns, setColumns] = useState<Column[]>([]);
@@ -37,12 +36,12 @@ export default function ShortCutTable() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // 未完成
-        //
-        const data: HTMLElement = document.createElement("div");
-        data.setAttribute("dbName", "website_taipei");
+        // 使用 DataElement 对象
+        const dataElement = {
+          dbName: "website_taipei",
+        };
 
-        const [rowData, columnData] = await fetchDbsAndTables(data); // fetch 數據修改的地方
+        const [rowData, columnData] = await fetchDbsAndTables(dataElement);
 
         setData(rowData);
 
@@ -62,7 +61,7 @@ export default function ShortCutTable() {
     };
 
     fetchData();
-  }, []); // 空數組表示這個effect只在組件掛載時運行一次
+  }, []);
 
   return (
     <Paper className={classes.root}>
@@ -108,4 +107,4 @@ export default function ShortCutTable() {
       </TableContainer>
     </Paper>
   );
-}
+};

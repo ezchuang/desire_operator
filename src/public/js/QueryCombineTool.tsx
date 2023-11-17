@@ -17,7 +17,6 @@ interface Column {
   minWidth?: number;
   padding?: number;
   align?: "right";
-  // format?: (value: number) => string;
 }
 
 const useStyles = makeStyles({
@@ -29,7 +28,7 @@ const useStyles = makeStyles({
   },
 });
 
-export default function QueryCombineTool() {
+export const QueryCombineTool = () => {
   const classes = useStyles();
   const [data, setData] = useState([]);
   const [columns, setColumns] = useState<Column[]>([]);
@@ -37,12 +36,14 @@ export default function QueryCombineTool() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data: HTMLElement = document.createElement("div");
-        data.setAttribute("dbName", "website_taipei");
-        data.setAttribute("table", "attractions");
-        data.setAttribute("limit", "2");
+        // 使用 DataElement 对象
+        const dataElement = {
+          dbName: "website_taipei",
+          table: "attractions",
+          limit: "2",
+        };
 
-        const [rowData, columnData] = await fetchTableData(data); // fetch 數據修改的地方
+        const [rowData, columnData] = await fetchTableData(dataElement);
 
         setData(rowData);
 
@@ -62,7 +63,7 @@ export default function QueryCombineTool() {
     };
 
     fetchData();
-  }, []); // 空數組表示這個effect只在組件掛載時運行一次
+  }, []);
 
   return (
     <Paper className={classes.root}>
@@ -108,4 +109,4 @@ export default function QueryCombineTool() {
       </TableContainer>
     </Paper>
   );
-}
+};

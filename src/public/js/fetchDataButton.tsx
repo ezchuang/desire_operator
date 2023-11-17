@@ -1,10 +1,10 @@
-// 要做在 DB Name 上
+import { DataElement } from "./DataContext";
+
 export async function fetchDbsAndTables(
-  element: HTMLElement
+  element: DataElement
 ): Promise<[any, any]> {
   try {
-    // 若 dbmame 為空則取值為 null
-    const data: Object = { dbName: element.getAttribute("dbName") || null };
+    const data: Object = { dbName: element.dbName || null };
     const response = await fetch("/api/readDbsAndTables", {
       method: "POST",
       body: JSON.stringify(data),
@@ -24,19 +24,18 @@ export async function fetchDbsAndTables(
   }
 }
 
-// 要做在 DB Name 上
 export async function fetchTableData(
-  element: HTMLElement
+  element: DataElement
 ): Promise<[any, any]> {
   const data: Object = {
-    dbName: element.getAttribute("dbName"),
-    table: element.getAttribute("table"),
+    dbName: element.dbName,
+    table: element.table,
     select: null,
     where: null,
     groupBy: null,
     orderBy: null,
     orderDirection: null,
-    limit: Number(element.getAttribute("limit")) || 10,
+    limit: 10, // 如果需要动态设置 limit，可将其作为参数传入或从其他地方获取
   };
 
   const response = await fetch("/api/readData", {
