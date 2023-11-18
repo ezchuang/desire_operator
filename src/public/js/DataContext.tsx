@@ -1,23 +1,42 @@
 import React, { createContext, useState, useContext, ReactNode } from "react";
 
-export interface DataElement {
-  dbName?: string;
-  table?: string;
+export interface ReadDataElement {
+  dbName?: string | null;
+  table?: string | null;
+  select?: string | null;
+  where?: string | null;
+  groupBy?: string | null;
+  orderBy?: string | null;
+  orderDirection?: string | null;
+  limit?: number | 100;
+}
+
+interface WhereCondition {
+  column: string;
+  operator: string;
+  value: any;
+}
+
+export interface UpdateObj {
+  dbName: string;
+  table: string;
+  data: { [key: string]: any };
+  where?: WhereCondition[];
 }
 
 interface DataContextType {
-  dataElement: DataElement;
-  setDataElement: React.Dispatch<React.SetStateAction<DataElement>>;
+  readDataElement: ReadDataElement;
+  setReadDataElement: React.Dispatch<React.SetStateAction<ReadDataElement>>;
 }
 
-const defaultDataElement: DataElement = {
+const defaultReadDataElement: ReadDataElement = {
   dbName: "website_taipei",
   table: "attractions",
 };
 
 const DataContext = createContext<DataContextType>({
-  dataElement: defaultDataElement,
-  setDataElement: () => {},
+  readDataElement: defaultReadDataElement,
+  setReadDataElement: () => {},
 });
 
 interface DataProviderProps {
@@ -25,11 +44,12 @@ interface DataProviderProps {
 }
 
 export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
-  const [dataElement, setDataElement] =
-    useState<DataElement>(defaultDataElement);
+  const [readDataElement, setReadDataElement] = useState<ReadDataElement>(
+    defaultReadDataElement
+  );
 
   return (
-    <DataContext.Provider value={{ dataElement, setDataElement }}>
+    <DataContext.Provider value={{ readDataElement, setReadDataElement }}>
       {children}
     </DataContext.Provider>
   );

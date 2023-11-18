@@ -8,7 +8,7 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 
-import { fetchTableData } from "./fetchDataButton";
+import { readTableData } from "./readData";
 
 interface Column {
   id: string;
@@ -34,16 +34,15 @@ export const QueryCombineTool = () => {
   const [columns, setColumns] = useState<Column[]>([]);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const readData = async () => {
       try {
-        // 使用 DataElement 对象
-        const dataElement = {
+        const readDataElement = {
           dbName: "website_taipei",
           table: "attractions",
-          limit: "2",
+          limit: 2,
         };
 
-        const [rowData, columnData] = await fetchTableData(dataElement);
+        const [rowData, columnData] = await readTableData(readDataElement);
 
         setData(rowData);
 
@@ -58,11 +57,11 @@ export const QueryCombineTool = () => {
         });
         setColumns(dynamicColumns);
       } catch (error) {
-        console.error("Error fetching data: ", error);
+        console.error("Error reading data: ", error);
       }
     };
 
-    fetchData();
+    readData();
   }, []);
 
   return (

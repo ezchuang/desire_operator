@@ -6,7 +6,7 @@ import { QueryCombineTool } from "./QueryCombineTool";
 import { DataProvider, useData } from "./DataContext";
 
 const Test = () => {
-  const { setDataElement } = useData();
+  const { setReadDataElement } = useData();
 
   const toggleShortcut = () => {
     const panel = document.getElementById("shortcutLinks") as HTMLElement;
@@ -16,7 +16,7 @@ const Test = () => {
       panel.style.display = "none";
     }
 
-    setDataElement((prevElement) => ({
+    setReadDataElement((prevElement) => ({
       dbName:
         prevElement.dbName === "website_taipei"
           ? "website_taipei"

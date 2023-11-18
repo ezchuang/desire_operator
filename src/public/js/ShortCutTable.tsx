@@ -8,7 +8,7 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 
-import { fetchDbsAndTables } from "./fetchDataButton";
+import { readDbsAndTables } from "./readData";
 
 interface Column {
   id: string;
@@ -34,15 +34,13 @@ export const ShortCutTable = () => {
   const [columns, setColumns] = useState<Column[]>([]);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const readData = async () => {
       try {
-        // 使用 DataElement 对象
-        const dataElement = {
+        const readDataElement = {
           dbName: "website_taipei",
         };
 
-        const [rowData, columnData] = await fetchDbsAndTables(dataElement);
-
+        const [rowData, columnData] = await readDbsAndTables(readDataElement);
         setData(rowData);
 
         const dynamicColumns = columnData.map((column: any) => {
@@ -56,11 +54,11 @@ export const ShortCutTable = () => {
         });
         setColumns(dynamicColumns);
       } catch (error) {
-        console.error("Error fetching data: ", error);
+        console.error("Error reading data: ", error);
       }
     };
 
-    fetchData();
+    readData();
   }, []);
 
   return (

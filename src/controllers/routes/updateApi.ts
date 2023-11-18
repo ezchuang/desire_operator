@@ -14,14 +14,16 @@ export default async function updateApiInit() {
       const params: UpdateObj = {
         dbName: req.body.dbName,
         table: req.body.table,
-        data: req.body.columns,
+        data: req.body.data,
+        where: req.body.where,
       };
       const data = await updateUtility.update(params);
 
-      return res.status(200).json({ data: data });
+      return res.status(200).json({ data: data[0].info });
     } catch (err) {
       return res.status(500).json({ error: err });
     }
   });
+
   return updateApi;
 }
