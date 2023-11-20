@@ -1,12 +1,48 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import { MainTable } from "./MainTable";
 import { ShortCutTable } from "./ShortCutTable";
 import { QueryCombineTool } from "./QueryCombineTool";
 import { DataProvider, useData } from "./DataContext";
+import { verifyUser } from "./signin";
 
-const Test = () => {
+import io from "socket.io-client";
+
+const socket = io("/");
+
+socket.on("connect", () => {
+  console.log("Connected to server");
+});
+
+socket.on("disconnect", () => {
+  console.log("Disconnected from server");
+});
+
+socket.on("connected", () => {
+  console.log("connected to server2");
+});
+
+socket.emit("join-room", 10);
+
+// 發送一個事件到伺服器
+socket.emit("someEvent", { someData: "data" });
+
+// 接收從伺服器發送的事件
+socket.on("anotherEvent", (data) => {
+  console.log("Received data:", data);
+});
+
+const Entry: React.FC = () => {
   const { setReadDataElement } = useData();
+
+  useEffect(() => {
+    verifyUser().then((isVerified) => {
+      const signinElement = document.querySelector("#signin");
+      if (signinElement) {
+        signinElement.textContent = isVerified ? "登出" : "登入/註冊";
+      }
+    });
+  }, []);
 
   const toggleShortcut = () => {
     const panel = document.getElementById("shortcutLinks") as HTMLElement;
@@ -40,7 +76,7 @@ const Test = () => {
                 title="用户名全名"
               ></div>
             </div>
-            <div>Navigation Items</div>
+            <div id="signin"> 載入中 </div>
           </div>
         </nav>
 
@@ -96,7 +132,7 @@ const Test = () => {
 const App = () => {
   return (
     <DataProvider>
-      <Test />
+      <Entry />
     </DataProvider>
   );
 };

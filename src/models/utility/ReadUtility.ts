@@ -1,5 +1,5 @@
 import DBUtilityBase from "./DbUtilityBase";
-import { ReadDbsAndTablesObj, ReadObj } from "models/base/QueryObjInterfaces";
+import { ReadDbsAndTablesObj, ReadObj } from "../base/QueryObjInterfaces";
 
 class ReadUtility extends DBUtilityBase {
   async readDBsAndTables(obj: ReadDbsAndTablesObj) {
@@ -11,7 +11,7 @@ class ReadUtility extends DBUtilityBase {
     } else {
       queryStr += "DATABASES";
     }
-    console.log(queryStr);
+    // console.log(queryStr);
     return await this.execute(queryStr, []);
   }
 
@@ -21,8 +21,8 @@ class ReadUtility extends DBUtilityBase {
     const values: any[] = [];
     let queryStr = "SELECT ";
 
-    console.log(obj);
-    console.log(dbName, table, select, where, orderBy, orderDirection, limit);
+    // console.log(obj);
+    // console.log(dbName, table, select, where, orderBy, orderDirection, limit);
 
     if (select && select.length > 0) {
       queryStr += select.join(", ");
@@ -52,7 +52,7 @@ class ReadUtility extends DBUtilityBase {
       values.push(limit);
     }
 
-    console.log(queryStr);
+    // console.log(queryStr);
 
     return await this.execute(queryStr, values);
   }
@@ -61,7 +61,7 @@ class ReadUtility extends DBUtilityBase {
     const { dbName, table } = obj;
     let queryStr = `SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?`;
 
-    console.log(queryStr);
+    // console.log(queryStr);
     return await this.execute(queryStr, [dbName, table]);
   }
 }

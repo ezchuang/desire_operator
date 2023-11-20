@@ -1,5 +1,5 @@
 import DBUtilityBase from "./DbUtilityBase";
-import { DeleteObj } from "models/base/QueryObjInterfaces";
+import { DeleteObj } from "../base/QueryObjInterfaces";
 
 class DeleteUtility extends DBUtilityBase {
   async delete(obj: DeleteObj) {

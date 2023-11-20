@@ -1,15 +1,14 @@
 import { ReadDataElement } from "./DataContext";
+import fetchPackager from "./fetchPackager";
 
 export async function readDbsAndTables(
   element: ReadDataElement
 ): Promise<any[]> {
   try {
-    const response = await fetch("/api/readDbsAndTables", {
-      method: "POST",
-      body: JSON.stringify(element),
-      headers: new Headers({
-        "Content-Type": "application/json",
-      }),
+    const response = await fetchPackager({
+      urlFetch: "/api/readDbsAndTables",
+      methodFetch: "POST",
+      bodyFetch: JSON.stringify(element),
     });
 
     const result = await response.json();
@@ -25,13 +24,12 @@ export async function readDbsAndTables(
 
 export async function readTableData(element: ReadDataElement): Promise<any[]> {
   try {
-    const response = await fetch("/api/readData", {
-      method: "POST",
-      body: JSON.stringify(element),
-      headers: new Headers({
-        "Content-Type": "application/json",
-      }),
+    const response = await fetchPackager({
+      urlFetch: "/api/readData",
+      methodFetch: "POST",
+      bodyFetch: JSON.stringify(element),
     });
+
     const result = await response.json();
     console.log(result.data);
     console.log(result.structure);

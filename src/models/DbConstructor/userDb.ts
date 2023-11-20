@@ -1,10 +1,10 @@
 import permissionsDb from "./permissionsDb";
-import UserUtility from "../../models/utility/UserUtility";
+import UserUtility from "../utility/UserUtility";
 
 const userUtility = new UserUtility(permissionsDb);
 async function createUserDb() {
   return await userUtility.getUserDb({
-    userMail: "test@test.com",
+    userMail: "test2@test.com",
     userPw: "test",
   });
 }

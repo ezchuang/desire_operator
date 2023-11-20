@@ -17,6 +17,7 @@ class Database {
       connectionLimit: config.connectionLimit || 10,
       queueLimit: config.queueLimit || 0, // 0 表示無限等待
     });
+    // console.log("DB connect success.");
   }
 
   getPool(): Pool {

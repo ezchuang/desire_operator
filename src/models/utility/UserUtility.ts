@@ -1,8 +1,11 @@
 import * as dotenv from "dotenv";
 import DbUtilityBase from "./DbUtilityBase";
-import { CreateUserObj, getUserDbObj } from "models/base/QueryObjInterfaces";
-import Database from "../DbConstructor/Database";
-import { DatabaseConfigObj } from "models/base/QueryObjInterfaces";
+import {
+  CreateUserObj,
+  getUserDbObj,
+  DatabaseConfigObj,
+} from "models/base/QueryObjInterfaces";
+import Database from "../dbConstructor/Database";
 
 const Snowflake = require("snowflake-id").default;
 const generator = new Snowflake({ mid: 1 });
@@ -77,7 +80,7 @@ class UserUtility extends DbUtilityBase {
       await this.execute(insertGToUQuery, [groupId, userId, 1]);
     } else {
       // 記得回來加
-      throw new Error("帳密錯誤");
+      throw new Error("資料異常");
     }
 
     await this.createMySQLUser(groupUserName, groupPw);
@@ -88,28 +91,36 @@ class UserUtility extends DbUtilityBase {
     };
   }
 
-  async getUserDb(userObj: getUserDbObj): Promise<Database> {
+  async getUserDb(userObj: getUserDbObj): Promise<[string, Database]> {
     const { userMail, userPw } = userObj;
-    const getUserInfoQuery =
-      "SELECT user_groups.signin_user AS dbUser, user_groups.signin_pw AS dbPw\
+    const getUserDbQuery =
+      "SELECT user_groups.group_name AS groupName,user_groups.signin_user AS dbUser, user_groups.signin_pw AS dbPw\
       FROM user_info.user_groups LEFT JOIN user_info.user_groups_to_users ON user_groups.id = user_groups_to_users.user_groups_id \
       LEFT JOIN user_info.users ON users.id = user_groups_to_users.users_id \
       WHERE users.user_mail = ? AND users.user_pw = ?";
-    const { dbUser, dbPw } = (
-      await this.execute(getUserInfoQuery, [userMail, userPw])
+    const { groupName, dbUser, dbPw } = (
+      await this.execute(getUserDbQuery, [userMail, userPw])
     )[0][0];
+
+    if (globalThis.groupDbMap.has(groupName)) {
+      return [groupName, globalThis.groupDbMap.get(groupName)];
+    }
+
+    // 沒建立過該群組的 DB
     const config: DatabaseConfigObj = {
       user: dbUser,
       password: dbPw,
+      host: process.env.USERDB_HOST!,
     };
-    const userDb = new Database(config);
-    return userDb;
+    const groupDb = new Database(config);
+
+    return [groupName, groupDb];
   }
 
   async getUserInfo(userObj: getUserDbObj): Promise<string[]> {
     const { userMail, userPw } = userObj;
     const getUserInfoQuery =
-      "SELECT users.id AS userId users.user_name AS userName FROM user_info.users WHERE users.user_mail = ? AND users.user_pw = ?";
+      "SELECT users.id AS userId, users.user_name AS userName FROM user_info.users WHERE users.user_mail = ? AND users.user_pw = ?";
     const { userId, userName } = (
       await this.execute(getUserInfoQuery, [userMail, userPw])
     )[0][0];

@@ -1,4 +1,5 @@
-const typeList = {
+// 沒有用到
+export const typeList = {
   0: "DECIMAL",
   1: "TINYINT",
   2: "SMALLINT",

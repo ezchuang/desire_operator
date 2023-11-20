@@ -1,10 +1,11 @@
+import * as dotenv from "dotenv";
 import express, { Express, Request, Response } from "express";
 import http from "http";
-import * as dotenv from "dotenv";
+import Database from "./models/dbConstructor/Database";
 
 // import multer from 'multer';
 // import s3Connector from './models/s3Connector'; // 暫時用不到
-
+import ioConstructor from "./controllers/routes/soeketEntry";
 import createApi from "./controllers/routes/createApi";
 import readApi from "./controllers/routes/readApi";
 import updateApi from "./controllers/routes/updateApi";
@@ -12,18 +13,18 @@ import deleteApi from "./controllers/routes/deleteApi";
 
 dotenv.config();
 
+// JWT secret key
+global.secretKey = process.env.JWT_SECRET_KEY || "your-secret-key";
+// 群組與資料庫連接池的映射，[使用者群組, 群組DB]
+global.groupDbMap = new Map<string, Database>();
+// 用戶對群組映射，[使用者編號, 使用者群組]
+global.userGroupMap = new Map<string, string>();
+
 async function appInit() {
   const app: Express = express();
   const port: number = Number(process.env.PORT) || 5252;
   const server = http.createServer(app);
-
-  // 測試區
-  // const testObj: CreateObj = {
-  //   dbName: 'horror',
-  //   table: 'life'
-  // }
-  // db.create(testObj)
-  // db.execute('', [])
+  ioConstructor(server);
 
   // 暫時用不到
   // const upload = multer({

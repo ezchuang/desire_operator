@@ -1,13 +1,12 @@
 import { UpdateObj } from "./DataContext";
+import fetchPackager from "./fetchPackager";
 
 export async function updateData(element: UpdateObj): Promise<any> {
   try {
-    const response = await fetch("/api/updateData", {
-      method: "POST",
-      body: JSON.stringify(element),
-      headers: new Headers({
-        "Content-Type": "application/json",
-      }),
+    const response = await fetchPackager({
+      urlFetch: "/api/updateData",
+      methodFetch: "POST",
+      bodyFetch: JSON.stringify(element),
     });
 
     console.log(response);

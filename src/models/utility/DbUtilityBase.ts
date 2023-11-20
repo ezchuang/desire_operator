@@ -1,5 +1,5 @@
 import { Pool, PoolConnection, FieldPacket } from "mysql2";
-import Database from "../DbConstructor/Database";
+import Database from "../dbConstructor/Database";
 
 class DbUtilityBase {
   private database: Database;
@@ -28,7 +28,7 @@ class DbUtilityBase {
     try {
       const result = await new Promise<[any, FieldPacket[]]>(
         (resolve, reject) => {
-          console.log(queryStr, values);
+          // console.log(queryStr, values);
           connection.query(queryStr, values, (err, res, fields) => {
             if (err) reject([err]);
             else resolve([res, fields]);

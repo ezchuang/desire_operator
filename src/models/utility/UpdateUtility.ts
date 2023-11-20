@@ -1,5 +1,5 @@
 import DBUtilityBase from "./DbUtilityBase";
-import { UpdateObj } from "models/base/QueryObjInterfaces";
+import { UpdateObj } from "../base/QueryObjInterfaces";
 
 class UpdateUtility extends DBUtilityBase {
   async update(obj: UpdateObj) {

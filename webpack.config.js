@@ -1,7 +1,7 @@
 const path = require("path");
 
 module.exports = {
-  entry: "./src/public/js/index.tsx",
+  entry: "./src/frontendFunctions/entry.tsx",
   module: {
     rules: [
       {
@@ -9,7 +9,7 @@ module.exports = {
         use: "ts-loader",
         exclude: /node_modules/,
       },
-      // 其他 loader 配置，例如样式和图片处理
+      // 其他 loader 配置
     ],
   },
   resolve: {
