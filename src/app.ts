@@ -49,6 +49,10 @@ async function appInit() {
     return res.render("index");
   });
 
+  app.get("/main", (req: Request, res: Response) => {
+    return res.render("main");
+  });
+
   // import * as jwt from "jsonwebtoken";
 
   server.listen(port, () => {
