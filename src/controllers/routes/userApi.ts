@@ -3,20 +3,19 @@ import {
   CreateUserObj,
   getUserDbObj,
 } from "../../models/base/QueryObjInterfaces";
+import UserUtility from "../../models/utility/UserUtility";
 import rootDb from "../../models/dbConstructor/rootDb";
 import jwt from "jsonwebtoken";
-// import userDb from "../../models/DbConstructor/userDb";
-import userUtility from "../../models/utility/UserUtility";
 
 export default async function userApiInit() {
   const userApi: IRouter = express.Router();
 
-  const rootUserUtility = new userUtility(rootDb);
-  // const userUserUtility = new userUtility(await userDb);
+  const rootUtility = new UserUtility(rootDb);
 
   /* 寫一個 middleware 驗證使用者 */
   /* 多寫一個 model 用來檢測使用者 */
 
+  // 創建使用者
   userApi.post("/createUser", async (req: Request, res: Response) => {
     try {
       const params: CreateUserObj = {
@@ -31,12 +30,12 @@ export default async function userApiInit() {
         throw new Error("ValidationError");
       }
 
-      const result = await rootUserUtility.createUser(params);
+      const result = await rootUtility.createUser(params);
       if (!result) {
         throw new Error("DuplicateEmail");
       }
 
-      res.status(200).json({ ok: true });
+      res.status(200).json({ success: true });
     } catch (error) {
       let msg = "";
       if (error instanceof Error) {
@@ -62,6 +61,7 @@ export default async function userApiInit() {
     }
   });
 
+  // 登入
   userApi.post("/signin", async (req: Request, res: Response) => {
     try {
       const params: getUserDbObj = {
@@ -74,18 +74,18 @@ export default async function userApiInit() {
       }
 
       // 撈出 [使用者編號, 使用者暱稱]
-      const userInfo = await rootUserUtility.getUserInfo(params);
-      if (!userInfo) {
+      const userInfo = await rootUtility.getUserInfo(params);
+      if (!userInfo || userInfo.length <= 0) {
         throw new Error("InvalidCredentials");
       }
 
       // 撈出 [使用者群組, 群組DB]
-      const [groupName, groupDb] = await rootUserUtility.getUserDb(params);
+      const [groupName, groupDb] = await rootUtility.getUserDb(params);
       global.groupDbMap.set(groupName, groupDb);
       global.userGroupMap.set(userInfo[0], groupName);
 
       const token = jwt.sign(
-        { userId: userInfo[1], userEmail: params.userMail },
+        { userId: userInfo[0], userEmail: params.userMail },
         global.secretKey,
         { expiresIn: "1h" }
       );
@@ -114,9 +114,10 @@ export default async function userApiInit() {
     }
   });
 
+  // 已登入驗證
   userApi.get("/auth", (req: Request, res: Response) => {
     try {
-      const token = req.headers.authorization?.split(" ")[1]; // 假设使用 "Bearer <token>" 格式
+      const token = req.headers.authorization?.split(" ")[1];
       if (!token) {
         throw new Error("NoTokenProvided");
       }
@@ -130,9 +131,11 @@ export default async function userApiInit() {
           case "NoTokenProvided":
             msg = "No token provided";
             break;
+
           case "jwt expired":
             msg = "JWT expired";
             break;
+
           default:
             console.error(error);
             return res.status(500).json({ error: true, message: "伺服器錯誤" });

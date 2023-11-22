@@ -32,7 +32,7 @@ export interface CreateUserObj {
 
 export interface getUserDbObj {
   userMail: string;
-  userPw: string;
+  userPw?: string;
 }
 
 export interface CreateDbObj {

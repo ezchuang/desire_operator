@@ -129,7 +129,7 @@ const Entry: React.FC = () => {
   );
 };
 
-const App = () => {
+const App: React.FC = () => {
   return (
     <DataProvider>
       <Entry />

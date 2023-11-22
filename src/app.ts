@@ -2,10 +2,12 @@ import * as dotenv from "dotenv";
 import express, { Express, Request, Response } from "express";
 import http from "http";
 import Database from "./models/dbConstructor/Database";
+// import verifyToken from "./controllers/verifyToken";
 
 // import multer from 'multer';
 // import s3Connector from './models/s3Connector'; // 暫時用不到
 import ioConstructor from "./controllers/routes/soeketEntry";
+import userApi from "./controllers/routes/userApi";
 import createApi from "./controllers/routes/createApi";
 import readApi from "./controllers/routes/readApi";
 import updateApi from "./controllers/routes/updateApi";
@@ -40,6 +42,7 @@ async function appInit() {
   app.use(express.urlencoded({ extended: true }));
 
   // Routers
+  app.use("/api", await userApi());
   app.use("/api", await createApi());
   app.use("/api", await readApi());
   app.use("/api", await updateApi());

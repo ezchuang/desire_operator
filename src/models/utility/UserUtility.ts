@@ -15,26 +15,29 @@ dotenv.config();
 const mySqlSever = process.env.USERDB_HOST!;
 
 class UserUtility extends DbUtilityBase {
+  // 針對帳密加密儲存，尚未啟用
   private async hashUserInfo(
     username: string,
     password: string
   ): Promise<string[]> {
-    // 加密邏輯
     const un = username;
     const pw = password;
     return [un, pw];
   }
 
+  // 新群組用的自動生成邀請碼
   private createInvitationCode(): string {
     const snowflakeId = String(generator.generate());
     return snowflakeId;
   }
 
+  // 建立 MySQL 的使用者
   private async createMySQLUser(username: string, password: string) {
     let queryStr = `CREATE USER ?@? IDENTIFIED BY ?`;
     await this.execute(queryStr, [username, mySqlSever, password]);
   }
 
+  // 主要的 創建使用者 函式
   async createUser(userObj: CreateUserObj) {
     const { userMail, userPw, userName, invitationCode, groupName } = userObj;
 
@@ -91,6 +94,7 @@ class UserUtility extends DbUtilityBase {
     };
   }
 
+  // 取得既有 DB 連線(不是直接回傳 Pool)
   async getUserDb(userObj: getUserDbObj): Promise<[string, Database]> {
     const { userMail, userPw } = userObj;
     const getUserDbQuery =
@@ -117,14 +121,48 @@ class UserUtility extends DbUtilityBase {
     return [groupName, groupDb];
   }
 
+  // 取得使用者資料
   async getUserInfo(userObj: getUserDbObj): Promise<string[]> {
     const { userMail, userPw } = userObj;
     const getUserInfoQuery =
       "SELECT users.id AS userId, users.user_name AS userName FROM user_info.users WHERE users.user_mail = ? AND users.user_pw = ?";
-    const { userId, userName } = (
-      await this.execute(getUserInfoQuery, [userMail, userPw])
+    const results = await this.execute(getUserInfoQuery, [userMail, userPw]);
+
+    if (results.length > 0 && results[0].length > 0) {
+      const { userId, userName } = results[0][0];
+      console.log("userId, userName: ", userId, userName);
+      return [userId, userName];
+    } else {
+      // throw new Error('User not found.');
+      return [];
+    }
+  }
+
+  // 在有 Token 的情況下使用
+  async getUserDbByToken(userObj: getUserDbObj): Promise<[string, Database]> {
+    const { userMail, userPw } = userObj;
+    const getUserDbQuery =
+      "SELECT user_groups.group_name AS groupName,user_groups.signin_user AS dbUser, user_groups.signin_pw AS dbPw\
+      FROM user_info.user_groups LEFT JOIN user_info.user_groups_to_users ON user_groups.id = user_groups_to_users.user_groups_id \
+      LEFT JOIN user_info.users ON users.id = user_groups_to_users.users_id \
+      WHERE users.user_mail = ?";
+    const { groupName, dbUser, dbPw } = (
+      await this.execute(getUserDbQuery, [userMail, userPw])
     )[0][0];
-    return [userId, userName];
+
+    if (globalThis.groupDbMap.has(groupName)) {
+      return [groupName, globalThis.groupDbMap.get(groupName)];
+    }
+
+    // 沒建立過該群組的 DB
+    const config: DatabaseConfigObj = {
+      user: dbUser,
+      password: dbPw,
+      host: process.env.USERDB_HOST!,
+    };
+    const groupDb = new Database(config);
+
+    return [groupName, groupDb];
   }
 }
 
