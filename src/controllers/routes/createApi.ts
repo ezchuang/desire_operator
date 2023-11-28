@@ -1,5 +1,5 @@
 import express, { Request, Response, IRouter } from "express";
-import { CreateDbObj, CreateObj } from "../../models/base/QueryObjInterfaces";
+import { CreateDbObj, CreateObj } from "../../models/base/Interfaces";
 import rootDb from "../../models/dbConstructor/rootDb";
 import CreateUtility from "../../models/utility/CreateUtility";
 import verifyToken from "../../controllers/verifyToken";
@@ -8,10 +8,6 @@ export default async function createApiInit() {
   const createApi: IRouter = express.Router();
 
   const rootCreateUtility = new CreateUtility(rootDb);
-  // const userCreateUtility = new CreateUtility(await userDb);
-
-  /* 寫一個 middleware 驗證使用者 */
-  /* 多寫一個 model 用來檢測使用者 */
 
   createApi.post(
     "/createDb",
@@ -19,16 +15,15 @@ export default async function createApiInit() {
     async (req: Request, res: Response) => {
       console.log("createDb");
       try {
-        /* 做 token 轉換後，未完成 */
-        const userID = req.body.creatorUsername;
+        const userGroup = req.userGroup;
 
         const params: CreateDbObj = {
           dbName: req.body.dbName,
-          creatorUsername: userID,
+          groupName: userGroup,
         };
-        const data = await rootCreateUtility.createDb(params); // true or error
+        const data = await rootCreateUtility.createDb(params);
 
-        return res.status(200).json({ data: data });
+        return res.status(200).json({ data: data }); // data: true or error
       } catch (err) {
         return res.status(500).json({ error: err });
       }

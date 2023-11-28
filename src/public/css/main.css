@@ -12,7 +12,7 @@
 .floating-btn {
   /* 添加適畜的樣式，比如大小、顏色等 */
   border-radius: 10px;
-  padding: 4px;
+  padding: 8px;
   background-color: rgb(2, 142, 142);
 }
 
@@ -22,4 +22,28 @@
   bottom: 100%; /* 使其顯示在按鈕的上方 */
   right: 0;
   /* 其他樣式根據需要添加 */
+}
+
+.fullScreenCentered {
+  @apply fixed top-0 left-0 h-full w-full flex items-center justify-center z-50;
+}
+
+.formContainer {
+  @apply absolute top-20 left-1/2 transform -translate-x-1/2 bg-white shadow-lg rounded-md overflow-hidden w-80;
+}
+
+.formInner {
+  @apply flex flex-col items-center py-6;
+}
+
+.formField {
+  @apply w-full p-2 border border-gray-300 rounded mt-2 text-black;
+}
+
+.primaryButton {
+  @apply bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4;
+}
+
+.secondaryButton {
+  @apply bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mt-2;
 }

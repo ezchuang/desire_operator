@@ -3,9 +3,6 @@ import jwt from "jsonwebtoken";
 import rootDb from "../models/dbConstructor/rootDb";
 import UserUtility from "../models/utility/UserUtility";
 
-// export interface RequestWithUser extends Request {
-//   user: jwt.JwtPayload;
-// }
 const rootUtility = new UserUtility(rootDb);
 
 const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
@@ -17,25 +14,22 @@ const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const decoded = jwt.verify(token, global.secretKey) as jwt.JwtPayload;
     req.user = decoded;
-    console.log(req.user);
 
     let userGroup = globalThis.userGroupMap.get(req.user!.userId) as string;
+
+    // 若是伺服器有重啟，就需要走這裡，由 Token 建立 DB Connection
     if (!userGroup) {
-      const [groupName, groupDb] = await rootUtility.getUserDbByToken(
-        req.user.userEmail
-      );
+      const [groupName, groupDb] = await rootUtility.getUserDbByToken({
+        userId: req.user.userId,
+        userMail: req.user.userEmail,
+      });
       global.groupDbMap.set(groupName, groupDb);
       global.userGroupMap.set(req.user.userId, groupName);
       userGroup = groupName;
-      console.log("global.groupDbMap: ", global.groupDbMap);
-      console.log("global.userGroupMap: ", global.userGroupMap);
-      console.log("groupName: ", groupName);
-      console.log("groupDb: ", groupDb);
     }
-    const groupDb = globalThis.groupDbMap.get(userGroup);
-    req.db = groupDb;
 
-    console.log("db: ", req.db);
+    req.userGroup = userGroup;
+    req.db = globalThis.groupDbMap.get(userGroup);
 
     next();
   } catch (error) {

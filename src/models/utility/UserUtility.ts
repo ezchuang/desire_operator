@@ -4,7 +4,7 @@ import {
   CreateUserObj,
   getUserDbObj,
   DatabaseConfigObj,
-} from "models/base/QueryObjInterfaces";
+} from "models/base/Interfaces";
 import Database from "../dbConstructor/Database";
 
 const Snowflake = require("snowflake-id").default;
@@ -12,7 +12,8 @@ const generator = new Snowflake({ mid: 1 });
 
 dotenv.config();
 
-const mySqlSever = process.env.USERDB_HOST!;
+// 應該用不到，我當初設計有點誤解
+// const mySqlSever = process.env.USERDB_HOST!;
 
 class UserUtility extends DbUtilityBase {
   // 針對帳密加密儲存，尚未啟用
@@ -20,8 +21,8 @@ class UserUtility extends DbUtilityBase {
     username: string,
     password: string
   ): Promise<string[]> {
-    const un = username;
-    const pw = password;
+    const un = "999" + username;
+    const pw = "999" + password;
     return [un, pw];
   }
 
@@ -33,15 +34,15 @@ class UserUtility extends DbUtilityBase {
 
   // 建立 MySQL 的使用者
   private async createMySQLUser(username: string, password: string) {
-    let queryStr = `CREATE USER ?@? IDENTIFIED BY ?`;
-    await this.execute(queryStr, [username, mySqlSever, password]);
+    // let queryStr = `CREATE USER ?@? IDENTIFIED BY ?`;
+    // await this.execute(queryStr, [username, mySqlSever, password]);
+    let queryStr = `CREATE USER ?@\`localhost\` IDENTIFIED BY ?`;
+    await this.execute(queryStr, [username, password]);
   }
 
   // 主要的 創建使用者 函式
   async createUser(userObj: CreateUserObj) {
     const { userMail, userPw, userName, invitationCode, groupName } = userObj;
-
-    const [groupUserName, groupPw] = await this.hashUserInfo(userMail, userPw);
 
     const insertUserQuery = `INSERT INTO user_info.users (user_mail, user_pw, user_name) VALUES (?, ?, ?)`;
     await this.execute(insertUserQuery, [userMail, userPw, userName]);
@@ -59,11 +60,17 @@ class UserUtility extends DbUtilityBase {
       )[0][0].id;
 
       // verify 有機會再回頭加
-      const insertGroupQuery = `INSERT INTO user_info.user_groups (group_table_id, user_table_id, verify) VALUES (?, ?, ?)`;
+      const insertGroupQuery = `INSERT INTO user_info.user_groups_to_users (user_groups_id, users_id, verify) VALUES (?, ?, ?)`;
       await this.execute(insertGroupQuery, [groupId, userId, 1]);
     } else if (groupName) {
       // 建立新的 Group
       const newInvitationCode = this.createInvitationCode();
+
+      // 加密使用者帳密用作 Group 登入用
+      const [groupUserName, groupPw] = await this.hashUserInfo(
+        userMail,
+        userPw
+      );
 
       const insertGroupQuery = `INSERT INTO user_info.user_groups (group_name, owner_mail, signin_user, signin_pw, invitation_code) VALUES (?, ?, ?, ?, ?)`;
       await this.execute(insertGroupQuery, [
@@ -81,12 +88,12 @@ class UserUtility extends DbUtilityBase {
 
       const insertGToUQuery = `INSERT INTO user_info.user_groups_to_users (group_table_id, user_table_id, verify) VALUES (?, ?, ?)`;
       await this.execute(insertGToUQuery, [groupId, userId, 1]);
+
+      await this.createMySQLUser(groupUserName, groupPw);
     } else {
       // 記得回來加
       throw new Error("資料異常");
     }
-
-    await this.createMySQLUser(groupUserName, groupPw);
 
     return {
       success: true,
@@ -140,14 +147,13 @@ class UserUtility extends DbUtilityBase {
 
   // 在有 Token 的情況下使用
   async getUserDbByToken(userObj: getUserDbObj): Promise<[string, Database]> {
-    const { userMail, userPw } = userObj;
-    const getUserDbQuery =
-      "SELECT user_groups.group_name AS groupName,user_groups.signin_user AS dbUser, user_groups.signin_pw AS dbPw\
-      FROM user_info.user_groups LEFT JOIN user_info.user_groups_to_users ON user_groups.id = user_groups_to_users.user_groups_id \
-      LEFT JOIN user_info.users ON users.id = user_groups_to_users.users_id \
-      WHERE users.user_mail = ?";
+    const { userId, userMail } = userObj;
+    const getUserDbQuery = `SELECT user_groups.group_name AS groupName,user_groups.signin_user AS dbUser, user_groups.signin_pw AS dbPw
+      FROM user_info.user_groups LEFT JOIN user_info.user_groups_to_users ON user_groups.id = user_groups_to_users.user_groups_id
+      LEFT JOIN user_info.users ON users.id = user_groups_to_users.users_id
+      WHERE users.id = ? AND users.user_mail = ?`;
     const { groupName, dbUser, dbPw } = (
-      await this.execute(getUserDbQuery, [userMail, userPw])
+      await this.execute(getUserDbQuery, [userId, userMail])
     )[0][0];
 
     if (globalThis.groupDbMap.has(groupName)) {

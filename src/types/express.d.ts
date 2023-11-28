@@ -6,6 +6,7 @@ declare global {
     interface Request {
       user?: JwtPayload;
       db?: Database;
+      userGroup: string;
     }
   }
 }

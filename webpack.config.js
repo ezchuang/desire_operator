@@ -2,8 +2,8 @@ const path = require("path");
 
 module.exports = {
   entry: {
-    index: "./src/frontendFunctions/index/indexEntry.tsx", // 路徑修改為您的 indexEntry.tsx 檔案位置
-    main: "./src/frontendFunctions/main/mainEntry.tsx", // 路徑修改為您的 mainEntry.tsx 檔案位置
+    index: "./src/frontendFunctions/indexEntry.tsx", // 路徑修改為您的 indexEntry.tsx 檔案位置
+    main: "./src/frontendFunctions/mainEntry.tsx", // 路徑修改為您的 mainEntry.tsx 檔案位置
   },
   module: {
     rules: [

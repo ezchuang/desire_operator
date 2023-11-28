@@ -1,20 +1,23 @@
 import DBUtilityBase from "./DbUtilityBase";
-import { ReadDbsAndTablesObj, ReadObj } from "../base/QueryObjInterfaces";
+import { ReadDbsAndTablesObj, ReadObj } from "../base/Interfaces";
 
 class ReadUtility extends DBUtilityBase {
-  async readDBsAndTables(obj: ReadDbsAndTablesObj) {
+  // 讀取 DBs or Tables
+  async readDbsOrTables(obj: ReadDbsAndTablesObj) {
     const { dbName } = obj;
     let queryStr = "SHOW ";
 
     if (dbName) {
-      queryStr += `TABLES FROM ${dbName}`;
+      queryStr += `TABLES FROM \`${dbName}\``;
+      return await this.execute(queryStr, []);
     } else {
       queryStr += "DATABASES";
+      return await this.execute(queryStr, []);
     }
     // console.log(queryStr);
-    return await this.execute(queryStr, []);
   }
 
+  // 讀取 Table 內部資料
   async read(obj: ReadObj) {
     const { dbName, table, select, where, orderBy, orderDirection, limit } =
       obj;
@@ -52,16 +55,18 @@ class ReadUtility extends DBUtilityBase {
       values.push(limit);
     }
 
-    // console.log(queryStr);
+    console.log(queryStr, values);
 
     return await this.execute(queryStr, values);
   }
 
+  // 取得 [{COLUMN_NAME, DATA_TYPE}]
   async readTableStructures(obj: ReadObj) {
     const { dbName, table } = obj;
     let queryStr = `SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?`;
 
-    // console.log(queryStr);
+    console.log(queryStr, [dbName, table]);
+
     return await this.execute(queryStr, [dbName, table]);
   }
 }

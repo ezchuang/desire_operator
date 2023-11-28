@@ -1,6 +1,6 @@
 // 尚未寫到 ? 針對 column type 的 驗證
 import mysql2, { Pool } from "mysql2";
-import { DatabaseConfigObj } from "models/base/QueryObjInterfaces";
+import { DatabaseConfigObj } from "models/base/Interfaces";
 
 class Database {
   private pool: Pool;

@@ -2,7 +2,8 @@ import express, { Request, Response, IRouter } from "express";
 import {
   CreateUserObj,
   getUserDbObj,
-} from "../../models/base/QueryObjInterfaces";
+  UserPayload,
+} from "../../models/base/Interfaces";
 import UserUtility from "../../models/utility/UserUtility";
 import rootDb from "../../models/dbConstructor/rootDb";
 import jwt from "jsonwebtoken";
@@ -85,14 +86,18 @@ export default async function userApiInit() {
       global.userGroupMap.set(userInfo[0], groupName);
 
       const token = jwt.sign(
-        { userId: userInfo[0], userEmail: params.userMail },
+        {
+          userId: userInfo[0],
+          userEmail: params.userMail,
+          userName: userInfo[1],
+        },
         global.secretKey,
-        { expiresIn: "1h" }
+        { expiresIn: "7d" }
       );
 
       res
         .status(200)
-        .json({ success: true, token: token, userName: userInfo[1] });
+        .json({ success: true, data: { token: token, userName: userInfo[1] } });
     } catch (error) {
       let msg = "";
       if (error instanceof Error) {
@@ -122,8 +127,13 @@ export default async function userApiInit() {
         throw new Error("NoTokenProvided");
       }
 
-      const decoded = jwt.verify(token, global.secretKey);
-      res.status(200).json({ success: true, data: decoded });
+      const decoded = jwt.verify(token, global.secretKey) as UserPayload;
+      const resData = {
+        userEmail: decoded.userEmail,
+        userId: decoded.userId,
+        userName: decoded.userName,
+      };
+      res.status(200).json({ success: true, data: resData });
     } catch (error) {
       let msg = "";
       if (error instanceof Error) {

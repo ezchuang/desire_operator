@@ -15,7 +15,7 @@
 }
 
 .formField {
-  @apply w-full p-2 border border-gray-300 rounded mt-2;
+  @apply w-full p-2 border border-gray-300 rounded mt-2 text-black;
 }
 
 .primaryButton {

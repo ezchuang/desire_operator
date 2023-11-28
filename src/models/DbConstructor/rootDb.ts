@@ -1,6 +1,6 @@
 import * as dotenv from "dotenv";
 import Database from "./Database";
-import { DatabaseConfigObj } from "../base/QueryObjInterfaces";
+import { DatabaseConfigObj } from "../base/Interfaces";
 
 dotenv.config();
 
