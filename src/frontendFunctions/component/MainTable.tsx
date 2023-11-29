@@ -150,6 +150,10 @@ const MainTable: React.FC = () => {
   useEffect(() => {
     const readData = async () => {
       try {
+        if (!readDataElement.dbName || !readDataElement.table) {
+          return;
+        }
+
         // read 修改數據的地方，return [列資料, 表頭資料 / 行分類 + CSS Style]
         const response = await readTableData(readDataElement);
 

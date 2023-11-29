@@ -33,12 +33,17 @@ class ReadUtility extends DBUtilityBase {
       queryStr += "*";
     }
 
-    queryStr += ` FROM ${dbName}.${table}`;
+    // 這段要再改，看是改成 return [false, errMsg] 如何
+    if (!dbName || !table) {
+      throw new Error("Database name or table name is missing or invalid.");
+    }
+
+    queryStr += ` FROM \`${dbName}\`.\`${table}\``;
 
     if (where && where.length > 0) {
       const whereClauses = where.map((condition) => {
         values.push(condition.value);
-        return `\`${condition.column}\` \`${condition.operator}\` ?`;
+        return `\`${condition.column}\` ${condition.operator} ?`;
       });
       queryStr += " WHERE " + whereClauses.join(" AND ");
     }
@@ -46,7 +51,7 @@ class ReadUtility extends DBUtilityBase {
     if (orderBy) {
       queryStr += ` ORDER BY \`${orderBy}\``;
       if (orderDirection) {
-        queryStr += ` \`${orderDirection}\``;
+        queryStr += ` ${orderDirection}`;
       }
     }
 

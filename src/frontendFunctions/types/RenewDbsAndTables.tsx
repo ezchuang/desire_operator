@@ -61,6 +61,7 @@ function deepEqual(obj1: any, obj2: any): boolean {
   return false;
 }
 
+// 深比較
 function deepCompareArrays(arr1: any[], arr2: any[]): boolean {
   if (arr1.length !== arr2.length) {
     return false;

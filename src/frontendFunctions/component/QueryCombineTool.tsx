@@ -157,6 +157,10 @@ const QueryCombineTool: React.FC = () => {
         return;
       }
 
+      if (!readDataElement.dbName || !readDataElement.table) {
+        return;
+      }
+
       const response = await readTableData(readDataElement);
 
       const columnNames = response[1].map((column: any) => {
@@ -193,6 +197,10 @@ const QueryCombineTool: React.FC = () => {
   useEffect(() => {
     const renewColumnsData = async () => {
       if (readDataElement.dbName === "" && readDataElement.table === "") {
+        return;
+      }
+
+      if (!readDataElement.dbName || !readDataElement.table) {
         return;
       }
 
