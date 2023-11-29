@@ -4,13 +4,19 @@ import { HistoryRecord } from "models/base/Interfaces";
 class HistoryUtility extends DbUtilityBase {
   // 新增歷史記錄
   async addHistoryRecord(record: HistoryRecord) {
-    const { id, actionType, queryHistory } = record;
-    const values = [id, actionType, queryHistory];
+    try {
+      const { id, actionType, queryHistory } = record;
+      const values = [id, actionType, queryHistory];
 
-    const queryStr = `INSERT INTO user_info.query_history (user_groups_to_users_id, action_type, query_history) VALUES (?, ?, ?)`;
-    await this.execute(queryStr, values);
+      const queryStr = `INSERT INTO user_info.query_history (user_id, action_type, query_history) VALUES (?, ?, ?)`;
 
-    return true;
+      console.log(queryStr, values);
+      await this.execute(queryStr, values);
+
+      return true;
+    } catch (error) {
+      console.error("Error adding history record:", error);
+    }
   }
 
   // 根據用戶的群組 ID 獲取歷史記錄
@@ -36,8 +42,6 @@ class HistoryUtility extends DbUtilityBase {
       `;
 
     return await this.execute(queryStr, [groupName]);
-
-    // 這裡可以添加其他方法，如新增、更新或刪除歷史記錄
   }
 }
 

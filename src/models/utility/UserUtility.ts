@@ -12,17 +12,16 @@ const generator = new Snowflake({ mid: 1 });
 
 dotenv.config();
 
-// 應該用不到，我當初設計有點誤解
-// const mySqlSever = process.env.USERDB_HOST!;
+// const mySqlSever = process.env.USERDB_HOST!; // 應該用不到，我當初設計有點誤解
 
 class UserUtility extends DbUtilityBase {
-  // 針對帳密加密儲存，尚未啟用
+  // 針對帳密加密儲存，尚未設計
   private async hashUserInfo(
     username: string,
     password: string
   ): Promise<string[]> {
-    const un = "999" + username;
-    const pw = "999" + password;
+    const un = "a999a" + username;
+    const pw = "a999a" + password;
     return [un, pw];
   }
 
@@ -36,7 +35,7 @@ class UserUtility extends DbUtilityBase {
   private async createMySQLUser(username: string, password: string) {
     // let queryStr = `CREATE USER ?@? IDENTIFIED BY ?`;
     // await this.execute(queryStr, [username, mySqlSever, password]);
-    let queryStr = `CREATE USER ?@\`localhost\` IDENTIFIED BY ?`;
+    let queryStr = `CREATE USER ?@\`%\` IDENTIFIED BY ?`;
     await this.execute(queryStr, [username, password]);
   }
 
@@ -47,7 +46,7 @@ class UserUtility extends DbUtilityBase {
     const insertUserQuery = `INSERT INTO user_info.users (user_mail, user_pw, user_name) VALUES (?, ?, ?)`;
     await this.execute(insertUserQuery, [userMail, userPw, userName]);
 
-    const getUserIdQuery = `SELECT id FROM user_info.users WHERE user_mail=? AND user_pw=?`;
+    const getUserIdQuery = `SELECT id FROM user_info.users WHERE user_mail = ? AND user_pw = ?`;
     const userId = (
       await this.execute(getUserIdQuery, [userMail, userPw])
     )[0][0].id;
@@ -81,12 +80,12 @@ class UserUtility extends DbUtilityBase {
         newInvitationCode,
       ]);
 
-      const getGroupIdQuery = `SELECT id FROM user_info.user_groups WHERE invitation_code=?`;
+      const getGroupIdQuery = `SELECT id FROM user_info.user_groups WHERE invitation_code = ?`;
       const groupId = (
         await this.execute(getGroupIdQuery, [newInvitationCode])
       )[0][0].id;
 
-      const insertGToUQuery = `INSERT INTO user_info.user_groups_to_users (group_table_id, user_table_id, verify) VALUES (?, ?, ?)`;
+      const insertGToUQuery = `INSERT INTO user_info.user_groups_to_users (user_groups_id, users_id, verify) VALUES (?, ?, ?)`;
       await this.execute(insertGToUQuery, [groupId, userId, 1]);
 
       await this.createMySQLUser(groupUserName, groupPw);

@@ -13,9 +13,6 @@ export default async function userApiInit() {
 
   const rootUtility = new UserUtility(rootDb);
 
-  /* 寫一個 middleware 驗證使用者 */
-  /* 多寫一個 model 用來檢測使用者 */
-
   // 創建使用者
   userApi.post("/createUser", async (req: Request, res: Response) => {
     try {

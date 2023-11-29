@@ -1,7 +1,5 @@
 import express, { Request, Response, IRouter } from "express";
 import { ReadDbsAndTablesObj, ReadObj } from "../../models/base/Interfaces";
-// import rootDb from "../../models/getDb/rootDb";
-// import userDb from "../../models/DbConstructor/userDb";
 import ReadUtility from "../../models/utility/ReadUtility";
 import dataClean from "../../controllers/dataClean";
 import verifyToken from "../../controllers/verifyToken";
@@ -15,6 +13,7 @@ export default async function readApiInit() {
     verifyToken,
     async (req: Request, res: Response) => {
       console.log("readDbsOrTables");
+
       try {
         const readUtility = new ReadUtility(req.db);
 
@@ -40,12 +39,10 @@ export default async function readApiInit() {
     verifyToken,
     async (req: Request, res: Response) => {
       console.log("readDbsAndTables");
+
       try {
         const readUtility = new ReadUtility(req.db);
 
-        // const paramsDbs: ReadDbsAndTablesObj = {
-        //   dbName: undefined,
-        // };
         const [data, structure] = await readUtility.readDbsOrTables({});
 
         // 取出 dictionary cursor 的 key
@@ -54,25 +51,25 @@ export default async function readApiInit() {
           data.length > 0 ? Object.keys(data[0])[0] : "";
 
         const dataCluster = await Promise.all(
-          data.map(async (dbsObj: any) => {
-            const paramsTables: ReadDbsAndTablesObj = {
-              dbName: dbsObj[dbsDataKey],
-            };
-            const tablesDataArr = await readUtility.readDbsOrTables(
-              paramsTables
-            );
-            return {
-              [dbsDataKey.toLowerCase()]: dbsObj[dbsDataKey],
-              tables: tablesDataArr[0],
-            };
-          })
+          data
+            .filter(
+              (dbsObj: any) =>
+                dbsObj[dbsDataKey] !== `information_schema` &&
+                dbsObj[dbsDataKey] !== `performance_schema`
+            )
+            .map(async (dbsObj: any) => {
+              const paramsTables: ReadDbsAndTablesObj = {
+                dbName: dbsObj[dbsDataKey],
+              };
+              const tablesDataArr = await readUtility.readDbsOrTables(
+                paramsTables
+              );
+              return {
+                [dbsDataKey.toLowerCase()]: dbsObj[dbsDataKey],
+                tables: tablesDataArr[0],
+              };
+            })
         );
-
-        // console.log(data);
-        // console.log(data[0][dbsDataKey]);
-        // console.log(Object.keys(data[0])[0]);
-        // console.log(dataCluster);
-        // console.log(structure);
 
         return res
           .status(200)
@@ -90,6 +87,7 @@ export default async function readApiInit() {
     verifyToken,
     async (req: Request, res: Response) => {
       console.log("readData");
+
       try {
         const readUtility = new ReadUtility(req.db);
 

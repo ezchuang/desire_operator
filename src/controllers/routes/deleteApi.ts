@@ -13,11 +13,12 @@ export default async function deleteApiInit() {
     async (req: Request, res: Response) => {
       try {
         const deleteUtility = new DeleteUtility(req.db);
+        const userId = req.user!.userId;
 
         const params: DeleteObj = {
           dbName: req.body.dbName,
         };
-        const data = await deleteUtility.dropDatabase(params);
+        const data = await deleteUtility.dropDatabase(userId, params);
 
         return res.status(200).json({ data: data });
       } catch (err) {
@@ -33,12 +34,13 @@ export default async function deleteApiInit() {
     async (req: Request, res: Response) => {
       try {
         const deleteUtility = new DeleteUtility(req.db);
+        const userId = req.user!.userId;
 
         const params: DeleteObj = {
           dbName: req.body.dbName,
           table: req.body.table,
         };
-        const data = await deleteUtility.dropTable(params);
+        const data = await deleteUtility.dropTable(userId, params);
 
         return res.status(200).json({ data: data });
       } catch (err) {
@@ -56,14 +58,14 @@ export default async function deleteApiInit() {
 
       try {
         const deleteUtility = new DeleteUtility(req.db);
+        const userId = req.user!.userId;
 
         const params: DeleteObj = {
           dbName: req.body.dbName,
           table: req.body.table,
           where: req.body.where, // 若不需要此值，前端須給空 Array
-          /* 檢查是否需要在這邊展開 where 內層 */
         };
-        const data = await deleteUtility.delete(params);
+        const data = await deleteUtility.delete(userId, params);
 
         return res.status(200).json({ data: data });
       } catch (err) {

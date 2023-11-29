@@ -25,6 +25,7 @@ const SignInUpForm: React.FC = () => {
         body: JSON.stringify(data),
       });
       const result = await response.json();
+
       if (response.status === 200 && result.success) {
         // 將 Token 寫入 localStorage
         localStorage.setItem("token", result.data.token);
@@ -56,9 +57,15 @@ const SignInUpForm: React.FC = () => {
         body: JSON.stringify(data),
       });
       const result = await response.json();
-      if (result.success) {
+
+      if (response.status === 200 && result.success) {
         setIsVerified(true);
         setSignInUpVisible(false);
+
+        if (window.location.pathname !== "/main") {
+          const url = "/main";
+          linkToUrl(url);
+        }
       } else {
         setErrorMessage(result.message || "未知錯誤");
       }
@@ -115,6 +122,11 @@ const SignInUpForm: React.FC = () => {
         localStorage.removeItem("token");
 
         setIsVerified(false);
+
+        if (window.location.pathname !== "/") {
+          const url = "/";
+          linkToUrl(url);
+        }
       }
     } catch (error) {
       console.error("Error verifying user:", error);
@@ -122,6 +134,11 @@ const SignInUpForm: React.FC = () => {
       localStorage.removeItem("token");
 
       setIsVerified(false);
+
+      if (window.location.pathname !== "/") {
+        const url = "/";
+        linkToUrl(url);
+      }
     }
   };
 

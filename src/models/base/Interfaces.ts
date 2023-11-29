@@ -75,6 +75,15 @@ export interface InsertObj {
   data: any;
 }
 
+export interface AddColumnObj {
+  dbName: string;
+  table: string;
+  columnName: string;
+  columnType: string;
+  columnOption: string[];
+  defaultValue: string;
+}
+
 export interface DeleteObj {
   dbName: string;
   table?: string;

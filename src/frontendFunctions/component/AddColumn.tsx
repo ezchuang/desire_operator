@@ -8,10 +8,17 @@ import {
   TextField,
 } from "@mui/material";
 
+import { AddColumnObj } from "../types/Interfaces";
+import { useReadData } from "../types/ReadDataContext";
+import { useMessage } from "../types/MessageContext";
+import { useRefreshDataFlag } from "../types/RefreshDataFlagContext";
+import { addColumn } from "../models/updateData";
+
 interface Column {
   name: string;
+  type: string;
   isNotNull: boolean;
-  isPrimaryKey: boolean;
+  // isPrimaryKey: boolean;
   isUniqueKey: boolean;
   // isMultipleKey: boolean;
   // isBlob: boolean;
@@ -19,15 +26,16 @@ interface Column {
   // isZerofill: boolean;
   // isBinary: boolean;
   // isEnum: boolean;
-  isAutoIncrement: boolean;
+  // isAutoIncrement: boolean;
   // isTimestamp: boolean;
   // isSet: boolean;
 }
 
 const initialColumnState: Column = {
   name: "",
+  type: "",
   isNotNull: false,
-  isPrimaryKey: false,
+  // isPrimaryKey: false,
   isUniqueKey: false,
   // isMultipleKey: false,
   // isBlob: false,
@@ -35,14 +43,18 @@ const initialColumnState: Column = {
   // isZerofill: false,
   // isBinary: false,
   // isEnum: false,
-  isAutoIncrement: false,
+  // isAutoIncrement: false,
   // isTimestamp: false,
   // isSet: false,
 };
 
 const AddColumn: React.FC = () => {
-  const [columns, setColumns] = useState<Column[]>([]);
+  // const [columns, setColumns] = useState<Column[]>([]);
   const [newColumn, setNewColumn] = useState<Column>(initialColumnState);
+
+  const { readDataElement, setReadDataElement } = useReadData();
+  const { setMessage, setOpenSnackbar, setSeverity } = useMessage();
+  const { setRefreshDataFlag } = useRefreshDataFlag();
 
   useEffect(() => {
     // 處理相互依賴和排斥關係
@@ -54,9 +66,9 @@ const AddColumn: React.FC = () => {
     // }
 
     // 自動增長僅適用於主鍵
-    if (updatedColumn.isAutoIncrement && !updatedColumn.isPrimaryKey) {
-      updatedColumn.isAutoIncrement = false;
-    }
+    // if (updatedColumn.isAutoIncrement && !updatedColumn.isPrimaryKey) {
+    //   updatedColumn.isAutoIncrement = false;
+    // }
 
     // 如果是BLOB或TEXT類型，不能設為主鍵、唯一鍵、無符號或零填充
     // if (updatedColumn.isBlob) {
@@ -78,10 +90,48 @@ const AddColumn: React.FC = () => {
     }
   }, [newColumn]);
 
-  const addColumn = () => {
-    if (newColumn.name) {
-      setColumns([...columns, newColumn]);
+  const handleSubmit = async () => {
+    try {
+      if (!newColumn.name || !newColumn.type) {
+        setSeverity("warning");
+        setMessage("請填寫列名和列類型");
+        setOpenSnackbar(true);
+        return;
+      }
+
+      const columnOptions: string[] = [];
+      if (newColumn.isNotNull) columnOptions.push("NOT NULL");
+      if (newColumn.isUniqueKey) columnOptions.push("UNIQUE");
+      if (newColumn.isUnsigned) columnOptions.push("UNSIGNED");
+
+      const requestOptions: AddColumnObj = {
+        dbName: readDataElement.dbName!,
+        table: readDataElement.table!,
+        columnName: newColumn.name!,
+        columnType: newColumn.type!,
+        columnOption: columnOptions,
+        // defaultValue: null,
+      };
+
+      const response = await addColumn(requestOptions);
+
+      if (!response) {
+        throw new Error(`Add Column Error!`);
+      }
+      // setColumns([...columns, newColumn]);
+
+      setSeverity("success");
+      setMessage("新增成功");
+      setOpenSnackbar(true);
+
       setNewColumn(initialColumnState);
+      setReadDataElement({ ...readDataElement });
+      setRefreshDataFlag([]);
+    } catch (error) {
+      console.error("Error adding column:", error);
+      setSeverity("error");
+      setMessage("新增失敗");
+      setOpenSnackbar(true);
     }
   };
 
@@ -108,8 +158,19 @@ const AddColumn: React.FC = () => {
               fullWidth
             />
           </Grid>
-          {Object.entries(initialColumnState)
-            .slice(1)
+          <Grid item xs={12}>
+            <TextField
+              label="Column Type"
+              name="type"
+              value={newColumn.type}
+              onChange={(e) =>
+                setNewColumn({ ...newColumn, type: e.target.value })
+              }
+              fullWidth
+            />
+          </Grid>
+          {Object.entries(newColumn)
+            .slice(2)
             .map(([key]) => (
               <Grid item xs={6} sm={4} md={3} lg={2} key={key}>
                 <FormControlLabel
@@ -132,7 +193,7 @@ const AddColumn: React.FC = () => {
             <Button
               variant="contained"
               color="secondary"
-              onClick={addColumn}
+              onClick={handleSubmit}
               fullWidth
             >
               Add Column
@@ -149,8 +210,8 @@ const AddColumn: React.FC = () => {
     switch (key) {
       // case "isMultipleKey":
       //   return newColumn.isPrimaryKey;
-      case "isAutoIncrement":
-        return !newColumn.isPrimaryKey;
+      // case "isAutoIncrement":
+      //   return !newColumn.isPrimaryKey;
       // case "isPrimaryKey":
       // case "isUniqueKey":
       // return newColumn.isBlob;
@@ -158,7 +219,6 @@ const AddColumn: React.FC = () => {
       // case "isZerofill":
       //   // 禁用於 Blob 或 Binary 類型
       // return newColumn.isBlob || newColumn.isBinary;
-      // 根據需要添加更多規則
       default:
         return false;
     }

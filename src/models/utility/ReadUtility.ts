@@ -9,12 +9,15 @@ class ReadUtility extends DBUtilityBase {
 
     if (dbName) {
       queryStr += `TABLES FROM \`${dbName}\``;
+
+      // console.log(queryStr, []);
       return await this.execute(queryStr, []);
     } else {
       queryStr += "DATABASES";
+
+      // console.log(queryStr, []);
       return await this.execute(queryStr, []);
     }
-    // console.log(queryStr);
   }
 
   // 讀取 Table 內部資料
@@ -23,9 +26,6 @@ class ReadUtility extends DBUtilityBase {
       obj;
     const values: any[] = [];
     let queryStr = "SELECT ";
-
-    // console.log(obj);
-    // console.log(dbName, table, select, where, orderBy, orderDirection, limit);
 
     if (select && select.length > 0) {
       queryStr += select.join(", ");
@@ -38,15 +38,15 @@ class ReadUtility extends DBUtilityBase {
     if (where && where.length > 0) {
       const whereClauses = where.map((condition) => {
         values.push(condition.value);
-        return `${condition.column} ${condition.operator} ?`;
+        return `\`${condition.column}\` \`${condition.operator}\` ?`;
       });
       queryStr += " WHERE " + whereClauses.join(" AND ");
     }
 
     if (orderBy) {
-      queryStr += ` ORDER BY ${orderBy}`;
+      queryStr += ` ORDER BY \`${orderBy}\``;
       if (orderDirection) {
-        queryStr += ` ${orderDirection}`;
+        queryStr += ` \`${orderDirection}\``;
       }
     }
 
@@ -55,8 +55,7 @@ class ReadUtility extends DBUtilityBase {
       values.push(limit);
     }
 
-    console.log(queryStr, values);
-
+    // console.log(queryStr, values);
     return await this.execute(queryStr, values);
   }
 
@@ -65,8 +64,7 @@ class ReadUtility extends DBUtilityBase {
     const { dbName, table } = obj;
     let queryStr = `SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?`;
 
-    console.log(queryStr, [dbName, table]);
-
+    // console.log(queryStr, [dbName, table]);
     return await this.execute(queryStr, [dbName, table]);
   }
 }

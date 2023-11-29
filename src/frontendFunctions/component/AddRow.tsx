@@ -41,10 +41,10 @@ const StyledTableCell = styled(TableCell)(() => ({
 }));
 
 const AddRow: React.FC = () => {
-  const [rows, setRows] = useState<Array<any>>([]);
+  const [rows, setRows] = useState<Array<any>>([{}]);
   const [newRow, setNewRow] = useState<any>({});
 
-  const { readDataElement } = useReadData();
+  const { readDataElement, setReadDataElement } = useReadData();
   const { columnDataElement } = useColumnData();
   const { setMessage, setOpenSnackbar, setSeverity } = useMessage();
 
@@ -64,13 +64,6 @@ const AddRow: React.FC = () => {
     setRows(updatedRows);
   };
 
-  const handleNewRowChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = event.target;
-    setNewRow({ ...newRow, [name]: value });
-  };
-
   const addRow = () => {
     setRows([...rows, newRow]);
     setNewRow({});
@@ -83,18 +76,21 @@ const AddRow: React.FC = () => {
         table: readDataElement.table!,
         values: rows,
       };
+
       const response = await insertData(requestOptions);
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (!response) {
+        throw new Error(`Save Rows Error!`);
       }
 
-      const result = await response.json();
-      console.log("Rows saved:", result);
+      console.log("Rows saved:", response);
 
       setSeverity("success");
       setMessage("新增成功");
       setOpenSnackbar(true);
+
+      setReadDataElement({ ...readDataElement });
+      setRows([{}]);
     } catch (error) {
       console.error("Error saving rows:", error);
       setSeverity("error");
@@ -133,18 +129,6 @@ const AddRow: React.FC = () => {
                 ))}
               </TableRow>
             ))}
-            <TableRow>
-              {columnDataElement.map((column) => (
-                <StyledTableCell key={column.id}>
-                  <TextField
-                    size="small"
-                    name={column.id}
-                    value={newRow[column.id] || ""}
-                    onChange={handleNewRowChange}
-                  />
-                </StyledTableCell>
-              ))}
-            </TableRow>
           </TableBody>
         </Table>
         <Box mt={1}>

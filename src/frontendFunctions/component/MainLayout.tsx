@@ -227,7 +227,7 @@ const MainLayout: React.FC = () => {
                 onChange={() => seHistoryTableExpanded(!historyTableExpanded)}
               >
                 <StyledAccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <div>歷史紀錄</div>
+                  <div>歷史紀錄 (更新機制未完成)</div>
                 </StyledAccordionSummary>
                 <StyledAccordionDetails>
                   <HistoryTable />

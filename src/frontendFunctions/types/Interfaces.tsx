@@ -36,6 +36,15 @@ export interface InsertObj {
   values: any[];
 }
 
+export interface AddColumnObj {
+  dbName: string;
+  table: string;
+  columnName: string;
+  columnType: string;
+  columnOption?: string[];
+  defaultValue?: string;
+}
+
 export interface HistoryRecord {
   name: string;
   action: string;

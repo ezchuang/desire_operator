@@ -23,6 +23,7 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 // import { useMessage } from "../types/MessageContext";
 import { useColumnData } from "../types/ColumnDataContext";
 import { useColumnOnShow } from "../types/ColumnOnShowContext";
+import { useRefreshDataFlag } from "../types/RefreshDataFlagContext";
 import { useReadData } from "../types/ReadDataContext";
 import { readTableData } from "../models/readData";
 
@@ -72,6 +73,7 @@ const QueryCombineTool: React.FC = () => {
   // const { setMessage, setOpenSnackbar, setSeverity } = useMessage();
   const { columnDataElement, setColumnDataElement } = useColumnData();
   const { readDataElement, setReadDataElement } = useReadData();
+  const { refreshDataFlag } = useRefreshDataFlag();
   const { setColumnOnShowElement } = useColumnOnShow();
 
   const [rowCondition, setRowCondition] = useState<any>({});
@@ -177,19 +179,55 @@ const QueryCombineTool: React.FC = () => {
       const initialRow: any = {};
 
       columnNames.forEach((column: any) => {
-        // console.log("start");
         initialCondition[column.id] = "";
         initialRow[column.id] = "";
-        // console.log("end");
       });
-      // console.log("start2");
+
       setRowCondition(initialCondition);
       setRow(initialRow);
-      // console.log("end2");
     };
 
     renewColumnsData();
   }, [readDataElement]);
+
+  useEffect(() => {
+    const renewColumnsData = async () => {
+      if (readDataElement.dbName === "" && readDataElement.table === "") {
+        return;
+      }
+
+      const response = await readTableData(readDataElement);
+
+      const columnNames = response[1].map((column: any) => {
+        return {
+          id: column.name,
+          label: column.name.toUpperCase(),
+        };
+      });
+
+      setTableParams({
+        db: readDataElement.dbName,
+        table: readDataElement.table,
+      });
+
+      setColumnDataElement(columnNames);
+
+      setColumnOnShowElement(columnNames);
+
+      const initialCondition: any = {};
+      const initialRow: any = {};
+
+      columnNames.forEach((column: any) => {
+        initialCondition[column.id] = "";
+        initialRow[column.id] = "";
+      });
+
+      setRowCondition(initialCondition);
+      setRow(initialRow);
+    };
+
+    renewColumnsData();
+  }, [refreshDataFlag]);
 
   return readDataElement.table ? (
     <StyledPaper>

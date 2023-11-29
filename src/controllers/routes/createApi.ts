@@ -9,6 +9,7 @@ export default async function createApiInit() {
 
   const rootCreateUtility = new CreateUtility(rootDb);
 
+  // 建立 Database
   createApi.post(
     "/createDb",
     verifyToken,
@@ -16,12 +17,13 @@ export default async function createApiInit() {
       console.log("createDb");
       try {
         const userGroup = req.userGroup;
+        const userId = req.user!.userId;
 
         const params: CreateDbObj = {
           dbName: req.body.dbName,
           groupName: userGroup,
         };
-        const data = await rootCreateUtility.createDb(params);
+        const data = await rootCreateUtility.createDb(userId, params);
 
         return res.status(200).json({ data: data }); // data: true or error
       } catch (err) {
@@ -30,6 +32,7 @@ export default async function createApiInit() {
     }
   );
 
+  // 建立 Table
   createApi.post(
     "/createTable",
     verifyToken,
@@ -37,13 +40,14 @@ export default async function createApiInit() {
       console.log("createTable");
       try {
         const userCreateUtility = new CreateUtility(req.db);
+        const userId = req.user!.userId;
 
         const params: CreateObj = {
           dbName: req.body.dbName,
           table: req.body.table,
           columns: req.body.columns,
         };
-        const data = await userCreateUtility.create(params);
+        const data = await userCreateUtility.create(userId, params);
 
         return res.status(200).json({ data: data });
       } catch (err) {

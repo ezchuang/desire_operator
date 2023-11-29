@@ -7,6 +7,7 @@ import { MessageProvider } from "./types/MessageContext";
 import { DbsAndTablesProvider } from "./types/DbsAndTablesContext";
 import { UserNameProvider } from "./types/UserNameContext";
 import { VerificationProvider } from "./types/VerificationContext";
+import { RefreshDataFlagProvider } from "./types/RefreshDataFlagContext";
 import MainLayout from "./component/MainLayout";
 
 import io from "socket.io-client";
@@ -44,7 +45,9 @@ const App: React.FC = () => {
             <DbsAndTablesProvider>
               <ColumnDataProvider>
                 <ColumnOnShowProvider>
-                  <MainLayout />
+                  <RefreshDataFlagProvider>
+                    <MainLayout />
+                  </RefreshDataFlagProvider>
                 </ColumnOnShowProvider>
               </ColumnDataProvider>
             </DbsAndTablesProvider>

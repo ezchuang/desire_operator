@@ -18,6 +18,7 @@ import { useMessage } from "../types/MessageContext";
 import { useReadData } from "../types/ReadDataContext";
 // import { useColumnData } from "../types/ColumnDataContext";
 import { useColumnOnShow } from "../types/ColumnOnShowContext";
+import { useRefreshDataFlag } from "../types/RefreshDataFlagContext";
 import { readTableData } from "../models/readData";
 import { updateData } from "../models/updateData";
 import { deleteData } from "../models/deleteData";
@@ -49,6 +50,7 @@ const MainTable: React.FC = () => {
   const { setMessage, setOpenSnackbar, setSeverity } = useMessage();
   const { readDataElement } = useReadData();
   const { columnOnShowElement } = useColumnOnShow();
+  const { refreshDataFlag } = useRefreshDataFlag();
 
   const [data, setData] = useState<any[]>([]);
   const [edit, setEdit] = useState<EditState>({ row: -1, cell: "" });
@@ -167,7 +169,7 @@ const MainTable: React.FC = () => {
     };
 
     readData();
-  }, [readDataElement]);
+  }, [readDataElement, refreshDataFlag]);
 
   return (
     // <MainStyledPaper>

@@ -1,9 +1,10 @@
 import DBUtilityBase from "./DbUtilityBase";
-import { UpdateObj, InsertObj } from "../base/Interfaces";
+import { UpdateObj, InsertObj, AddColumnObj } from "../base/Interfaces";
+import addHistory from "../../controllers/addHistory";
 
 class UpdateUtility extends DBUtilityBase {
   // 更新 Table 既有資料
-  async update(obj: UpdateObj) {
+  async update(userId: string, obj: UpdateObj) {
     const { dbName, table, data, where } = obj;
     const values: any[] = [];
     const setData: string[] = [];
@@ -13,7 +14,9 @@ class UpdateUtility extends DBUtilityBase {
       values.push(val);
     });
 
-    let queryStr = `UPDATE ${dbName}.${table} SET ${setData.join(", ")}`;
+    let queryStr = `UPDATE \`${dbName}\`.\`${table}\` SET ${setData.join(
+      ", "
+    )}`;
 
     if (where && where.length > 0) {
       const whereClauses = where.map((condition) => {
@@ -26,24 +29,62 @@ class UpdateUtility extends DBUtilityBase {
     console.log(queryStr, values);
     await this.execute(queryStr, values);
 
+    await addHistory(userId, "Update Data", queryStr, values);
+
     return true;
   }
 
   // 新增新的 Row
-  async insert(obj: InsertObj) {
+  async insert(userId: string, obj: InsertObj) {
     const { dbName, table, data } = obj;
     const columns = Object.keys(data[0]).join(", ");
-    const placeholders = data
+    const insertData = data
       .map(() => `(${Object.keys(data[0]).fill("?").join(", ")})`)
       .join(", ");
     const values = data.flatMap(Object.values);
 
-    const queryStr = `INSERT INTO ${dbName}.${table} (${columns}) VALUES ${placeholders}`;
+    const queryStr = `INSERT INTO \`${dbName}\`.\`${table}\` (${columns}) VALUES ${insertData}`;
 
     console.log(queryStr, values);
     await this.execute(queryStr, values);
 
+    await addHistory(userId, "Insert Data", queryStr, values);
+
     return true;
+  }
+
+  // 變更 Table 新增 Column
+  async addColumn(userId: string, obj: AddColumnObj) {
+    try {
+      const {
+        dbName,
+        table,
+        columnName,
+        columnType,
+        columnOption,
+        defaultValue,
+      } = obj;
+
+      let queryStr = `ALTER TABLE \`${dbName}\`.\`${table}\` ADD COLUMN \`${columnName}\` ${columnType}`;
+
+      if (columnOption) {
+        queryStr += ` ${columnOption.join(" ")}`;
+      }
+
+      if (defaultValue !== undefined) {
+        queryStr += ` DEFAULT '${defaultValue}'`;
+      }
+
+      console.log(queryStr);
+      await this.execute(queryStr, []);
+
+      await addHistory(userId, "Add Column", queryStr, []);
+
+      return true;
+    } catch (err) {
+      console.error("Error in addColumn:", err);
+      throw err;
+    }
   }
 }
 

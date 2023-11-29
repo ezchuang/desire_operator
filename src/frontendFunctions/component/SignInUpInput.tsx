@@ -30,12 +30,12 @@ const SignInUpInput: React.FC<SignInUpFormProps> = ({
   errorMessage,
 }) => {
   const [isSignUp, setIsSignUp] = useState(false);
+  const [isNewUserOrInvited, setIsNewUserOrInvited] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [newGroupName, setNewGroupName] = useState("");
   const [invitationCode, setInvitationCode] = useState("");
-  // const [errMsg, setErrorMessage] = useState("");
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -49,6 +49,11 @@ const SignInUpInput: React.FC<SignInUpFormProps> = ({
   const toggleSignUp = () => {
     setErrorMessage("");
     setIsSignUp(!isSignUp);
+  };
+
+  const toggleNewUserOrInvited = () => {
+    setErrorMessage("");
+    setIsNewUserOrInvited(!isNewUserOrInvited);
   };
 
   return (
@@ -90,23 +95,27 @@ const SignInUpInput: React.FC<SignInUpFormProps> = ({
               placeholder="輸入密碼"
               className="formField"
             />
-            {isSignUp && (
-              <>
-                <input
-                  type="text"
-                  value={newGroupName}
-                  onChange={(event) => setNewGroupName(event.target.value)}
-                  placeholder="輸入新群組名稱"
-                  className="formField"
-                />
-                <input
-                  type="password"
-                  value={invitationCode}
-                  onChange={(event) => setInvitationCode(event.target.value)}
-                  placeholder="輸入群組邀請碼"
-                  className="formField"
-                />
-              </>
+            {isSignUp && isNewUserOrInvited ? (
+              <input
+                type="text"
+                value={newGroupName}
+                onChange={(event) => setNewGroupName(event.target.value)}
+                placeholder="輸入新群組名稱"
+                className="formField"
+              />
+            ) : (
+              <></>
+            )}
+            {isSignUp && !isNewUserOrInvited ? (
+              <input
+                type="password"
+                value={invitationCode}
+                onChange={(event) => setInvitationCode(event.target.value)}
+                placeholder="輸入群組邀請碼"
+                className="formField"
+              />
+            ) : (
+              <></>
             )}
             <div>
               <button type="submit" className="primaryButton">
@@ -147,8 +156,35 @@ const SignInUpInput: React.FC<SignInUpFormProps> = ({
                   註冊
                 </button>
               </span>
-            )}
+            )}{" "}
           </div>
+          {isSignUp && (
+            <div className="mt-4 text-sm">
+              <span className="text-black">
+                {isNewUserOrInvited ? (
+                  <>
+                    有邀請碼？{" "}
+                    <button
+                      onClick={toggleNewUserOrInvited}
+                      className="text-blue-500 hover:text-blue-700"
+                    >
+                      輸入邀請碼
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    沒有邀請碼？{" "}
+                    <button
+                      onClick={toggleNewUserOrInvited}
+                      className="text-blue-500 hover:text-blue-700"
+                    >
+                      輸入新群組名稱
+                    </button>
+                  </>
+                )}
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </div>

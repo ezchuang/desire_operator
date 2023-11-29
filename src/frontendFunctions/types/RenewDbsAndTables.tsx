@@ -9,6 +9,7 @@ const useRenewDbsAndTables = () => {
   const renewDbsAndTables = async () => {
     try {
       const response = await readDbsAndTables();
+
       const dbsAndTablesData = response[0]; // 返回的資料結構是 DbsAndTablesElement[...]
 
       if (deepCompareArrays(dbsAndTablesData, dbsAndTablesElement)) {
