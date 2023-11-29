@@ -14,4 +14,4 @@ RUN npm install
 COPY . .
 
 # 應用程式執行的預設指令
-CMD ["node", "build/app.js"]
+CMD ["node", "build/src/app.js"]

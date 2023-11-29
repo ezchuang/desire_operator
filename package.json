@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.ts",
   "scripts": {
-    "start": "set NODE_PATH=./build && node build/app.js",
+    "start": "set NODE_PATH=./build && node build/src/app.js",
     "build": "tsc -p .",
     "dev": "nodemon src/app.ts",
     "renewcss_index": "npx tailwindcss -i ./src/public/css/index.css  -o ./src/public/css/indexOutput.css --watch",

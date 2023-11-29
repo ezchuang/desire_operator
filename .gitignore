@@ -151,3 +151,6 @@ Thumbs.db
 
 # SQL Data
 *.sql
+
+# tsc
+bulid
