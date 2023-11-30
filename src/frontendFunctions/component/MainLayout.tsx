@@ -252,7 +252,7 @@ const MainLayout: React.FC = () => {
               className="floating-btn text-white"
               onClick={toggleShortcutPage}
             >
-              Shortcut
+              Tables 捷徑
             </button>
             <div
               className="bg-white shadow-lg p-4 mb-4 overflow-auto hidden floating-panel"

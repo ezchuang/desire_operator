@@ -68,7 +68,11 @@ const SignInUpInput: React.FC<SignInUpFormProps> = ({
         return;
       }
 
-      onSignUp({ name, email, password, newGroupName, invitationCode });
+      if (isNewUserOrInvited && newGroupName) {
+        onSignUp({ name, email, password, newGroupName });
+      }
+
+      onSignUp({ name, email, password, invitationCode });
     } else {
       onSignIn({ email, password });
     }

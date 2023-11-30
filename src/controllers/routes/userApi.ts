@@ -21,15 +21,19 @@ export default async function userApiInit() {
         userPw: req.body.password,
         userName: req.body.name,
         invitationCode: req.body.invitationCode,
-        groupName: req.body.newGroupName,
+        groupName: req.body.invitationCode ? null : req.body.newGroupName, // 邀請碼優先
       };
 
       if (!params.userMail || !params.userPw || !params.userName) {
         throw new Error("ValidationError");
       }
 
+      if (!params.invitationCode || !params.groupName) {
+        throw new Error("ValidationError");
+      }
+
       if (await rootUtility.checkExist(params)) {
-        return res.status(400).json({ error: true, message: "帳號已存在" });
+        throw new Error("DuplicateEmail");
       }
 
       const result = await rootUtility.createUser(params);

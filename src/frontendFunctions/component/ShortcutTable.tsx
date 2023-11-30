@@ -45,6 +45,7 @@ const StyledTableCell = styled(TableCell)(() => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: "#d0d0d0",
     minWidth: 10,
+    textAlign: "center",
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
