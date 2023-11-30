@@ -19,13 +19,14 @@ const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
 
     // 若是伺服器有重啟，就需要走這裡，由 Token 建立 DB Connection
     if (!userGroup) {
-      const [groupName, groupDb] = await rootUtility.getUserDbByToken({
+      const [dbUser, groupDb] = await rootUtility.getUserDbByToken({
         userId: req.user.userId,
         userMail: req.user.userEmail,
+        dbUser: req.user.dbUser,
       });
-      global.groupDbMap.set(groupName, groupDb);
-      global.userGroupMap.set(req.user.userId, groupName);
-      userGroup = groupName;
+      global.groupDbMap.set(dbUser, groupDb);
+      global.userGroupMap.set(req.user.userId, dbUser);
+      userGroup = dbUser;
     }
 
     req.userGroup = userGroup;

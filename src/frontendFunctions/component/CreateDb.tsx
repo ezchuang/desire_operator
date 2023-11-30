@@ -36,6 +36,7 @@ const CreateDatabase: React.FC = () => {
         value={dbName}
         onChange={(e) => setDbName(e.target.value)}
         fullWidth
+        size="small"
       />
       <Box mt={1}>
         <Grid item xs={12}>

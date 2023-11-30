@@ -3,7 +3,9 @@ import React, { createContext, useState, useContext, ReactNode } from "react";
 export interface ColumnDataElement {
   id: string;
   label: string;
+  type: string;
   selected?: boolean;
+  options: object;
 }
 
 interface ColumnDataContextType {

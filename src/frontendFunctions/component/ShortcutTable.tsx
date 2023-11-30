@@ -149,7 +149,9 @@ const ShortcutTable: React.FC = () => {
       <Table stickyHeader aria-label="collapsible table" size="small">
         <TableHead>
           <TableRow>
-            <StyledTableCell colSpan={2}>{"Shortcut Tree"}</StyledTableCell>
+            <StyledTableCell colSpan={2}>
+              {"Databases and Tables Structure Tree"}
+            </StyledTableCell>
           </TableRow>
         </TableHead>
         <TableBody>

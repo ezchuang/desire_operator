@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useVerification } from "../types/VerificationContext";
-import { useUserName } from "../types/UserNameContext";
+import { useUserInfo } from "../types/UserInfoContext";
 import SignInUpInput, { SignInData, SignUpData } from "./SignInUpInput";
 
 const SignInUpForm: React.FC = () => {
-  const { setUserName } = useUserName();
+  const { setUserInfo } = useUserInfo();
   const { isVerified, setIsVerified } = useVerification();
 
   const [signInUpVisible, setSignInUpVisible] = useState(false);
@@ -26,20 +26,25 @@ const SignInUpForm: React.FC = () => {
       });
       const result = await response.json();
 
-      if (response.status === 200 && result.success) {
-        // 將 Token 寫入 localStorage
-        localStorage.setItem("token", result.data.token);
-
-        setUserName(result.data.userName);
-        setIsVerified(true);
-        setSignInUpVisible(false);
-
-        if (window.location.pathname !== "/main") {
-          const url = "/main";
-          linkToUrl(url);
-        }
-      } else {
+      if (response.status !== 200 && !result.success) {
         setErrorMessage(result.message || "未知錯誤");
+      }
+
+      // 將 Token 寫入 localStorage
+      localStorage.setItem("token", result.data.token);
+
+      setUserInfo({
+        userName: result.data.userName,
+        groupName: result.data.groupName,
+        invitationCode: result.data.invitationCode,
+      });
+      setIsVerified(true);
+      setSignInUpVisible(false);
+
+      // 轉跳判斷
+      if (window.location.pathname !== "/main") {
+        const url = "/main";
+        linkToUrl(url);
       }
     } catch (error) {
       setErrorMessage("服務器錯誤");
@@ -49,25 +54,39 @@ const SignInUpForm: React.FC = () => {
   // 創建使用者
   const handleSignUp = async (data: SignUpData) => {
     try {
-      const response = await fetch("/api/createUser", {
+      // 註冊驗證
+      const signUpResponse = await fetch("/api/createUser", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
       });
-      const result = await response.json();
+      const signUpResult = await signUpResponse.json();
 
-      if (response.status === 200 && result.success) {
-        setIsVerified(true);
-        setSignInUpVisible(false);
+      if (signUpResponse.status !== 200 || !signUpResult.success) {
+        setErrorMessage(signUpResult.message || "未知錯誤");
+        return;
+      }
 
-        if (window.location.pathname !== "/main") {
-          const url = "/main";
-          linkToUrl(url);
-        }
-      } else {
-        setErrorMessage(result.message || "未知錯誤");
+      // 直接做登入驗證
+      const signInResponse = await fetch("/api/signin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const signInResult = await signInResponse.json();
+
+      // 將 Token 寫入 localStorage
+      localStorage.setItem("token", signInResult.data.token);
+
+      // 轉跳判斷
+      if (window.location.pathname !== "/main") {
+        const url = "/main";
+        linkToUrl(url);
       }
     } catch (error) {
       setErrorMessage("服務器錯誤");
@@ -97,6 +116,13 @@ const SignInUpForm: React.FC = () => {
       const token = localStorage.getItem("token");
       if (!token) {
         setIsVerified(false);
+
+        // 轉跳判斷
+        if (window.location.pathname !== "/") {
+          const url = "/";
+          linkToUrl(url);
+        }
+
         return;
       }
 
@@ -109,11 +135,16 @@ const SignInUpForm: React.FC = () => {
       });
 
       const result = await response.json();
-      setUserName(result.data.userName);
+      setUserInfo({
+        userName: result.data.userName,
+        groupName: result.data.groupName,
+        invitationCode: result.data.invitationCode,
+      });
 
       if (response.status === 200 && result.success) {
         setIsVerified(true);
 
+        // 轉跳判斷
         if (window.location.pathname !== "/main") {
           const url = "/main";
           linkToUrl(url);
@@ -123,6 +154,7 @@ const SignInUpForm: React.FC = () => {
 
         setIsVerified(false);
 
+        // 轉跳判斷
         if (window.location.pathname !== "/") {
           const url = "/";
           linkToUrl(url);
@@ -135,6 +167,7 @@ const SignInUpForm: React.FC = () => {
 
       setIsVerified(false);
 
+      // 轉跳判斷
       if (window.location.pathname !== "/") {
         const url = "/";
         linkToUrl(url);

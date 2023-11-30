@@ -149,7 +149,8 @@ const AddColumn: React.FC = () => {
         <Grid container spacing={1}>
           <Grid item xs={12}>
             <TextField
-              label="Column Name"
+              size="small"
+              label="Column 名稱"
               name="name"
               value={newColumn.name}
               onChange={(e) =>
@@ -160,7 +161,8 @@ const AddColumn: React.FC = () => {
           </Grid>
           <Grid item xs={12}>
             <TextField
-              label="Column Type"
+              size="small"
+              label="Column 型別"
               name="type"
               value={newColumn.type}
               onChange={(e) =>

@@ -34,6 +34,7 @@ export interface getUserDbObj {
   userMail: string;
   userPw?: string;
   userId?: string;
+  dbUser?: string;
 }
 
 export interface CreateDbObj {
@@ -97,7 +98,10 @@ export interface HistoryRecord {
 }
 
 export interface UserPayload {
-  userEmail: string;
   userId: number;
+  userEmail: string;
   userName: string;
+  dbUser: string;
+  invitationCode: string;
+  groupName: string;
 }

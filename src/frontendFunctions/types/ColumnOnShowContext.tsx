@@ -3,6 +3,8 @@ import React, { createContext, useState, useContext, ReactNode } from "react";
 export interface ColumnOnShowElement {
   id: string;
   label: string;
+  type: string;
+  options: object;
 }
 
 interface ColumnOnShowContextType {

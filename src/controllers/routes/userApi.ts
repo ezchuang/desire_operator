@@ -28,6 +28,10 @@ export default async function userApiInit() {
         throw new Error("ValidationError");
       }
 
+      if (await rootUtility.checkExist(params)) {
+        return res.status(400).json({ error: true, message: "帳號已存在" });
+      }
+
       const result = await rootUtility.createUser(params);
       if (!result) {
         throw new Error("DuplicateEmail");
@@ -55,7 +59,7 @@ export default async function userApiInit() {
         console.error("Unexpected error", error);
         return res.status(500).json({ error: true, message: "未知錯誤" });
       }
-      res.status(400).json({ error: true, message: msg });
+      return res.status(400).json({ error: true, message: msg });
     }
   });
 
@@ -78,23 +82,33 @@ export default async function userApiInit() {
       }
 
       // 撈出 [使用者群組, 群組DB]
-      const [groupName, groupDb] = await rootUtility.getUserDb(params);
-      global.groupDbMap.set(groupName, groupDb);
-      global.userGroupMap.set(userInfo[0], groupName);
+      const [groupName, dbUser, invitationCode, groupDb] =
+        await rootUtility.getUserDb(params);
+      global.groupDbMap.set(dbUser, groupDb);
+      global.userGroupMap.set(userInfo[0], dbUser);
 
       const token = jwt.sign(
         {
           userId: userInfo[0],
           userEmail: params.userMail,
           userName: userInfo[1],
+          dbUser: dbUser, // 取得 DB 映射用，不呈現在一般資料中
+          invitationCode: invitationCode,
+          groupName: groupName,
         },
         global.secretKey,
         { expiresIn: "7d" }
       );
 
-      res
-        .status(200)
-        .json({ success: true, data: { token: token, userName: userInfo[1] } });
+      return res.status(200).json({
+        success: true,
+        data: {
+          token: token,
+          userName: userInfo[1],
+          groupName: groupName,
+          invitationCode: invitationCode,
+        },
+      });
     } catch (error) {
       let msg = "";
       if (error instanceof Error) {
@@ -112,7 +126,7 @@ export default async function userApiInit() {
             return res.status(500).json({ error: true, message: "伺服器錯誤" });
         }
       }
-      res.status(400).json({ error: true, message: msg });
+      return res.status(400).json({ error: true, message: msg });
     }
   });
 
@@ -126,11 +140,12 @@ export default async function userApiInit() {
 
       const decoded = jwt.verify(token, global.secretKey) as UserPayload;
       const resData = {
-        userEmail: decoded.userEmail,
-        userId: decoded.userId,
         userName: decoded.userName,
+        groupName: decoded.groupName,
+        invitationCode: decoded.invitationCode,
       };
-      res.status(200).json({ success: true, data: resData });
+
+      return res.status(200).json({ success: true, data: resData });
     } catch (error) {
       let msg = "";
       if (error instanceof Error) {
@@ -148,7 +163,7 @@ export default async function userApiInit() {
             return res.status(500).json({ error: true, message: "伺服器錯誤" });
         }
       }
-      res.status(401).json({ error: true, message: msg });
+      return res.status(401).json({ error: true, message: msg });
     }
   });
 

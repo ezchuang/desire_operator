@@ -28,7 +28,7 @@ const HistoryTable: React.FC = () => {
     const fetchHistory = async () => {
       try {
         const historyData = await readHistoryData();
-        console.log(historyData[0]);
+        // console.log(historyData[0]);
 
         setRecords(historyData[0]);
       } catch (error) {

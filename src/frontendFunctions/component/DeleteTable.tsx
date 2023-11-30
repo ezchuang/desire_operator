@@ -13,6 +13,7 @@ import { useMessage } from "../types/MessageContext";
 import { deleteTable } from "../models/deleteData";
 import { useDbsAndTables } from "../types/DbsAndTablesContext";
 import useRenewDbsAndTables from "../types/RenewDbsAndTables";
+import { useReadData } from "../types/ReadDataContext";
 
 const DeleteTable: React.FC = () => {
   const { setMessage, setOpenSnackbar, setSeverity } = useMessage();
@@ -20,6 +21,7 @@ const DeleteTable: React.FC = () => {
   const [tableName, setTableName] = useState("");
   const renewDbsAndTables = useRenewDbsAndTables();
   const { dbsAndTablesElement } = useDbsAndTables();
+  const { readDataElement, setReadDataElement } = useReadData();
 
   const handleSubmit = async () => {
     try {
@@ -29,14 +31,23 @@ const DeleteTable: React.FC = () => {
       };
       const response = await deleteTable(delData);
 
-      if (response) {
-        setSeverity("success");
-        setMessage(`刪除 Table ${tableName} 成功`);
-        setOpenSnackbar(true);
-
-        renewDbsAndTables();
-        setTableName("");
+      if (!response) {
+        throw new Error(`Delete Table Error!`);
       }
+
+      if (
+        delData.dbName === readDataElement.dbName ||
+        delData.table === readDataElement.table
+      ) {
+        setReadDataElement({ dbName: "", table: "" });
+      }
+
+      setSeverity("success");
+      setMessage(`刪除 Table ${tableName} 成功`);
+      setOpenSnackbar(true);
+
+      renewDbsAndTables();
+      setTableName("");
     } catch (error) {
       console.error("Table 刪除失敗:", error);
       setSeverity("error");
@@ -48,7 +59,12 @@ const DeleteTable: React.FC = () => {
   return (
     <>
       <Box width="100%" margin="auto" padding={"2px"}>
-        <FormControl fullWidth margin="normal" sx={{ mt: 0, mb: 1 }}>
+        <FormControl
+          fullWidth
+          margin="normal"
+          sx={{ mt: 0, mb: 1 }}
+          size="small"
+        >
           <InputLabel id="database-select-label">選擇資料庫</InputLabel>
           <Select
             labelId="database-select-label"
@@ -64,7 +80,12 @@ const DeleteTable: React.FC = () => {
               ))}
           </Select>
         </FormControl>
-        <FormControl fullWidth margin="normal" sx={{ mt: 0, mb: 1 }}>
+        <FormControl
+          fullWidth
+          margin="normal"
+          sx={{ mt: 0, mb: 1 }}
+          size="small"
+        >
           <InputLabel id="table-select-label">選擇表格</InputLabel>
           <Select
             labelId="table-select-label"

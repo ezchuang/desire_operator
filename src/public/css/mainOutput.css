@@ -652,9 +652,18 @@ video {
   z-index: 30;
 }
 
+.m-1 {
+  margin: 0.25rem;
+}
+
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
+}
+
+.my-auto {
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
 .mb-4 {
@@ -671,6 +680,14 @@ video {
 
 .mt-4 {
   margin-top: 1rem;
+}
+
+.ml-1 {
+  margin-left: 0.25rem;
+}
+
+.mr-auto {
+  margin-right: auto;
 }
 
 .block {
@@ -1133,6 +1150,22 @@ video {
 .secondaryButton:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(55 65 81 / var(--tw-bg-opacity));
+}
+
+.selection\:justify-between *::-moz-selection {
+  justify-content: space-between;
+}
+
+.selection\:justify-between *::selection {
+  justify-content: space-between;
+}
+
+.selection\:justify-between::-moz-selection {
+  justify-content: space-between;
+}
+
+.selection\:justify-between::selection {
+  justify-content: space-between;
 }
 
 .hover\:text-blue-700:hover {

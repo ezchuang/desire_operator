@@ -121,7 +121,7 @@ const CreateTable: React.FC = () => {
 
   return (
     <Box width="100%" margin="auto" padding={"2px"}>
-      <FormControl fullWidth margin="normal" sx={{ mt: 0, mb: 1 }}>
+      <FormControl fullWidth margin="normal" sx={{ mt: 0, mb: 1 }} size="small">
         <InputLabel id="database-select-label">選擇資料庫</InputLabel>
         <Select
           labelId="database-select-label"
@@ -145,6 +145,7 @@ const CreateTable: React.FC = () => {
         label="表名稱"
         value={tableName}
         onChange={(event) => setTableName(event.target.value)}
+        size="small"
       />
 
       {columns.map((column, index) => (
@@ -157,6 +158,7 @@ const CreateTable: React.FC = () => {
               onChange={(event) =>
                 handleColumnChange(index, "columnName", event.target.value)
               }
+              size="small"
             />
           </Grid>
           <Grid item xs={2}>
@@ -167,6 +169,7 @@ const CreateTable: React.FC = () => {
               onChange={(event) =>
                 handleColumnChange(index, "columnType", event.target.value)
               }
+              size="small"
             />
           </Grid>
           <Grid item xs={6}>

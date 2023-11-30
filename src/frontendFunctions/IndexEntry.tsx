@@ -1,18 +1,18 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { ReadDataProvider } from "./types/ReadDataContext";
-import { UserNameProvider } from "./types/UserNameContext";
+import { UserInfoProvider } from "./types/UserInfoContext";
 import { VerificationProvider } from "./types/VerificationContext";
 import IndexLayout from "./component/IndexLayout";
 
 const App: React.FC = () => {
   return (
     <VerificationProvider>
-      <UserNameProvider>
+      <UserInfoProvider>
         <ReadDataProvider>
           <IndexLayout />
         </ReadDataProvider>
-      </UserNameProvider>
+      </UserInfoProvider>
     </VerificationProvider>
   );
 };

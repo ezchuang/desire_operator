@@ -11,22 +11,34 @@ import {
   TableHead,
   TableRow,
   TextField,
+  Typography,
 } from "@mui/material";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
+import Tooltip, { TooltipProps, tooltipClasses } from "@mui/material/Tooltip";
 
 import { useMessage } from "../types/MessageContext";
 import { useReadData } from "../types/ReadDataContext";
-// import { useColumnData } from "../types/ColumnDataContext";
-import { useColumnOnShow } from "../types/ColumnOnShowContext";
+import { useColumnData } from "../types/ColumnDataContext";
+import {
+  ColumnOnShowElement,
+  useColumnOnShow,
+} from "../types/ColumnOnShowContext";
 import { useRefreshDataFlag } from "../types/RefreshDataFlagContext";
 import { readTableData } from "../models/readData";
 import { updateData } from "../models/updateData";
 import { deleteData } from "../models/deleteData";
+import formatColumnOption from "../models/formatColumnOption";
 
 // interface Column {
 //   id: string;
 //   label: string;
 // }
+
+interface WhereCluster {
+  column: string;
+  operator: string;
+  value: any;
+}
 
 interface EditState {
   row: number;
@@ -43,12 +55,27 @@ const StyledTableCell = styled(TableCell)(() => ({
     fontSize: 14,
     minWidth: 60,
     padding: 14,
+    paddingTop: 6,
+    paddingBottom: 6,
+  },
+}));
+
+const BootstrapTooltip = styled(({ className, ...props }: TooltipProps) => (
+  <Tooltip {...props} arrow classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.arrow}`]: {
+    color: theme.palette.common.black,
+  },
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: theme.palette.common.black,
+    textAlign: "center",
   },
 }));
 
 const MainTable: React.FC = () => {
   const { setMessage, setOpenSnackbar, setSeverity } = useMessage();
   const { readDataElement } = useReadData();
+  const { columnDataElement } = useColumnData();
   const { columnOnShowElement } = useColumnOnShow();
   const { refreshDataFlag } = useRefreshDataFlag();
 
@@ -73,16 +100,20 @@ const MainTable: React.FC = () => {
 
   //
   const handleRemoveRow = async (row: any, index: number) => {
+    const whereCluster: WhereCluster[] = columnDataElement
+      .filter((column) => row[column.id] !== "")
+      .map((column) => ({
+        column: column.id,
+        operator: "=",
+        value: row[column.id],
+      }));
+
+    console.log(whereCluster);
+
     const removeRow = {
       dbName: readDataElement.dbName,
       table: readDataElement.table,
-      where: [
-        {
-          column: "id",
-          operator: "=",
-          value: row.id,
-        },
-      ],
+      where: whereCluster,
     };
 
     try {
@@ -158,6 +189,7 @@ const MainTable: React.FC = () => {
         const response = await readTableData(readDataElement);
 
         setData(response[0]);
+        console.log(response);
 
         // const columnNames = columnData.map((column: any) => {
         //   return {
@@ -181,9 +213,45 @@ const MainTable: React.FC = () => {
       <Table stickyHeader aria-label="main table">
         <TableHead>
           <TableRow>
-            {columnOnShowElement.map((column) => (
-              <StyledTableCell key={column.id}>{column.label}</StyledTableCell>
-            ))}
+            {columnOnShowElement.map((column: ColumnOnShowElement) => {
+              const columnOptionsDetail = Object.entries(column.options)
+                // eslint-disable-next-line no-unused-vars
+                .filter(([key, value]) => value !== false)
+                .map(([key, value]) => formatColumnOption(key, value));
+
+              // 將 columnOptionsDetail 元素和 column.type 合併成一個元素陣列，並收進 ARR 中
+              const columnDetailElements = [
+                <Typography
+                  key="type"
+                  variant="body2"
+                  style={{ textAlign: "center" }}
+                >
+                  {`type: ${column.type}`}
+                </Typography>,
+                ...columnOptionsDetail.map((line, index) => (
+                  <Typography
+                    key={index}
+                    variant="body2"
+                    style={{ textAlign: "center" }}
+                  >
+                    {line}
+                  </Typography>
+                )),
+              ];
+
+              return (
+                <BootstrapTooltip
+                  key={column.id}
+                  title={<div>{columnDetailElements}</div>}
+                  placement="bottom"
+                  arrow
+                >
+                  <StyledTableCell key={column.id}>
+                    {column.label}
+                  </StyledTableCell>
+                </BootstrapTooltip>
+              );
+            })}
             <StyledTableCell>DELETE DATA</StyledTableCell>
           </TableRow>
         </TableHead>
@@ -208,7 +276,7 @@ const MainTable: React.FC = () => {
                         fullWidth
                       />
                     ) : (
-                      value
+                      value || ""
                     )}
                   </StyledTableCell>
                 );

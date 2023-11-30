@@ -39,7 +39,35 @@ const SignInUpInput: React.FC<SignInUpFormProps> = ({
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
+
+    if (!email || !password) {
+      setErrorMessage("請填寫所有必要資訊");
+      return;
+    }
+
+    if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email)) {
+      setErrorMessage("電子郵箱格式不正確");
+      return;
+    }
+
+    if (password.length < 4) {
+      setErrorMessage("密碼至少需要 4 個字");
+      return;
+    }
+
     if (isSignUp) {
+      if (!name) {
+        setErrorMessage("請輸入使用者名稱");
+        return;
+      }
+      if (isNewUserOrInvited && !newGroupName) {
+        setErrorMessage("請輸入新群組名稱");
+        return;
+      } else if (!isNewUserOrInvited && !invitationCode) {
+        setErrorMessage("請輸入邀請碼");
+        return;
+      }
+
       onSignUp({ name, email, password, newGroupName, invitationCode });
     } else {
       onSignIn({ email, password });
@@ -74,6 +102,7 @@ const SignInUpInput: React.FC<SignInUpFormProps> = ({
           >
             {isSignUp && (
               <input
+                required
                 type="text"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
@@ -82,6 +111,7 @@ const SignInUpInput: React.FC<SignInUpFormProps> = ({
               />
             )}
             <input
+              required
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
@@ -89,6 +119,7 @@ const SignInUpInput: React.FC<SignInUpFormProps> = ({
               className="formField"
             />
             <input
+              required
               type="password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
@@ -97,6 +128,7 @@ const SignInUpInput: React.FC<SignInUpFormProps> = ({
             />
             {isSignUp && isNewUserOrInvited ? (
               <input
+                required
                 type="text"
                 value={newGroupName}
                 onChange={(event) => setNewGroupName(event.target.value)}
@@ -108,6 +140,7 @@ const SignInUpInput: React.FC<SignInUpFormProps> = ({
             )}
             {isSignUp && !isNewUserOrInvited ? (
               <input
+                required
                 type="password"
                 value={invitationCode}
                 onChange={(event) => setInvitationCode(event.target.value)}

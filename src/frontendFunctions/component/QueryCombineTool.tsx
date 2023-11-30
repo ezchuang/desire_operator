@@ -30,7 +30,9 @@ import { readTableData } from "../models/readData";
 interface Column {
   id: string;
   label: string;
+  type: string;
   selected?: boolean;
+  options: object;
 }
 
 interface FormState {
@@ -72,9 +74,9 @@ const StyledTableCell = styled(TableCell)<{ selected?: boolean }>(
 const QueryCombineTool: React.FC = () => {
   // const { setMessage, setOpenSnackbar, setSeverity } = useMessage();
   const { columnDataElement, setColumnDataElement } = useColumnData();
+  const { setColumnOnShowElement } = useColumnOnShow();
   const { readDataElement, setReadDataElement } = useReadData();
   const { refreshDataFlag } = useRefreshDataFlag();
-  const { setColumnOnShowElement } = useColumnOnShow();
 
   const [rowCondition, setRowCondition] = useState<any>({});
   const [row, setRow] = useState<any>({});
@@ -139,9 +141,9 @@ const QueryCombineTool: React.FC = () => {
     setReadDataElement({
       ...readDataElement,
       orderBy: formState.orderBy,
-      orderDirection: formState.orderDirection,
-      limit: formState.limit,
+      orderDirection: formState.orderBy ? formState.orderDirection : null,
       offset: formState.offset,
+      limit: formState.limit,
       where: whereConditions.length > 0 ? whereConditions : null,
     });
 
@@ -167,17 +169,25 @@ const QueryCombineTool: React.FC = () => {
         return {
           id: column.name,
           label: column.name.toUpperCase(),
+          type: column.type,
+          options: column.flags,
         };
       });
+      const columnNamesWithSelected = columnNames.map((column: any) => ({
+        ...column,
+        selected: true,
+      }));
+
+      console.log(response[1]);
+      console.log(columnNamesWithSelected);
+
+      setColumnDataElement(columnNamesWithSelected);
+      setColumnOnShowElement(columnNames);
 
       setTableParams({
         db: readDataElement.dbName,
         table: readDataElement.table,
       });
-
-      setColumnDataElement(columnNames);
-
-      setColumnOnShowElement(columnNames);
 
       const initialCondition: any = {};
       const initialRow: any = {};
@@ -210,17 +220,22 @@ const QueryCombineTool: React.FC = () => {
         return {
           id: column.name,
           label: column.name.toUpperCase(),
+          type: column.type,
+          options: column.flags,
         };
       });
+      const columnNamesWithSelected = columnNames.map((column: any) => ({
+        ...column,
+        selected: true,
+      }));
+
+      setColumnDataElement(columnNamesWithSelected);
+      setColumnOnShowElement(columnNames);
 
       setTableParams({
         db: readDataElement.dbName,
         table: readDataElement.table,
       });
-
-      setColumnDataElement(columnNames);
-
-      setColumnOnShowElement(columnNames);
 
       const initialCondition: any = {};
       const initialRow: any = {};
@@ -301,9 +316,9 @@ const QueryCombineTool: React.FC = () => {
           sx={{ mt: 1, mb: 1 }}
           size="small"
         >
-          <InputLabel id="orderBy">orderBy</InputLabel>
+          <InputLabel id="orderBy">{"Order By"}</InputLabel>
           <Select
-            // size="small"
+            size="small"
             labelId="orderBy"
             value={formState.orderBy}
             name="orderBy"
@@ -318,7 +333,7 @@ const QueryCombineTool: React.FC = () => {
         </FormControl>
         <TextField
           size="small"
-          label="orderDirection"
+          label="Order Direction"
           name="orderDirection"
           sx={{ mt: 0, mb: 1 }}
           value={formState.orderDirection}
@@ -327,7 +342,7 @@ const QueryCombineTool: React.FC = () => {
         />
         <TextField
           size="small"
-          label="offset"
+          label="Offset"
           name="offset"
           type="number"
           sx={{ mt: 0, mb: 1 }}
@@ -337,7 +352,7 @@ const QueryCombineTool: React.FC = () => {
         />
         <TextField
           size="small"
-          label="limit"
+          label="Limit"
           name="limit"
           type="number"
           sx={{ mt: 0, mb: 1 }}

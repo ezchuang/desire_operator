@@ -10,7 +10,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 import { useVerification } from "../types/VerificationContext";
 import { useReadData } from "../types/ReadDataContext";
-import { useUserName } from "../types/UserNameContext";
+import { useUserInfo } from "../types/UserInfoContext";
 import CustomizedSnackbars from "./Alert";
 import MainTable from "./MainTable";
 import ShortcutTable from "./ShortcutTable";
@@ -62,7 +62,7 @@ const Type2ShortcutStyledPaper = styled(Paper)({
 const MainLayout: React.FC = () => {
   const { isVerified } = useVerification();
   const { readDataElement, setReadDataElement } = useReadData();
-  const { userName } = useUserName();
+  const { userInfo } = useUserInfo();
 
   const [mainTableExpanded, setMainTableExpanded] = useState(true);
   const [queryCombineToolExpanded, setQueryCombineToolExpanded] =
@@ -93,9 +93,9 @@ const MainLayout: React.FC = () => {
                 <div
                   id="userInfo"
                   className="bg-purple-600 w-8 h-8 rounded-full cursor-pointer flex items-center justify-center mr-2"
-                  title={userName}
+                  title={userInfo.userName}
                 >
-                  {userName.charAt(0)}
+                  {userInfo.userName.charAt(0)}
                 </div>
               </div>
               {/* Content for Verify User */}
@@ -107,8 +107,8 @@ const MainLayout: React.FC = () => {
         {isVerified && (
           <>
             {/* PATH */}
-            <div className="bg-blue-200 p-2 text-blue-900 text-sm sticky top-16 z-20">
-              <div className="max-w-7xl mx-auto">
+            <div className="bg-blue-200 p-2 text-blue-900 text-sm sticky top-16 z-20 flex selection:justify-between">
+              <div className="max-w-7xl my-auto ml-1 mr-auto">
                 {/* Content for PATH */}
                 {/* <div>Breadcrumb / Path</div> */}
                 <div>
@@ -119,7 +119,7 @@ const MainLayout: React.FC = () => {
                       return false;
                     }}
                   >
-                    {userName}
+                    {userInfo.userName}
                   </span>
                   {readDataElement.dbName && readDataElement.table ? (
                     <>
@@ -152,6 +152,13 @@ const MainLayout: React.FC = () => {
                   ) : (
                     <></>
                   )}
+                </div>
+              </div>
+              <div className="flex justify-between">
+                <div className=" m-1">{`群組名稱: ${userInfo.groupName}`}</div>
+                <div className=" m-1">{` / `}</div>
+                <div className=" m-1">
+                  {`群組邀請碼: ${userInfo.invitationCode}`}
                 </div>
               </div>
             </div>
@@ -227,7 +234,7 @@ const MainLayout: React.FC = () => {
                 onChange={() => seHistoryTableExpanded(!historyTableExpanded)}
               >
                 <StyledAccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <div>歷史紀錄 (更新機制未完成)</div>
+                  <div>歷史紀錄</div>
                 </StyledAccordionSummary>
                 <StyledAccordionDetails>
                   <HistoryTable />
