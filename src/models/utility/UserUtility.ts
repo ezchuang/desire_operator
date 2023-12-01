@@ -139,13 +139,8 @@ class UserUtility extends DbUtilityBase {
       await this.execute(getUserDbQuery, [userMail, userPw])
     )[0][0];
 
-    if (globalThis.groupDbMap.has(groupName)) {
-      return [
-        groupName,
-        dbUser,
-        invitationCode,
-        globalThis.groupDbMap.get(groupName),
-      ];
+    if (global.groupDbMap.has(dbUser)) {
+      return [groupName, dbUser, invitationCode, global.groupDbMap.get(dbUser)];
     }
 
     // 沒建立過該群組的 DB
@@ -174,7 +169,6 @@ class UserUtility extends DbUtilityBase {
 
     if (results.length > 0 && results[0].length > 0) {
       const { userId, userName } = results[0][0];
-      console.log("userId, userName: ", userId, userName);
       return [userId, userName];
     } else {
       // throw new Error('User not found.');
@@ -187,8 +181,7 @@ class UserUtility extends DbUtilityBase {
     const { userId, userMail, dbUser } = userObj;
     const getUserDbQuery = `
       SELECT 
-        user_groups.group_name AS groupName,
-        user_groups.signin_pw AS dbPw,
+        user_groups.signin_pw AS dbPw
       FROM 
         user_info.user_groups 
       LEFT JOIN 
@@ -197,12 +190,12 @@ class UserUtility extends DbUtilityBase {
         user_info.users ON users.id = user_groups_to_users.users_id
       WHERE 
         users.id = ? AND users.user_mail = ? AND user_groups.signin_user = ?`;
-    const { groupName, dbPw } = (
+    const { dbPw } = (
       await this.execute(getUserDbQuery, [userId, userMail, dbUser])
     )[0][0];
 
-    if (globalThis.groupDbMap.has(groupName)) {
-      return [groupName, globalThis.groupDbMap.get(groupName)];
+    if (global.groupDbMap.has(dbUser!)) {
+      return [dbUser!, global.groupDbMap.get(dbUser!)];
     }
 
     // 沒建立過該群組的 DB instance
@@ -213,7 +206,7 @@ class UserUtility extends DbUtilityBase {
     };
     const groupDb = new Database(config);
 
-    return [groupName, groupDb];
+    return [dbUser!, groupDb];
   }
 
   // 建立 User 前先檢查是否既存

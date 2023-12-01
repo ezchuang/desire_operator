@@ -35,9 +35,12 @@ class DeleteUtility extends DBUtilityBase {
     console.log(where);
     if (where && where.length > 0) {
       const whereClauses = where.map((condition) => {
+        if (condition.value !== 0 && !condition.value) {
+          return `\`${condition.column}\` IS NULL`;
+        }
         values.push(condition.value);
 
-        return `${condition.column} ${condition.operator} ?`;
+        return `\`${condition.column}\` ${condition.operator} ?`;
       });
 
       queryStr += ` WHERE  ${whereClauses.join(" AND ")}`;

@@ -22,9 +22,8 @@ export default async function readApiInit() {
         };
         const [data, structure] = await readUtility.readDbsOrTables(params);
 
-        console.log(data);
-        console.log(structure);
-
+        // console.log(data);
+        // console.log(structure);
         return res.status(200).json({ data: data, structure: structure });
       } catch (err) {
         console.log(err);

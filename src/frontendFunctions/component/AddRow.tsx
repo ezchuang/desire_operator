@@ -14,6 +14,7 @@ import {
   Paper,
   Grid,
 } from "@mui/material";
+import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
 import { InsertObj } from "../types/Interfaces";
@@ -24,7 +25,7 @@ import { insertData } from "../models/updateData";
 
 const StyledPaper = styled(Paper)({
   width: "100%",
-  overflow: "hidden",
+  overflow: "auto",
 });
 
 const StyledTableCell = styled(TableCell)(() => ({
@@ -35,8 +36,10 @@ const StyledTableCell = styled(TableCell)(() => ({
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
-    minWidth: 60,
-    padding: 6,
+    minWidth: "100px",
+    padding: 14,
+    paddingTop: 6,
+    paddingBottom: 6,
   },
 }));
 
@@ -60,13 +63,18 @@ const AddRow: React.FC = () => {
       }
       return row;
     });
-    console.log(updatedRows);
+    // console.log(updatedRows);
     setRows(updatedRows);
   };
 
   const addRow = () => {
     setRows([...rows, newRow]);
     setNewRow({});
+  };
+
+  const handleRemoveRow = (rowIndex: number) => {
+    const updatedRows = rows.filter((row, index) => index !== rowIndex);
+    setRows(updatedRows);
   };
 
   const saveRows = async () => {
@@ -83,7 +91,7 @@ const AddRow: React.FC = () => {
         throw new Error(`Save Rows Error!`);
       }
 
-      console.log("Rows saved:", response);
+      // console.log("Rows saved:", response);
 
       setSeverity("success");
       setMessage("新增成功");
@@ -108,9 +116,10 @@ const AddRow: React.FC = () => {
               {/* 建立表格 Columns */}
               {columnDataElement.map((column) => (
                 <StyledTableCell key={column.id}>
-                  {column.label}
+                  {`${column.label} (${column.type})`}
                 </StyledTableCell>
               ))}
+              <StyledTableCell>{`DELETE ROW`}</StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -127,37 +136,49 @@ const AddRow: React.FC = () => {
                     />
                   </StyledTableCell>
                 ))}
+                <StyledTableCell key={rowIndex}>
+                  <Box>
+                    <Button
+                      variant="contained"
+                      sx={{ padding: "2px" }}
+                      onClick={() => handleRemoveRow(rowIndex)}
+                      color="secondary"
+                    >
+                      <RemoveCircleOutlineIcon />
+                    </Button>
+                  </Box>
+                </StyledTableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-        <Box mt={1}>
-          <Grid item xs={12}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={addRow}
-              fullWidth
-              startIcon={<AddCircleOutlineIcon />}
-            >
-              Add Row
-            </Button>
-          </Grid>
-        </Box>
-        <Box mt={1}>
-          <Grid item xs={12}>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={saveRows}
-              // sx={{ ml: 2 }}
-              fullWidth
-            >
-              Save Data
-            </Button>
-          </Grid>
-        </Box>
       </TableContainer>
+      <Box mt={1}>
+        <Grid item xs={12}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={addRow}
+            fullWidth
+            startIcon={<AddCircleOutlineIcon />}
+          >
+            Add Row
+          </Button>
+        </Grid>
+      </Box>
+      <Box mt={1}>
+        <Grid item xs={12}>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={saveRows}
+            // sx={{ ml: 2 }}
+            fullWidth
+          >
+            Save Data
+          </Button>
+        </Grid>
+      </Box>
     </StyledPaper>
   );
 };

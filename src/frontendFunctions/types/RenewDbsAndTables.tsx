@@ -15,7 +15,7 @@ const useRenewDbsAndTables = () => {
       if (deepCompareArrays(dbsAndTablesData, dbsAndTablesElement)) {
         return;
       }
-      console.log(dbsAndTablesData);
+      // console.log(dbsAndTablesData);
       setDbsAndTablesElement(dbsAndTablesData);
     } catch (error) {
       if (error instanceof Error) {

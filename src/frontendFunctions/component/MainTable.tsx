@@ -108,7 +108,7 @@ const MainTable: React.FC = () => {
         value: row[column.id],
       }));
 
-    console.log(whereCluster);
+    // console.log(whereCluster);
 
     const removeRow = {
       dbName: readDataElement.dbName,
@@ -189,7 +189,7 @@ const MainTable: React.FC = () => {
         const response = await readTableData(readDataElement);
 
         setData(response[0]);
-        console.log(response);
+        // console.log(response);
 
         // const columnNames = columnData.map((column: any) => {
         //   return {
@@ -247,7 +247,7 @@ const MainTable: React.FC = () => {
                   arrow
                 >
                   <StyledTableCell key={column.id}>
-                    {column.label}
+                    {`${column.label} (${column.type})`}
                   </StyledTableCell>
                 </BootstrapTooltip>
               );
@@ -274,6 +274,7 @@ const MainTable: React.FC = () => {
                         onBlur={handleEditConfirm}
                         autoFocus
                         fullWidth
+                        size="small"
                       />
                     ) : (
                       value || ""

@@ -85,6 +85,12 @@ export interface AddColumnObj {
   defaultValue: string;
 }
 
+export interface delColumnObj {
+  dbName: string;
+  table: string;
+  columnName: string;
+}
+
 export interface DeleteObj {
   dbName: string;
   table?: string;

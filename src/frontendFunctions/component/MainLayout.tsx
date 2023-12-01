@@ -107,58 +107,61 @@ const MainLayout: React.FC = () => {
         {isVerified && (
           <>
             {/* PATH */}
-            <div className="bg-blue-200 p-2 text-blue-900 text-sm sticky top-16 z-20 flex selection:justify-between">
-              <div className="max-w-7xl my-auto ml-1 mr-auto">
-                {/* Content for PATH */}
-                {/* <div>Breadcrumb / Path</div> */}
-                <div>
-                  <span
-                    className="cursor-pointer"
-                    onClick={() => {
-                      setReadDataElement({});
-                      return false;
-                    }}
-                  >
-                    {userInfo.userName}
-                  </span>
-                  {readDataElement.dbName && readDataElement.table ? (
-                    <>
-                      <span> / </span>
-                      <span
-                        className="cursor-pointer"
-                        onClick={() => {
-                          setReadDataElement({
-                            dbName: readDataElement.dbName,
-                          });
-                          return false;
-                        }}
-                      >
-                        {readDataElement.dbName}
-                      </span>
-                      <span> / </span>
-                      <span
-                        className="cursor-pointer"
-                        onClick={() => {
-                          setReadDataElement({
-                            dbName: readDataElement.dbName,
-                            table: readDataElement.table,
-                          });
-                          return false;
-                        }}
-                      >
-                        {readDataElement.table}
-                      </span>
-                    </>
-                  ) : (
-                    <></>
-                  )}
+            <div className="bg-blue-200 p-2 text-blue-900 text-sm sticky top-16 z-20 flex ">
+              <div className=" max-w-7xl w-full justify-between m-auto flex">
+                <div className="max-w-7xl my-auto ml-1 mr-auto">
+                  {/* Content for PATH */}
+                  {/* <div>Breadcrumb / Path</div> */}
+                  <div>
+                    <span
+                      className="cursor-pointer"
+                      onClick={() => {
+                        setReadDataElement({});
+                        return false;
+                      }}
+                    >
+                      {userInfo.userName}
+                    </span>
+                    {readDataElement.dbName && readDataElement.table ? (
+                      <>
+                        <span> / </span>
+                        <span
+                          className="cursor-pointer"
+                          onClick={() => {
+                            setReadDataElement({
+                              dbName: readDataElement.dbName,
+                            });
+                            return false;
+                          }}
+                        >
+                          {readDataElement.dbName}
+                        </span>
+                        <span> / </span>
+                        <span
+                          className="cursor-pointer"
+                          onClick={() => {
+                            setReadDataElement({
+                              dbName: readDataElement.dbName,
+                              table: readDataElement.table,
+                            });
+                            return false;
+                          }}
+                        >
+                          {readDataElement.table}
+                        </span>
+                      </>
+                    ) : (
+                      <></>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <div className="flex justify-between">
-                <div className=" m-1">{`群組名稱: ${userInfo.groupName}`}</div>
-                <div className=" m-1">{` / `}</div>
-                <div className=" m-1">
-                  {`群組邀請碼: ${userInfo.invitationCode}`}
+
+                <div className="flex justify-between">
+                  <div className=" m-1">{`群組名稱: ${userInfo.groupName}`}</div>
+                  <div className=" m-1">{` / `}</div>
+                  <div className=" m-1">
+                    {`群組邀請碼: ${userInfo.invitationCode}`}
+                  </div>
                 </div>
               </div>
             </div>
@@ -170,7 +173,7 @@ const MainLayout: React.FC = () => {
                 onChange={() => setMainTableExpanded(!mainTableExpanded)}
               >
                 <StyledAccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <div>主表格</div>
+                  <div>表格主要工作區</div>
                 </StyledAccordionSummary>
                 <StyledAccordionDetails>
                   {readDataElement.table ? (

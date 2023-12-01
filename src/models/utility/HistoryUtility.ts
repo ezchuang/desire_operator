@@ -36,7 +36,7 @@ class HistoryUtility extends DbUtilityBase {
         JOIN
           user_info.user_groups ON user_groups_to_users.user_groups_id = user_groups.id
         WHERE
-          user_groups.group_name = ?
+          user_groups.signin_user = ?
         ORDER BY
           query_history.id DESC;
       `;
