@@ -49,7 +49,9 @@ const StyledTableCell = styled(TableCell)(() => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: "#d0d0d0",
     minWidth: 60,
-    padding: 10,
+    lineHeight: "1rem",
+    textAlign: "center",
+    whiteSpace: "nowrap",
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
@@ -77,7 +79,7 @@ const MainTable: React.FC = () => {
   const { readDataElement } = useReadData();
   const { columnDataElement } = useColumnData();
   const { columnOnShowElement } = useColumnOnShow();
-  const { refreshDataFlag } = useRefreshDataFlag();
+  const { refreshDataFlag, setRefreshDataFlag } = useRefreshDataFlag();
 
   const [data, setData] = useState<any[]>([]);
   const [edit, setEdit] = useState<EditState>({ row: -1, cell: "" });
@@ -98,7 +100,7 @@ const MainTable: React.FC = () => {
     setEditValue(event.target.value);
   };
 
-  //
+  // 送出 delete row 的需求
   const handleRemoveRow = async (row: any, index: number) => {
     const whereCluster: WhereCluster[] = columnDataElement
       .filter((column) => row[column.id] !== "")
@@ -132,6 +134,13 @@ const MainTable: React.FC = () => {
       setSeverity("error");
       setMessage(`刪除失敗`);
       setOpenSnackbar(true);
+    }
+  };
+
+  // 按下 enter 送出需求
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      handleEditConfirm();
     }
   };
 
@@ -169,6 +178,7 @@ const MainTable: React.FC = () => {
         };
 
         setData(updatedData); // 刷新
+        setRefreshDataFlag([]);
       } catch (error) {
         console.error("Error updating data: ", error);
       }
@@ -246,13 +256,15 @@ const MainTable: React.FC = () => {
                   placement="bottom"
                   arrow
                 >
-                  <StyledTableCell key={column.id}>
-                    {`${column.label} (${column.type})`}
+                  <StyledTableCell key={column.id} size="small">
+                    {`${column.label}`}
+                    <br />
+                    {`(${column.type})`}
                   </StyledTableCell>
                 </BootstrapTooltip>
               );
             })}
-            <StyledTableCell>DELETE DATA</StyledTableCell>
+            <StyledTableCell size="small">DELETE DATA</StyledTableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -272,6 +284,7 @@ const MainTable: React.FC = () => {
                         value={editValue}
                         onChange={handleInputChange}
                         onBlur={handleEditConfirm}
+                        onKeyDown={handleKeyPress}
                         autoFocus
                         fullWidth
                         size="small"
@@ -283,16 +296,18 @@ const MainTable: React.FC = () => {
                 );
               })}
               <StyledTableCell>
-                <Box>
-                  <Button
-                    variant="contained"
-                    sx={{ padding: "2px" }}
-                    onClick={() => handleRemoveRow(row, index)}
-                    color="secondary"
-                  >
-                    <RemoveCircleOutlineIcon />
-                  </Button>
-                </Box>
+                <div className="flex justify-center">
+                  <Box>
+                    <Button
+                      variant="contained"
+                      sx={{ padding: "2px" }}
+                      onClick={() => handleRemoveRow(row, index)}
+                      color="secondary"
+                    >
+                      <RemoveCircleOutlineIcon />
+                    </Button>
+                  </Box>
+                </div>
               </StyledTableCell>
             </TableRow>
           ))}

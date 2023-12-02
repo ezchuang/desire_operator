@@ -32,7 +32,9 @@ const StyledTableCell = styled(TableCell)(() => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: "#d0d0d0",
     minWidth: 60,
-    padding: 4,
+    lineHeight: "1rem",
+    textAlign: "center",
+    whiteSpace: "nowrap",
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
@@ -115,8 +117,10 @@ const AddRow: React.FC = () => {
             <TableRow>
               {/* 建立表格 Columns */}
               {columnDataElement.map((column) => (
-                <StyledTableCell key={column.id}>
-                  {`${column.label} (${column.type})`}
+                <StyledTableCell key={column.id} size="small">
+                  {`${column.label}`}
+                  <br />
+                  {`(${column.type})`}
                 </StyledTableCell>
               ))}
               <StyledTableCell>{`DELETE ROW`}</StyledTableCell>
@@ -124,32 +128,36 @@ const AddRow: React.FC = () => {
           </TableHead>
           <TableBody>
             {/* 主要用於更新 修改的表格內容 */}
-            {rows.map((row, rowIndex) => (
-              <TableRow key={rowIndex}>
-                {columnDataElement.map((column) => (
-                  <StyledTableCell key={column.id}>
-                    <TextField
-                      size="small"
-                      name={column.id}
-                      value={row[column.id] || ""}
-                      onChange={(event) => handleRowChange(event, rowIndex)}
-                    />
+            {columnDataElement.length > 0 ? (
+              rows.map((row, rowIndex) => (
+                <TableRow key={rowIndex}>
+                  {columnDataElement.map((column) => (
+                    <StyledTableCell key={column.id}>
+                      <TextField
+                        size="small"
+                        name={column.id}
+                        value={row[column.id] || ""}
+                        onChange={(event) => handleRowChange(event, rowIndex)}
+                      />
+                    </StyledTableCell>
+                  ))}
+                  <StyledTableCell key={rowIndex}>
+                    <Box>
+                      <Button
+                        variant="contained"
+                        sx={{ padding: "2px" }}
+                        onClick={() => handleRemoveRow(rowIndex)}
+                        color="secondary"
+                      >
+                        <RemoveCircleOutlineIcon />
+                      </Button>
+                    </Box>
                   </StyledTableCell>
-                ))}
-                <StyledTableCell key={rowIndex}>
-                  <Box>
-                    <Button
-                      variant="contained"
-                      sx={{ padding: "2px" }}
-                      onClick={() => handleRemoveRow(rowIndex)}
-                      color="secondary"
-                    >
-                      <RemoveCircleOutlineIcon />
-                    </Button>
-                  </Box>
-                </StyledTableCell>
-              </TableRow>
-            ))}
+                </TableRow>
+              ))
+            ) : (
+              <></>
+            )}
           </TableBody>
         </Table>
       </TableContainer>

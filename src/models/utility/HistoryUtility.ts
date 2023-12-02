@@ -25,7 +25,7 @@ class HistoryUtility extends DbUtilityBase {
         SELECT
             query_history.action_type AS action,
             query_history.query_history AS query,
-            query_history.timestamp_data AS timestamp,
+            CONVERT_TZ(query_history.timestamp_data, '+00:00', 'Asia/Taipei') AS timestamp,
             users.user_name AS name
         FROM
           user_info.query_history
@@ -38,10 +38,11 @@ class HistoryUtility extends DbUtilityBase {
         WHERE
           user_groups.signin_user = ?
         ORDER BY
-          query_history.id DESC;
+          query_history.id DESC
+        LIMIT 100;
       `;
 
-    console.log(queryStr, [groupName]);
+    // console.log(queryStr, [groupName]);
     return await this.execute(queryStr, [groupName]);
   }
 }

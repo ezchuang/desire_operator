@@ -44,32 +44,38 @@ interface FormState {
 
 const StyledPaper = styled(Paper)({
   width: "100%",
+  padding: "4px",
 });
 
-const StyledTableCell = styled(TableCell)<{ selected?: boolean }>(
+const StyledTableCell = styled(TableCell)({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: "#d0d0d0",
+    minWidth: 60,
+    lineHeight: "1rem",
+    textAlign: "center",
+    whiteSpace: "nowrap",
+    padding: 1,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+    minWidth: 60,
+    padding: "2px",
+    paddingTop: "2px",
+    paddingBottom: "2px",
+  },
+});
+
+const StyledInnerTableCell = styled(TableCell)<{ selected?: boolean }>(
   ({ selected }) => ({
-    [`&.${tableCellClasses.head}`]: {
-      backgroundColor: selected ? "#f0f0a0" : "#d0d0d0", // 選取後變色
-      minWidth: 60,
-      padding: "2px",
-    },
-    [`&.${tableCellClasses.body}`]: {
-      fontSize: 14,
-      minWidth: 60,
-      padding: "4px",
-      paddingTop: "2px",
-      paddingBottom: "2px",
-    },
+    backgroundColor: selected ? "#f0f0a0" : "#d0d0d0", // 選取後變色
+    minWidth: 60,
+    lineHeight: "1rem",
+    width: "100%",
+    textAlign: "center",
+    whiteSpace: "nowrap",
+    borderRadius: "5px",
   })
 );
-
-// const StyledTableCell = styled(TableCell)<{ selected?: boolean }>`
-//   ${({ theme, selected }) => ({
-//     backgroundColor: selected ? theme.palette.action.selected : "#d0d0d0",
-//     minWidth: 60,
-//     padding: 4,
-//   })}
-// `;
 
 const QueryCombineTool: React.FC = () => {
   // const { setMessage, setOpenSnackbar, setSeverity } = useMessage();
@@ -158,6 +164,12 @@ const QueryCombineTool: React.FC = () => {
       }
 
       if (!readDataElement.dbName || !readDataElement.table) {
+        setColumnDataElement([]);
+        setColumnOnShowElement([]);
+        setTableParams({
+          db: readDataElement.dbName,
+          table: readDataElement.table,
+        });
         return;
       }
 
@@ -256,21 +268,42 @@ const QueryCombineTool: React.FC = () => {
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
-              <StyledTableCell></StyledTableCell>
+              <StyledTableCell size="small"></StyledTableCell>
               {columnDataElement.map((column: Column) => (
-                <StyledTableCell key={column.id} selected={column.selected}>
-                  <Checkbox
-                    checked={column.selected || false}
-                    onChange={() => handleColumnSelect(column.id)}
-                  />
-                  {`${column.label} (${column.type})`}
+                <StyledTableCell key={column.id} size="small">
+                  <div className="flex justify-center items-center w-full">
+                    <StyledInnerTableCell
+                      key={column.id}
+                      selected={column.selected}
+                      size="small"
+                    >
+                      <div className="flex justify-center items-center w-full">
+                        <div>
+                          <Checkbox
+                            size="small"
+                            checked={column.selected || false}
+                            onChange={() => handleColumnSelect(column.id)}
+                          />
+                        </div>
+                        <div className="px-1">
+                          {`${column.label}`}
+                          <br />
+                          {`(${column.type})`}
+                        </div>
+                      </div>
+                    </StyledInnerTableCell>
+                  </div>
                 </StyledTableCell>
               ))}
             </TableRow>
           </TableHead>
           <TableBody>
             <TableRow>
-              <StyledTableCell>WHERE</StyledTableCell>
+              <StyledTableCell sx={{ backgroundColor: "#d0d0d0" }}>
+                <div className="flex items-center justify-center px-2 font-medium">
+                  WHERE
+                </div>
+              </StyledTableCell>
               {columnDataElement.map((column: Column) => {
                 return (
                   <StyledTableCell key={column.id}>
@@ -315,12 +348,12 @@ const QueryCombineTool: React.FC = () => {
           </TableBody>
         </Table>
       </TableContainer>
-      <>
+      {/* <> */}
+      <TableContainer sx={{ px: 1 }}>
         <FormControl
           fullWidth
           margin="normal"
           variant="outlined"
-          // sx={{ mt: 1, mb: 1, paddingTop: "8.5px", paddingBottom: "8.5px" }}
           sx={{ mt: 1, mb: 1 }}
           size="small"
         >
@@ -345,7 +378,7 @@ const QueryCombineTool: React.FC = () => {
           fullWidth
           margin="normal"
           size="small"
-          sx={{ mt: 0, mb: 1, px: 1 }}
+          sx={{ mt: 0, mb: 1 }}
         >
           <InputLabel id="orderDirection">{"Order Direction"}</InputLabel>
           <Select
@@ -353,6 +386,7 @@ const QueryCombineTool: React.FC = () => {
             labelId="orderDirection"
             value={formState.orderDirection}
             name="orderDirection"
+            label="Order Direction"
             onChange={handleSelectChange}
           >
             <MenuItem value="ASC">{`ASC`}</MenuItem>
@@ -364,7 +398,7 @@ const QueryCombineTool: React.FC = () => {
           label="Offset"
           name="offset"
           type="number"
-          sx={{ mt: 0, mb: 1, px: 1 }}
+          sx={{ mt: 0, mb: 1 }}
           value={formState.offset}
           onChange={handleFormChange}
           fullWidth
@@ -374,12 +408,13 @@ const QueryCombineTool: React.FC = () => {
           label="Limit"
           name="limit"
           type="number"
-          sx={{ mt: 0, mb: 1, px: 1 }}
+          sx={{ mt: 0, mb: 1 }}
           value={formState.limit}
           onChange={handleFormChange}
           fullWidth
         />
-      </>
+      </TableContainer>
+      {/* </> */}
       <Box mt={1}>
         <Grid item xs={12}>
           <Button

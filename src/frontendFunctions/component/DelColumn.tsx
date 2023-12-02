@@ -99,6 +99,7 @@ const DelColumn: React.FC = () => {
               <InputLabel id="column-select-label">選擇 Column</InputLabel>
               <Select
                 labelId="column-select-label"
+                label="選擇 Column"
                 value={delColumnName.columnName}
                 onChange={(event) =>
                   setDelColumnName({ columnName: event.target.value })
