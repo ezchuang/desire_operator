@@ -73,7 +73,7 @@ const StyledInnerTableCell = styled(TableCell)<{ selected?: boolean }>(
     width: "100%",
     textAlign: "center",
     whiteSpace: "nowrap",
-    borderRadius: "5px",
+    // borderRadius: "10px",
   })
 );
 
@@ -270,30 +270,26 @@ const QueryCombineTool: React.FC = () => {
             <TableRow>
               <StyledTableCell size="small"></StyledTableCell>
               {columnDataElement.map((column: Column) => (
-                <StyledTableCell key={column.id} size="small">
+                <StyledInnerTableCell
+                  key={column.id}
+                  selected={column.selected}
+                  size="small"
+                >
                   <div className="flex justify-center items-center w-full">
-                    <StyledInnerTableCell
-                      key={column.id}
-                      selected={column.selected}
-                      size="small"
-                    >
-                      <div className="flex justify-center items-center w-full">
-                        <div>
-                          <Checkbox
-                            size="small"
-                            checked={column.selected || false}
-                            onChange={() => handleColumnSelect(column.id)}
-                          />
-                        </div>
-                        <div className="px-1">
-                          {`${column.label}`}
-                          <br />
-                          {`(${column.type})`}
-                        </div>
-                      </div>
-                    </StyledInnerTableCell>
+                    <div>
+                      <Checkbox
+                        size="small"
+                        checked={column.selected || false}
+                        onChange={() => handleColumnSelect(column.id)}
+                      />
+                    </div>
+                    <div className="px-1">
+                      {`${column.label}`}
+                      <br />
+                      {`(${column.type})`}
+                    </div>
                   </div>
-                </StyledTableCell>
+                </StyledInnerTableCell>
               ))}
             </TableRow>
           </TableHead>
@@ -308,13 +304,6 @@ const QueryCombineTool: React.FC = () => {
                 return (
                   <StyledTableCell key={column.id}>
                     <div className="flex">
-                      {/* <FormControl
-                        fullWidth
-                        margin="normal"
-                        // sx={{ mt: 0, mb: 1 }}
-                        size="small"
-                        variant="outlined"
-                      > */}
                       <Select
                         size="small"
                         variant="outlined"
@@ -333,7 +322,6 @@ const QueryCombineTool: React.FC = () => {
                           </MenuItem>
                         ))}
                       </Select>
-                      {/* </FormControl> */}
                       <TextField
                         size="small"
                         name={column.id}
@@ -348,7 +336,6 @@ const QueryCombineTool: React.FC = () => {
           </TableBody>
         </Table>
       </TableContainer>
-      {/* <> */}
       <TableContainer sx={{ px: 1 }}>
         <FormControl
           fullWidth
