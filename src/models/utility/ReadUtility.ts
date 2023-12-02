@@ -10,12 +10,12 @@ class ReadUtility extends DBUtilityBase {
     if (dbName) {
       queryStr += `TABLES FROM \`${dbName}\``;
 
-      // console.log(queryStr, []);
+      console.log(queryStr, []);
       return await this.execute(queryStr, []);
     } else {
       queryStr += "DATABASES";
 
-      // console.log(queryStr, []);
+      console.log(queryStr, []);
       return await this.execute(queryStr, []);
     }
   }
@@ -60,7 +60,7 @@ class ReadUtility extends DBUtilityBase {
       values.push(limit);
     }
 
-    // console.log(queryStr, values);
+    console.log(queryStr, values);
     return await this.execute(queryStr, values);
   }
 
@@ -69,7 +69,7 @@ class ReadUtility extends DBUtilityBase {
     const { dbName, table } = obj;
     let queryStr = `SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?`;
 
-    // console.log(queryStr, [dbName, table]);
+    console.log(queryStr, [dbName, table]);
     return await this.execute(queryStr, [dbName, table]);
   }
 }

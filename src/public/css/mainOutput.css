@@ -660,10 +660,6 @@ video {
   margin: auto;
 }
 
-.m-\[1px\] {
-  margin: 1px;
-}
-
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
@@ -912,11 +908,6 @@ video {
   padding: 1rem;
 }
 
-.px-8 {
-  padding-left: 2rem;
-  padding-right: 2rem;
-}
-
 .px-1 {
   padding-left: 0.25rem;
   padding-right: 0.25rem;
@@ -925,6 +916,11 @@ video {
 .px-2 {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
+}
+
+.px-8 {
+  padding-left: 2rem;
+  padding-right: 2rem;
 }
 
 .pt-20 {

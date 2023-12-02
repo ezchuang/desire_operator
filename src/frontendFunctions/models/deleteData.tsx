@@ -15,10 +15,9 @@ export async function deleteData(element: any): Promise<any> {
       );
     }
 
-    const result = await response.json();
     // console.log("updateData: ", response);
 
-    return result.data;
+    return response.data;
   } catch (err) {
     console.error(`There was an error in the delete operation: `, err);
     throw err;
@@ -40,9 +39,7 @@ export async function deleteTable(element: any): Promise<any> {
       );
     }
 
-    const result = await response.json();
-
-    return result.data;
+    return response.data;
   } catch (err) {
     console.error("There was an error dropping the table: ", err);
     throw err;
@@ -64,9 +61,7 @@ export async function deleteDb(element: any): Promise<any> {
       );
     }
 
-    const result = await response.json();
-
-    return result.data;
+    return response.data;
   } catch (err) {
     console.error("There was an error dropping the database: ", err);
     throw err;

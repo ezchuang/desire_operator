@@ -1,3 +1,4 @@
+// 將 column 的 屬性 轉換成 字串
 const formatColumnOption = (key: string, value: string) => {
   switch (key) {
     case "isNotNull":

@@ -1,4 +1,7 @@
 // 封裝 fetch 請求
+const requestCache = new Map();
+const cacheTimeout = 2000; // 快取存在時限
+
 interface FetchPackagerConfig {
   urlFetch: string;
   methodFetch: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
@@ -6,19 +9,62 @@ interface FetchPackagerConfig {
   bodyFetch?: string | null;
 }
 
-export default function fetchPackager({
-  urlFetch = "/",
-  methodFetch = "GET",
-  headersFetch = {
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-    "Content-Type": "application/json",
-  },
-  bodyFetch = null,
-}: FetchPackagerConfig): Promise<Response> {
-  const headers = new Headers(headersFetch);
-  return fetch(urlFetch, {
-    method: methodFetch,
-    headers: headers,
-    body: bodyFetch,
+function generateCacheKey(config: FetchPackagerConfig): string {
+  return JSON.stringify({
+    url: config.urlFetch,
+    method: config.methodFetch,
+    headers: config.headersFetch,
+    body: config.bodyFetch,
   });
+}
+
+export default function fetchPackager(
+  config: FetchPackagerConfig
+): Promise<any> {
+  const cacheKey = generateCacheKey(config); // 轉成Json string
+  // 若時限內該使用者有做過同樣的指令，則回傳快取 Promise 給他
+  // 此時並未確認 Promise 解析結果
+  // 因為回傳的是同一個 物件，所以會一直在 await 的地方(呼叫此函式的地方)等到他完成
+  if (requestCache.has(cacheKey)) {
+    return requestCache.get(cacheKey);
+  }
+
+  const headers = new Headers(
+    config.headersFetch || {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "application/json",
+    }
+  );
+
+  const fetchPromise = new Promise((resolve, reject) => {
+    fetch(config.urlFetch || "/", {
+      method: config.methodFetch || "GET",
+      headers: headers,
+      body: config.bodyFetch || null,
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        resolve(data);
+      })
+      .catch((err) => {
+        reject(err);
+      })
+      .catch((err) => {
+        requestCache.delete(cacheKey); // 失敗時，刪除快取中的 Promise
+        throw err;
+      })
+      .finally(() => {
+        setTimeout(() => requestCache.delete(cacheKey), cacheTimeout);
+      });
+  });
+
+  // requestCache.delete(cacheKey) // 保留，不過應該沒有必要
+  requestCache.set(cacheKey, fetchPromise); // 將 "Promise" 存進內存
+
+  return fetchPromise;
 }

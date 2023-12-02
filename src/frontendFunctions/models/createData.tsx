@@ -1,4 +1,3 @@
-// import { ReadDataElement } from "../types/ReadDataContext";
 import fetchPackager from "./fetchPackager";
 
 interface TableData {
@@ -16,9 +15,8 @@ export async function createDb(element: string): Promise<boolean> {
       bodyFetch: JSON.stringify({ dbName: element }),
     });
 
-    const result = await response.json();
-    if (result.data) {
-      return result.data;
+    if (response.data) {
+      return response.data;
     } else {
       throw Error;
     }
@@ -29,7 +27,6 @@ export async function createDb(element: string): Promise<boolean> {
 }
 
 // 新建 Table
-// 回頭處理 any
 export async function createTable(element: TableData): Promise<boolean> {
   try {
     const response = await fetchPackager({
@@ -38,9 +35,8 @@ export async function createTable(element: TableData): Promise<boolean> {
       bodyFetch: JSON.stringify(refactorCreateDataParams(element)),
     });
 
-    const result = await response.json();
-    if (result.data) {
-      return result.data;
+    if (response.data) {
+      return response.data;
     } else {
       throw Error;
     }
@@ -50,6 +46,7 @@ export async function createTable(element: TableData): Promise<boolean> {
   }
 }
 
+// 將 element.columns 中 { key : value } 的 value 轉成要給後端執行的 Array
 function refactorCreateDataParams(element: TableData) {
   const validColumns = element.columns.filter(
     (column) => column.columnName && column.columnType
