@@ -145,7 +145,6 @@ const QueryCombineTool: React.FC = () => {
         value: row[column.id],
       }));
 
-    // 更新 readDataElement
     try {
       formState.limit = Number(formState.limit);
       formState.offset = Number(formState.offset);
@@ -156,6 +155,7 @@ const QueryCombineTool: React.FC = () => {
       return;
     }
 
+    // 更新 readDataElement
     setReadDataElement({
       ...readDataElement,
       orderBy: formState.orderBy,

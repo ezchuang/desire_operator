@@ -63,14 +63,14 @@ class ReadUtility extends DBUtilityBase {
       }
     }
 
+    if (limit && offset) {
+      queryStr += " LIMIT ?";
+      values.push(limit);
+    }
+
     if (offset) {
       queryStr += " OFFSET ?";
       values.push(offset);
-    }
-
-    if (limit) {
-      queryStr += " LIMIT ?";
-      values.push(limit);
     }
 
     console.log(queryStr, values);
