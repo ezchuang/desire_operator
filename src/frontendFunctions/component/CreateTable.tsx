@@ -121,11 +121,21 @@ const CreateTable: React.FC = () => {
 
   return (
     <Box width="100%" margin="auto" padding={"2px"}>
-      <FormControl fullWidth margin="normal" sx={{ mt: 0, mb: 1 }} size="small">
+      <FormControl
+        fullWidth
+        margin="normal"
+        sx={{ mt: 0, mb: 1 }}
+        // margin={"1"}
+        size="small"
+        variant="outlined"
+      >
         <InputLabel id="database-select-label">選擇資料庫</InputLabel>
         <Select
+          style={{ width: "100%" }}
           labelId="database-select-label"
           value={dbName}
+          variant="outlined"
+          label="選擇資料庫"
           onChange={(event) => setDbName(event.target.value)}
         >
           {dbsAndTablesElement
@@ -153,7 +163,7 @@ const CreateTable: React.FC = () => {
           <Grid item xs={3}>
             <TextField
               fullWidth
-              label="列名稱"
+              label="Column 名稱"
               value={column.columnName}
               onChange={(event) =>
                 handleColumnChange(index, "columnName", event.target.value)
@@ -164,7 +174,7 @@ const CreateTable: React.FC = () => {
           <Grid item xs={2}>
             <TextField
               fullWidth
-              label="數據類型"
+              label="Column 類型"
               value={column.columnType}
               onChange={(event) =>
                 handleColumnChange(index, "columnType", event.target.value)

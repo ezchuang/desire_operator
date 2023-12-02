@@ -186,7 +186,8 @@ const AddColumn: React.FC = () => {
                       disabled={shouldDisableCheckbox(key)}
                     />
                   }
-                  label={key.replace(/([A-Z])/g, " $1").trim()}
+                  // label={key.replace(/([A-Z])/g, " $1").trim()}
+                  label={key.toUpperCase()}
                 />
               </Grid>
             ))}

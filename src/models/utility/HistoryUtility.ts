@@ -41,6 +41,7 @@ class HistoryUtility extends DbUtilityBase {
           query_history.id DESC;
       `;
 
+    console.log(queryStr, [groupName]);
     return await this.execute(queryStr, [groupName]);
   }
 }

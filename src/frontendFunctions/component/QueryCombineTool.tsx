@@ -277,8 +277,16 @@ const QueryCombineTool: React.FC = () => {
                 return (
                   <StyledTableCell key={column.id}>
                     <div className="flex">
+                      {/* <FormControl
+                        fullWidth
+                        margin="normal"
+                        // sx={{ mt: 0, mb: 1 }}
+                        size="small"
+                        variant="outlined"
+                      > */}
                       <Select
                         size="small"
+                        variant="outlined"
                         labelId="database-select-label"
                         value={rowCondition[column.id] || ""}
                         onChange={(event) =>
@@ -294,6 +302,7 @@ const QueryCombineTool: React.FC = () => {
                           </MenuItem>
                         ))}
                       </Select>
+                      {/* </FormControl> */}
                       <TextField
                         size="small"
                         name={column.id}
@@ -312,6 +321,7 @@ const QueryCombineTool: React.FC = () => {
         <FormControl
           fullWidth
           margin="normal"
+          variant="outlined"
           // sx={{ mt: 1, mb: 1, paddingTop: "8.5px", paddingBottom: "8.5px" }}
           sx={{ mt: 1, mb: 1 }}
           size="small"
@@ -319,7 +329,9 @@ const QueryCombineTool: React.FC = () => {
           <InputLabel id="orderBy">{"Order By"}</InputLabel>
           <Select
             size="small"
+            variant="outlined"
             labelId="orderBy"
+            label="Order By"
             value={formState.orderBy}
             name="orderBy"
             onChange={handleSelectChange}

@@ -59,11 +59,14 @@ const DeleteDatabase: React.FC = () => {
           margin="normal"
           sx={{ mt: 0, mb: 1 }}
           size="small"
+          variant="outlined"
         >
           <InputLabel id="database-select-label">選擇資料庫</InputLabel>
           <Select
             labelId="database-select-label"
             value={dbName}
+            variant="outlined"
+            label="選擇資料庫"
             onChange={(event) => setDbName(event.target.value)}
           >
             {dbsAndTablesElement

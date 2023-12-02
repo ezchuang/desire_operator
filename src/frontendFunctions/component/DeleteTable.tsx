@@ -64,11 +64,14 @@ const DeleteTable: React.FC = () => {
           margin="normal"
           sx={{ mt: 0, mb: 1 }}
           size="small"
+          variant="outlined"
         >
           <InputLabel id="database-select-label">選擇資料庫</InputLabel>
           <Select
             labelId="database-select-label"
+            variant="outlined"
             value={dbName}
+            label="選擇資料庫"
             onChange={(event) => setDbName(event.target.value)}
           >
             {dbsAndTablesElement
@@ -85,10 +88,13 @@ const DeleteTable: React.FC = () => {
           margin="normal"
           sx={{ mt: 0, mb: 1 }}
           size="small"
+          variant="outlined"
         >
           <InputLabel id="table-select-label">選擇表格</InputLabel>
           <Select
             labelId="table-select-label"
+            variant="outlined"
+            label="選擇表格"
             value={tableName}
             onChange={(event) => setTableName(event.target.value)}
           >

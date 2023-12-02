@@ -153,4 +153,4 @@ Thumbs.db
 *.sql
 
 # tsc
-bulid/*
+./bulid/*
