@@ -22,8 +22,16 @@ class ReadUtility extends DBUtilityBase {
 
   // 讀取 Table 內部資料
   async read(obj: ReadObj) {
-    const { dbName, table, select, where, orderBy, orderDirection, limit } =
-      obj;
+    const {
+      dbName,
+      table,
+      select,
+      where,
+      orderBy,
+      orderDirection,
+      offset,
+      limit,
+    } = obj;
     const values: any[] = [];
     let queryStr = "SELECT ";
 
@@ -53,6 +61,11 @@ class ReadUtility extends DBUtilityBase {
       if (orderDirection) {
         queryStr += ` ${orderDirection}`;
       }
+    }
+
+    if (offset) {
+      queryStr += " OFFSET ?";
+      values.push(offset);
     }
 
     if (limit) {

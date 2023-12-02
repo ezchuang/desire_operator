@@ -98,7 +98,8 @@ export default async function readApiInit() {
           groupBy: req.body.groupBy,
           orderBy: req.body.orderBy,
           orderDirection: req.body.orderDirection,
-          limit: req.body.limit,
+          offset: Number(req.body.offset),
+          limit: Number(req.body.limit),
         };
         const [data, structure] = await readUtility.read(params);
 

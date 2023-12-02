@@ -60,7 +60,8 @@ export interface ReadObj {
   groupBy?: string;
   orderBy?: string;
   orderDirection?: "ASC" | "DESC";
-  limit?: number;
+  offset?: number | 0;
+  limit?: number | 100;
 }
 
 export interface UpdateObj {

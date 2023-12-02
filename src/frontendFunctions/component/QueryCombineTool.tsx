@@ -26,6 +26,7 @@ import { useColumnOnShow } from "../types/ColumnOnShowContext";
 import { useRefreshDataFlag } from "../types/RefreshDataFlagContext";
 import { useReadData } from "../types/ReadDataContext";
 import { readTableData } from "../models/readData";
+import { useMessage } from "../types/MessageContext";
 
 interface Column {
   id: string;
@@ -83,6 +84,7 @@ const QueryCombineTool: React.FC = () => {
   const { setColumnOnShowElement } = useColumnOnShow();
   const { readDataElement, setReadDataElement } = useReadData();
   const { refreshDataFlag } = useRefreshDataFlag();
+  const { setMessage, setOpenSnackbar, setSeverity } = useMessage();
 
   const [rowCondition, setRowCondition] = useState<any>({});
   const [row, setRow] = useState<any>({});
@@ -144,6 +146,16 @@ const QueryCombineTool: React.FC = () => {
       }));
 
     // 更新 readDataElement
+    try {
+      formState.limit = Number(formState.limit);
+      formState.offset = Number(formState.offset);
+    } catch (err) {
+      setSeverity("error");
+      setMessage("輸入異常");
+      setOpenSnackbar(true);
+      return;
+    }
+
     setReadDataElement({
       ...readDataElement,
       orderBy: formState.orderBy,
