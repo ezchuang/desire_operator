@@ -15,7 +15,7 @@ const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
     const decoded = jwt.verify(token, global.secretKey) as jwt.JwtPayload;
     req.user = decoded;
 
-    let userGroup = globalThis.userGroupMap.get(req.user!.userId) as string;
+    let userGroup = global.userGroupMap.get(req.user!.userId) as string;
 
     // 若是伺服器有重啟，就需要走這裡，由 Token 建立 DB Connection
     if (!userGroup) {
@@ -30,13 +30,14 @@ const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     req.userGroup = userGroup;
-    req.db = globalThis.groupDbMap.get(userGroup);
+    req.db = global.groupDbMap.get(userGroup);
 
     next();
   } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {
       return res.status(401).json({ error: "無效 Token" });
     }
+    console.error(error);
     return res.status(500).json({ error: "伺服器錯誤" });
   }
 };

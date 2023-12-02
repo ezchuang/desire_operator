@@ -28,7 +28,7 @@ export default async function userApiInit() {
         throw new Error("ValidationError");
       }
 
-      if (!params.invitationCode || !params.groupName) {
+      if (!params.invitationCode && !params.groupName) {
         throw new Error("ValidationError");
       }
 
@@ -148,6 +148,8 @@ export default async function userApiInit() {
         groupName: decoded.groupName,
         invitationCode: decoded.invitationCode,
       };
+
+      console.log("decoded: ", decoded);
 
       return res.status(200).json({ success: true, data: resData });
     } catch (error) {

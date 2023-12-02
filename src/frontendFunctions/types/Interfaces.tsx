@@ -45,6 +45,12 @@ export interface AddColumnObj {
   defaultValue?: string;
 }
 
+export interface delColumnObj {
+  dbName: string;
+  table: string;
+  columnName: string;
+}
+
 export interface HistoryRecord {
   name: string;
   action: string;

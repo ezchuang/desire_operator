@@ -1,5 +1,10 @@
 import DBUtilityBase from "./DbUtilityBase";
-import { UpdateObj, InsertObj, AddColumnObj } from "../base/Interfaces";
+import {
+  UpdateObj,
+  InsertObj,
+  AddColumnObj,
+  delColumnObj,
+} from "../base/Interfaces";
 import addHistory from "../../controllers/addHistory";
 
 class UpdateUtility extends DBUtilityBase {
@@ -83,6 +88,24 @@ class UpdateUtility extends DBUtilityBase {
       return true;
     } catch (err) {
       console.error("Error in addColumn:", err);
+      throw err;
+    }
+  }
+
+  async delColumn(userId: string, obj: delColumnObj) {
+    try {
+      const { dbName, table, columnName } = obj;
+
+      let queryStr = `ALTER TABLE \`${dbName}\`.\`${table}\` DROP COLUMN \`${columnName}\``;
+
+      console.log(queryStr);
+      await this.execute(queryStr, []);
+
+      await addHistory(userId, "Delete Column", queryStr, []);
+
+      return true;
+    } catch (err) {
+      console.error("Error in delColumn:", err);
       throw err;
     }
   }

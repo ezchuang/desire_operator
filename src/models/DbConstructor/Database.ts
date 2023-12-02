@@ -6,7 +6,7 @@ class Database {
   private pool: Pool;
 
   constructor(config: DatabaseConfigObj) {
-    console.log(config);
+    // console.log(config);
     this.pool = mysql2.createPool({
       user: config.user,
       password: config.password,

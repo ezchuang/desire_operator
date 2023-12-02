@@ -37,7 +37,7 @@ interface Column {
 
 interface FormState {
   orderBy: string;
-  orderDirection: "asc" | "desc";
+  orderDirection: "ASC" | "DESC";
   limit: number;
   offset: number;
 }
@@ -83,7 +83,7 @@ const QueryCombineTool: React.FC = () => {
   const [tableParams, setTableParams] = useState<any>({ db: "", table: "" });
   const [formState, setFormState] = useState<FormState>({
     orderBy: "",
-    orderDirection: "asc",
+    orderDirection: "ASC",
     limit: 100,
     offset: 0,
   });
@@ -146,8 +146,6 @@ const QueryCombineTool: React.FC = () => {
       limit: formState.limit,
       where: whereConditions.length > 0 ? whereConditions : null,
     });
-
-    // 可能還需要重新獲取數據
   };
 
   useEffect(() => {
@@ -178,8 +176,8 @@ const QueryCombineTool: React.FC = () => {
         selected: true,
       }));
 
-      console.log(response[1]);
-      console.log(columnNamesWithSelected);
+      // console.log(response[1]);
+      // console.log(columnNamesWithSelected);
 
       setColumnDataElement(columnNamesWithSelected);
       setColumnOnShowElement(columnNames);
@@ -265,7 +263,7 @@ const QueryCombineTool: React.FC = () => {
                     checked={column.selected || false}
                     onChange={() => handleColumnSelect(column.id)}
                   />
-                  {column.label}
+                  {`${column.label} (${column.type})`}
                 </StyledTableCell>
               ))}
             </TableRow>
@@ -338,26 +336,35 @@ const QueryCombineTool: React.FC = () => {
           >
             {columnDataElement.map((column: Column) => (
               <MenuItem key={column.id} value={column.id}>
-                {column.id}
+                {column.label}
               </MenuItem>
             ))}
           </Select>
         </FormControl>
-        <TextField
-          size="small"
-          label="Order Direction"
-          name="orderDirection"
-          sx={{ mt: 0, mb: 1 }}
-          value={formState.orderDirection}
-          onChange={handleFormChange}
+        <FormControl
           fullWidth
-        />
+          margin="normal"
+          size="small"
+          sx={{ mt: 0, mb: 1, px: 1 }}
+        >
+          <InputLabel id="orderDirection">{"Order Direction"}</InputLabel>
+          <Select
+            // sx={{ my: 1, mx: 1 }}
+            labelId="orderDirection"
+            value={formState.orderDirection}
+            name="orderDirection"
+            onChange={handleSelectChange}
+          >
+            <MenuItem value="ASC">{`ASC`}</MenuItem>
+            <MenuItem value="DESC">{`DESC`}</MenuItem>
+          </Select>
+        </FormControl>
         <TextField
           size="small"
           label="Offset"
           name="offset"
           type="number"
-          sx={{ mt: 0, mb: 1 }}
+          sx={{ mt: 0, mb: 1, px: 1 }}
           value={formState.offset}
           onChange={handleFormChange}
           fullWidth
@@ -367,7 +374,7 @@ const QueryCombineTool: React.FC = () => {
           label="Limit"
           name="limit"
           type="number"
-          sx={{ mt: 0, mb: 1 }}
+          sx={{ mt: 0, mb: 1, px: 1 }}
           value={formState.limit}
           onChange={handleFormChange}
           fullWidth

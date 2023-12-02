@@ -656,6 +656,10 @@ video {
   margin: 0.25rem;
 }
 
+.m-auto {
+  margin: auto;
+}
+
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
@@ -1126,22 +1130,6 @@ video {
 .secondaryButton:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(55 65 81 / var(--tw-bg-opacity));
-}
-
-.selection\:justify-between *::-moz-selection {
-  justify-content: space-between;
-}
-
-.selection\:justify-between *::selection {
-  justify-content: space-between;
-}
-
-.selection\:justify-between::-moz-selection {
-  justify-content: space-between;
-}
-
-.selection\:justify-between::selection {
-  justify-content: space-between;
 }
 
 .hover\:text-blue-700:hover {
