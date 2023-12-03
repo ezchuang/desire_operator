@@ -18,7 +18,7 @@ import Tooltip, { TooltipProps, tooltipClasses } from "@mui/material/Tooltip";
 
 import { useMessage } from "../types/MessageContext";
 import { useReadData } from "../types/ReadDataContext";
-import { useColumnData } from "../types/ColumnDataContext";
+import { ColumnDataElement, useColumnData } from "../types/ColumnDataContext";
 import {
   ColumnOnShowElement,
   useColumnOnShow,
@@ -146,7 +146,7 @@ const MainTable: React.FC = () => {
 
   // 處理編輯確認
   const handleEditConfirm = async () => {
-    const editingRow = data[edit.row]; // 獲取正在編輯的行(第幾行)
+    const editingRow = data[edit.row]; // 獲取正在編輯的行(第幾行/哪一行)
     const editingColumn = columnOnShowElement.find(
       (column) => column.id === edit.cell
     ); // 獲取正在編輯的列(列名稱)
@@ -158,13 +158,18 @@ const MainTable: React.FC = () => {
         data: {
           [editingColumn.id]: editValue,
         },
-        where: [
-          {
-            column: editingColumn.id,
-            operator: "=",
-            value: editingRow[editingColumn.id],
-          },
-        ],
+        // where: [
+        //   {
+        //     column: editingColumn.id,
+        //     operator: "=",
+        //     value: editingRow[editingColumn.id],
+        //   },
+        // ],
+        where: columnDataElement.map((cell: ColumnDataElement) => ({
+          column: cell.id,
+          operator: "=",
+          value: editingRow[cell.id],
+        })),
       };
 
       try {

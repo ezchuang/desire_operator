@@ -36,14 +36,16 @@ function refactorCreateDataParams(element: TableData) {
         column.isUnsigned ? "UNSIGNED" : "",
         column.isNotNull ? "NOT NULL" : "",
         // 只有非 AUTO_INCREMENT 列才設置 DEFAULT 值
-        !column.isAutoIncrement && column.defaultValue !== undefined
+        !column.isAutoIncrement &&
+        column.defaultValue !== undefined &&
+        column.defaultValue !== null &&
+        column.defaultValue !== ""
           ? `DEFAULT '${column.defaultValue}'`
           : "",
         column.isZerofill ? "ZEROFILL" : "",
         column.isAutoIncrement ? "AUTO_INCREMENT" : "",
         // 根據列的設置添加 UNIQUE 約束
         column.isUnique ? "UNIQUE" : "",
-        // 其他選項...
       ].filter(Boolean); // 移除 ""
 
       return {
