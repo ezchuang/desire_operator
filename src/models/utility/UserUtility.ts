@@ -43,23 +43,31 @@ class UserUtility extends DbUtilityBase {
   async createUser(userObj: CreateUserObj) {
     const { userMail, userPw, userName, invitationCode, groupName } = userObj;
 
-    const insertUserQuery = `
-      INSERT INTO 
-        user_info.users (user_mail, user_pw, user_name) 
-      VALUES 
-        (?, ?, ?)`;
-    await this.execute(insertUserQuery, [userMail, userPw, userName]);
-
-    const getUserIdQuery = `SELECT id FROM user_info.users WHERE user_mail = ? AND user_pw = ?`;
-    const userId = (
-      await this.execute(getUserIdQuery, [userMail, userPw])
-    )[0][0].id;
-
     if (invitationCode) {
       // 加入既有 Group
-      const getGroupIdQuery = `SELECT id FROM user_info.user_groups WHERE invitation_code=?`;
-      const groupId = (
-        await this.execute(getGroupIdQuery, [invitationCode])
+      // 從提供的邀請碼 搜尋群組 ID
+      const getGroupIdQuery = `SELECT id FROM user_info.user_groups WHERE invitation_code = ?`;
+
+      const groupIdResponse = await this.execute(getGroupIdQuery, [
+        invitationCode,
+      ]);
+
+      if (groupIdResponse[0].length <= 0) {
+        throw new Error("InvitationCodeDoesNotExist");
+      }
+      const groupId = groupIdResponse[0][0].id;
+
+      const insertUserQuery = `
+        INSERT INTO 
+          user_info.users (user_mail, user_pw, user_name) 
+        VALUES 
+          (?, ?, ?)`;
+      console.log(insertUserQuery, [userMail, userPw, userName]);
+      await this.execute(insertUserQuery, [userMail, userPw, userName]);
+
+      const getUserIdQuery = `SELECT id FROM user_info.users WHERE user_mail = ? AND user_pw = ?`;
+      const userId = (
+        await this.execute(getUserIdQuery, [userMail, userPw])
       )[0][0].id;
 
       // verify 有機會再回頭加
@@ -78,6 +86,26 @@ class UserUtility extends DbUtilityBase {
         userMail,
         userPw
       );
+
+      const selectGroupName = `SELECT group_name AS groupName FROM user_info.user_groups WHERE group_name = ?`;
+      const duplicateGroupName = await this.execute(selectGroupName, [
+        groupName,
+      ]);
+      if (duplicateGroupName[0].length >= 1) {
+        throw new Error("DuplicateGroupName");
+      }
+
+      const insertUserQuery = `
+        INSERT INTO 
+          user_info.users (user_mail, user_pw, user_name) 
+        VALUES 
+          (?, ?, ?)`;
+      await this.execute(insertUserQuery, [userMail, userPw, userName]);
+
+      const getUserIdQuery = `SELECT id FROM user_info.users WHERE user_mail = ? AND user_pw = ?`;
+      const userId = (
+        await this.execute(getUserIdQuery, [userMail, userPw])
+      )[0][0].id;
 
       const insertGroupQuery = `
         INSERT INTO 
@@ -110,10 +138,7 @@ class UserUtility extends DbUtilityBase {
       throw new Error("資料異常");
     }
 
-    return {
-      success: true,
-      message: "User and MySQL access created successfully.",
-    };
+    return true;
   }
 
   // 取得既有 DB 連線(不是直接回傳 Pool)
@@ -215,7 +240,7 @@ class UserUtility extends DbUtilityBase {
 
     const queryStr = `SELECT user_mail FROM user_info.users WHERE user_mail = ?`;
 
-    if ((await this.execute(queryStr, [userMail]))[0].length < 0) {
+    if ((await this.execute(queryStr, [userMail]))[0].length <= 0) {
       return false;
     }
 

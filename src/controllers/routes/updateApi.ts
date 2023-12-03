@@ -95,12 +95,12 @@ export default async function updateApiInit() {
         const userId = req.user!.userId;
 
         const params: AddColumnObj = {
-          dbName: dbName,
-          table: table,
-          columnName: columnName,
-          columnType: columnType,
-          columnOption: columnOption,
-          defaultValue: defaultValue,
+          dbName,
+          table,
+          columnName,
+          columnType,
+          columnOption,
+          defaultValue,
         };
         const data = await updateUtility.addColumn(userId, params);
 

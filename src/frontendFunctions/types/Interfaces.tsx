@@ -1,16 +1,28 @@
-interface ForeignKeyReference {
-  referencedTable?: string;
-  referencedColumnName?: string;
-}
+// interface ForeignKeyReference {
+//   referencedTable?: string;
+//   referencedColumnName?: string;
+// }
 
 export interface ColumnData {
   columnName: string;
   columnType: string;
-  isUnsigned: boolean;
-  isPrimaryKey: boolean;
-  isForeignKey: boolean;
+  columnSizeLimit?: number;
+  defaultValue?: string;
+
   isNotNull: boolean;
-  foreignKeyReference?: ForeignKeyReference;
+  isPrimaryKey: boolean;
+  isUniqueKey: boolean;
+  isUnsigned: boolean;
+  isAutoIncrement: boolean;
+  isZerofill: boolean;
+  // isForeignKey: boolean;
+  // foreignKeyReference?: ForeignKeyReference;
+}
+
+export interface TableData {
+  dbName: string;
+  table: string;
+  columns: any[];
 }
 
 export interface RowData {
@@ -42,7 +54,7 @@ export interface AddColumnObj {
   columnName: string;
   columnType: string;
   columnOption?: string[];
-  defaultValue?: string;
+  defaultValue?: string | null;
 }
 
 export interface delColumnObj {

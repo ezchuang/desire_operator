@@ -834,6 +834,10 @@ video {
   justify-content: space-between;
 }
 
+.gap-\[1px\] {
+  gap: 1px;
+}
+
 .overflow-auto {
   overflow: auto;
 }

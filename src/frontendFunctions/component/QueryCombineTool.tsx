@@ -71,7 +71,7 @@ const StyledInnerTableCell = styled(TableCell)<{ selected?: boolean }>(
     backgroundColor: selected ? "#f0f0a0" : "#d0d0d0", // 選取後變色
     minWidth: 60,
     lineHeight: "1rem",
-    width: "100%",
+    // width: "100%",
     textAlign: "center",
     whiteSpace: "nowrap",
     // borderRadius: "10px",
@@ -238,7 +238,7 @@ const QueryCombineTool: React.FC = () => {
 
       const response = await readTableData(readDataElement);
 
-      const columnNames = response[1].map((column: any) => {
+      const columnNames: Column[] = response[1].map((column: any) => {
         return {
           id: column.name,
           label: column.name.toUpperCase(),

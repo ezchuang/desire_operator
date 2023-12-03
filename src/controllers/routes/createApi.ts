@@ -16,12 +16,12 @@ export default async function createApiInit() {
     async (req: Request, res: Response) => {
       console.log("createDb");
       try {
-        const userGroup = req.userGroup;
+        const dbUser = req.userGroup;
         const userId = req.user!.userId;
 
         const params: CreateDbObj = {
           dbName: req.body.dbName,
-          groupName: userGroup,
+          groupSigninUser: dbUser,
         };
         const data = await rootCreateUtility.createDb(userId, params);
 

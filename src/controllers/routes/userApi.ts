@@ -54,6 +54,14 @@ export default async function userApiInit() {
             msg = "e-mail 重複申請";
             break;
 
+          case "InvitationCodeDoesNotExist":
+            msg = "邀請碼不存在";
+            break;
+
+          case "DuplicateGroupName":
+            msg = "群組名稱重複";
+            break;
+
           default:
             return res
               .status(500)

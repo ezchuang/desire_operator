@@ -14,13 +14,11 @@ export async function updateData(element: UpdateObj): Promise<any> {
       bodyFetch: JSON.stringify(element),
     });
 
-    if (!response.ok) {
-      throw new Error(`${response.status}`);
+    if (response.data) {
+      return response.data;
+    } else {
+      throw Error;
     }
-
-    // console.log("updateData: ", response);
-
-    return response.data;
   } catch (err) {
     console.error("Error in updateData: ", err);
     throw err;
@@ -35,13 +33,11 @@ export async function insertData(element: InsertObj): Promise<any> {
       bodyFetch: JSON.stringify(element),
     });
 
-    if (!response.ok) {
-      throw new Error(`${response.status}`);
+    if (response.data) {
+      return response.data;
+    } else {
+      throw Error;
     }
-
-    // console.log("insertData: ", response);
-
-    return response.data;
   } catch (err) {
     console.error("Error in insertData: ", err);
     throw err;
@@ -56,11 +52,11 @@ export async function addColumn(element: AddColumnObj): Promise<any> {
       bodyFetch: JSON.stringify(element),
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+    if (response.data) {
+      return response.data;
+    } else {
+      throw Error;
     }
-
-    return response.data;
   } catch (err) {
     console.error("Error in addColumn:", err);
     throw err;
@@ -75,11 +71,11 @@ export async function delColumn(element: delColumnObj): Promise<any> {
       bodyFetch: JSON.stringify(element),
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+    if (response.data) {
+      return response.data;
+    } else {
+      throw Error;
     }
-
-    return response.data;
   } catch (err) {
     console.error("Error in delColumn:", err);
     throw err;

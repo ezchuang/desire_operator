@@ -7,6 +7,7 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
+import { useReadData } from "../types/ReadDataContext";
 import AddRow from "./AddRow";
 import AddColumn from "./AddColumn";
 import DelColumn from "./DelColumn";
@@ -29,6 +30,9 @@ const AddToolEntry: React.FC = () => {
   const [addRowExpanded, setAddRowExpanded] = useState(false);
   const [addColumnExpanded, setAddColumnExpanded] = useState(false);
   const [delColumnExpanded, setDelColumnExpanded] = useState(false);
+
+  const { readDataElement } = useReadData();
+
   return (
     <>
       {/* ADD ROW */}
@@ -40,7 +44,7 @@ const AddToolEntry: React.FC = () => {
           <div>新增 Row</div>
         </StyledAccordionSummary>
         <StyledAccordionDetails>
-          <AddRow />
+          {readDataElement.dbName && readDataElement.table ? <AddRow /> : <></>}
         </StyledAccordionDetails>
       </Accordion>
       {/* ADD COLUMN */}
@@ -52,7 +56,11 @@ const AddToolEntry: React.FC = () => {
           <div>新增 Column</div>
         </StyledAccordionSummary>
         <StyledAccordionDetails>
-          <AddColumn />
+          {readDataElement.dbName && readDataElement.table ? (
+            <AddColumn />
+          ) : (
+            <></>
+          )}
         </StyledAccordionDetails>
       </Accordion>
       {/* DELETE COLUMN */}
@@ -64,7 +72,11 @@ const AddToolEntry: React.FC = () => {
           <div>刪除 Column</div>
         </StyledAccordionSummary>
         <StyledAccordionDetails>
-          <DelColumn />
+          {readDataElement.dbName && readDataElement.table ? (
+            <DelColumn />
+          ) : (
+            <></>
+          )}
         </StyledAccordionDetails>
       </Accordion>
     </>

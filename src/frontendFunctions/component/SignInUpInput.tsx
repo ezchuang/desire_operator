@@ -68,8 +68,10 @@ const SignInUpInput: React.FC<SignInUpFormProps> = ({
         return;
       }
 
+      // 再新建群組頁 並 有輸入群組 Name
       if (isNewUserOrInvited && newGroupName) {
         onSignUp({ name, email, password, newGroupName });
+        return;
       }
 
       onSignUp({ name, email, password, invitationCode });

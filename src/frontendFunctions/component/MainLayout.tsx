@@ -196,7 +196,7 @@ const MainLayout: React.FC = () => {
                 }
               >
                 <StyledAccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <div>查詢組合工具</div>
+                  <div>查詢組合工具 (請先選定 Table)</div>
                 </StyledAccordionSummary>
                 <StyledAccordionDetails>
                   <QueryCombineTool />

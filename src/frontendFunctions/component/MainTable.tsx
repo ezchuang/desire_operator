@@ -238,7 +238,7 @@ const MainTable: React.FC = () => {
                 >
                   {`type: ${column.type}`}
                 </Typography>,
-                ...columnOptionsDetail.map((line, index) => (
+                [...columnOptionsDetail].map((line, index) => (
                   <Typography
                     key={index}
                     variant="body2"
@@ -289,8 +289,10 @@ const MainTable: React.FC = () => {
                         fullWidth
                         size="small"
                       />
+                    ) : value === null || value === undefined ? (
+                      ""
                     ) : (
-                      value || ""
+                      value
                     )}
                   </StyledTableCell>
                 );

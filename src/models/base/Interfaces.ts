@@ -39,7 +39,7 @@ export interface getUserDbObj {
 
 export interface CreateDbObj {
   dbName: string;
-  groupName: string;
+  groupSigninUser: string;
 }
 
 export interface CreateObj {

@@ -5,7 +5,7 @@ import addHistory from "../../controllers/addHistory";
 class CreateUtility extends DbUtilityBase {
   // 需求權限等級較高，所以從比較前面開始做 SQL injection 預防，避免使用者異常嫁接指令
   async createDb(userId: string, obj: CreateDbObj) {
-    const { dbName, groupName } = obj;
+    const { dbName, groupSigninUser } = obj;
     // 主要新增
     let queryStr = `CREATE DATABASE IF NOT EXISTS \`${dbName}\``;
 
@@ -15,9 +15,10 @@ class CreateUtility extends DbUtilityBase {
     await addHistory(userId, "Create Database", queryStr, []);
 
     // 配套新增
-    queryStr = `SELECT signin_user FROM user_info.user_groups WHERE group_name = ?`;
-    const signinUser = (await this.execute(queryStr, [groupName]))[0][0]
-      .signin_user;
+    // queryStr = `SELECT signin_user FROM user_info.user_groups WHERE group_name = ?`;
+    // const signinUser = (await this.execute(queryStr, [dbUser]))[0][0]
+    //   .signin_user;
+    const signinUser = groupSigninUser;
 
     // 超級使用者尾綴不同，且根本不用特別加權限
     if (signinUser === "admin" || signinUser === "root") {
@@ -43,9 +44,14 @@ class CreateUtility extends DbUtilityBase {
     let queryStr = `CREATE TABLE \`${dbName}\`.\`${table}\` (`;
 
     for (const column of columns) {
-      columnsClauses.push(
-        `\`${column.name}\` ${column.type} ${column.options?.join(" ") || ""}`
-      );
+      if (column.name !== "PRIMARY KEY") {
+        columnsClauses.push(
+          `\`${column.name}\` ${column.type} ${column.options?.join(" ") || ""}`
+        );
+      } else {
+        // 目前為 PK 專屬
+        columnsClauses.push(column.type);
+      }
     }
 
     queryStr += columnsClauses.join(", ");

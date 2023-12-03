@@ -72,11 +72,11 @@ class UpdateUtility extends DBUtilityBase {
 
       let queryStr = `ALTER TABLE \`${dbName}\`.\`${table}\` ADD COLUMN \`${columnName}\` ${columnType}`;
 
-      if (columnOption) {
+      if (columnOption && columnOption.length > 0) {
         queryStr += ` ${columnOption.join(" ")}`;
       }
 
-      if (defaultValue !== undefined) {
+      if (defaultValue !== undefined && defaultValue !== null) {
         queryStr += ` DEFAULT '${defaultValue}'`;
       }
 
