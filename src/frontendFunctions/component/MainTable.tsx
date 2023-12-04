@@ -28,6 +28,7 @@ import { readTableData } from "../models/readData";
 import { updateData } from "../models/updateData";
 import { deleteData } from "../models/deleteData";
 import formatColumnOption from "../models/formatColumnOption";
+import NullSign from "../types/NullSign";
 
 // interface Column {
 //   id: string;
@@ -295,7 +296,7 @@ const MainTable: React.FC = () => {
                         size="small"
                       />
                     ) : value === null || value === undefined ? (
-                      ""
+                      <NullSign />
                     ) : (
                       value
                     )}

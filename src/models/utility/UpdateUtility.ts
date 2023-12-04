@@ -15,6 +15,10 @@ class UpdateUtility extends DBUtilityBase {
     const setData: string[] = [];
 
     Object.entries(data).map(([key, val]) => {
+      if (val === null) {
+        setData.push(`${key} = null`); // 保留 null
+        return;
+      }
       setData.push(`${key} = ?`);
       values.push(val);
     });
@@ -25,8 +29,12 @@ class UpdateUtility extends DBUtilityBase {
 
     if (where && where.length > 0) {
       const whereClauses = where.map((condition) => {
-        values.push(condition.value);
-        return `${condition.column} ${condition.operator} ?`;
+        if (condition.value === null) {
+          return `${condition.column} IS NULL`;
+        } else {
+          values.push(condition.value);
+          return `${condition.column} ${condition.operator} ?`;
+        }
       });
       queryStr += " WHERE " + whereClauses.join(" AND ");
     }

@@ -209,7 +209,7 @@ const MainLayout: React.FC = () => {
                 onChange={() => setAddToolEntryExpanded(!addToolEntryExpanded)}
               >
                 <StyledAccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <div>表格修改工具</div>
+                  <div>表格修改工具 (請先選定 Table)</div>
                 </StyledAccordionSummary>
                 <StyledAccordionDetails>
                   <AddToolEntry />
