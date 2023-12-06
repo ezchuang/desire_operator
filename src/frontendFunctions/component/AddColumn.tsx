@@ -11,6 +11,7 @@ import {
   Select,
   MenuItem,
   SelectChangeEvent,
+  InputAdornment,
 } from "@mui/material";
 
 import { AddColumnObj } from "../types/Interfaces";
@@ -18,8 +19,9 @@ import { useReadData } from "../types/ReadDataContext";
 import { useMessage } from "../types/MessageContext";
 import { useColumnData } from "../types/ColumnDataContext";
 import { useRefreshDataFlag } from "../types/RefreshDataFlagContext";
-import { mysqlDataTypes } from "../types/mysqlDataTypes";
+import { MysqlDataTypes } from "../types/MysqlDataTypes";
 import { addColumn } from "../models/updateData";
+import NullSign from "../types/NullSign";
 // import { ColumnData } from "../types/Interfaces";
 
 // 因為不開放部分功能，所以不用 Interfaces 中的 ColumnData
@@ -29,10 +31,11 @@ interface Column {
   columnSizeLimit?: number;
   needsLimit?: boolean;
   defaultValue?: string;
-  isNotNull: boolean;
+
   isPrimaryKey: boolean;
-  isUniqueKey: boolean;
   isAutoIncrement: boolean;
+  isNotNull: boolean;
+  isUniqueKey: boolean;
   isUnsigned: boolean;
   isZerofill: boolean;
   // isMultipleKey: boolean;
@@ -49,10 +52,11 @@ const initialColumnState: Column = {
   columnSizeLimit: 0,
   needsLimit: false,
   defaultValue: "",
-  isNotNull: false,
+
   isPrimaryKey: false,
-  isUniqueKey: false,
   isAutoIncrement: false,
+  isNotNull: false,
+  isUniqueKey: false,
   isUnsigned: false,
   isZerofill: false,
   // isMultipleKey: false,
@@ -63,6 +67,7 @@ const initialColumnState: Column = {
   // isSet: false,
 };
 
+// Column Options keys 顯示格式化，ex: isPrimaryKey => Primary Key
 function formatLabel(key: string): string {
   let formattedLabel = key.replace(/^is/, "");
 
@@ -82,6 +87,7 @@ const AddColumn: React.FC = () => {
   const [newColumn, setNewColumn] = useState<Column>(initialColumnState);
   const { columnDataElement } = useColumnData();
   const [havePrimaryKey, setHavePrimaryKey] = useState<boolean>(false);
+  const [edit, setEdit] = useState(false); // 此 component 中專屬於 defaultValue 修改
 
   const [displaySize, setDisplaySize] = useState<{
     min?: number | null;
@@ -94,15 +100,16 @@ const AddColumn: React.FC = () => {
   const checkboxProperties = [
     "isPrimaryKey",
     "isAutoIncrement",
+    "isUniqueKey",
     "isUnsigned",
     "isNotNull",
-    "isZerofill",
-    "isUniqueKey",
+    // "isBlob",
+    // "isBinary",
   ];
 
   const handleColumnTypeChange = (event: SelectChangeEvent<string>) => {
-    const selectedType = event.target.value as keyof typeof mysqlDataTypes;
-    const typeDetails = mysqlDataTypes[selectedType];
+    const selectedType = event.target.value as keyof typeof MysqlDataTypes;
+    const typeDetails = MysqlDataTypes[selectedType];
 
     setNewColumn((prev) => ({
       ...prev,
@@ -181,10 +188,13 @@ const AddColumn: React.FC = () => {
       const columnOptions: string[] = [];
       if (newColumn.isPrimaryKey) columnOptions.push("PRIMARY KEY");
       if (newColumn.isAutoIncrement) columnOptions.push("AUTO_INCREMENT");
+      // if (newColumn.isZerofill) columnOptions.push("ZEROFILL");
+      if (newColumn.isUnsigned) columnOptions.push("UNSIGNED");
       if (newColumn.isNotNull) columnOptions.push("NOT NULL");
       if (newColumn.isUniqueKey) columnOptions.push("UNIQUE");
-      if (newColumn.isUnsigned) columnOptions.push("UNSIGNED");
-      if (newColumn.isZerofill) columnOptions.push("ZEROFILL");
+
+      const updateValue =
+        newColumn.defaultValue === `""` ? "" : newColumn.defaultValue || null;
 
       const requestOptions: AddColumnObj = {
         dbName: readDataElement.dbName!,
@@ -196,7 +206,7 @@ const AddColumn: React.FC = () => {
             ? `(${newColumn.columnSizeLimit})`
             : ""),
         columnOption: columnOptions,
-        defaultValue: newColumn.defaultValue || null,
+        defaultValue: updateValue,
       };
 
       const response = await addColumn(requestOptions);
@@ -222,16 +232,43 @@ const AddColumn: React.FC = () => {
   };
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const { name, value } = e.target;
-    setNewColumn((prev) => ({ ...prev, [name]: value }));
+    const { name, value } = event.target;
+    setNewColumn((prev) => ({ ...prev, [name]: value === "" ? null : value }));
   };
 
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = event.target;
     setNewColumn((prev) => ({ ...prev, [name]: checked }));
   };
+
+  // 根據規則決定是否禁用某個選項
+  function shouldDisableCheckbox(key: string): boolean {
+    switch (key) {
+      // 從進來的條件，取得互鎖條件的 boolean 來決定是否禁用
+      case "isMultipleKey":
+        return newColumn.isPrimaryKey;
+      case "isPrimaryKey":
+        // return havePrimaryKey || newColumn.isBlob;
+        return havePrimaryKey || newColumn.isUniqueKey;
+      case "isAutoIncrement":
+        return !newColumn.isPrimaryKey;
+      case "isUniqueKey":
+        // return newColumn.isBlob;
+        return newColumn.isPrimaryKey;
+      // case "isUnsigned":
+      //   // case "isZerofill":
+      //   // 禁用於 Blob 或 Binary 類型
+      //   return newColumn.isBlob || newColumn.isBinary;
+      case "isBlob":
+        return newColumn.isUniqueKey || newColumn.isUnsigned;
+      case "isBinary":
+        return newColumn.isUnsigned;
+      default:
+        return false;
+    }
+  }
 
   return (
     <Box sx={{ padding: "2px" }}>
@@ -256,7 +293,7 @@ const AddColumn: React.FC = () => {
                 onChange={handleColumnTypeChange}
                 label="Column 型別"
               >
-                {Object.keys(mysqlDataTypes).map((type) => (
+                {Object.keys(MysqlDataTypes).map((type) => (
                   <MenuItem key={type} value={type}>
                     {type}
                   </MenuItem>
@@ -282,11 +319,27 @@ const AddColumn: React.FC = () => {
           <Grid item xs={12}>
             <TextField
               size="small"
-              label="預設值"
+              label={`預設值，空字串請輸入 "" `}
               name="defaultValue"
-              value={newColumn.defaultValue}
+              value={newColumn.defaultValue || ""}
               onChange={handleInputChange}
               fullWidth
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    {edit || newColumn.defaultValue ? null : <NullSign />}
+                  </InputAdornment>
+                ),
+              }}
+              onClick={() => {
+                setEdit(true);
+                if (!newColumn.defaultValue) {
+                  setNewColumn((prev) => ({ ...prev, defaultValue: "" }));
+                }
+              }}
+              onBlur={() => {
+                setEdit(false);
+              }}
             />
           </Grid>
           {checkboxProperties.map((prop) => (
@@ -322,27 +375,6 @@ const AddColumn: React.FC = () => {
       </Box>
     </Box>
   );
-
-  // 根據規則決定是否禁用某個選項
-  function shouldDisableCheckbox(key: string): boolean {
-    switch (key) {
-      // case "isMultipleKey":
-      //   return newColumn.isPrimaryKey;
-      case "isPrimaryKey":
-        return havePrimaryKey ? true : false;
-      case "isAutoIncrement":
-        return !newColumn.isPrimaryKey;
-      // case "isPrimaryKey":
-      // case "isUniqueKey":
-      //   return newColumn.isBlob;
-      // case "isUnsigned":
-      // case "isZerofill":
-      //   // 禁用於 Blob 或 Binary 類型
-      //   return newColumn.isBlob || newColumn.isBinary;
-      default:
-        return false;
-    }
-  }
 };
 
 export default AddColumn;

@@ -1,7 +1,7 @@
 import express, { Request, Response, IRouter } from "express";
 import { ReadDbsAndTablesObj, ReadObj } from "../../models/base/Interfaces";
 import ReadUtility from "../../models/utility/ReadUtility";
-import dataClean from "../../controllers/dataClean";
+import structureClean from "../structureClean";
 import verifyToken from "../../controllers/verifyToken";
 
 export default async function readApiInit() {
@@ -105,7 +105,7 @@ export default async function readApiInit() {
 
         const dataType = (await readUtility.readTableStructures(params))[0];
 
-        const cleanedStructure = dataClean(structure, dataType);
+        const cleanedStructure = structureClean(structure, dataType);
 
         return res
           .status(200)

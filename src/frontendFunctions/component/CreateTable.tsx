@@ -18,24 +18,23 @@ import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import { useMessage } from "../types/MessageContext";
 import { useDbsAndTables } from "../types/DbsAndTablesContext";
 import useRenewDbsAndTables from "../types/RenewDbsAndTables";
-import { mysqlDataTypes } from "../types/mysqlDataTypes";
+import { MysqlDataTypes } from "../types/MysqlDataTypes";
 import { createTable } from "../models/createData";
 import { ColumnData } from "../types/Interfaces";
 // import { TableData } from "../types/Interfaces";
 
-const defaultColumn = {
+const defaultColumn: ColumnData = {
   columnName: "",
   columnType: "",
   columnSizeLimit: 0,
   defaultValue: "",
-  isUnsigned: false,
-  isUniqueKey: false,
+
   isPrimaryKey: false,
-  isAutoIncrement: false,
-  isZerofill: false,
-  // isForeignKey: false,
   isNotNull: false,
-  // foreignKeyReference: { referencedTable: "", referencedColumnName: "" },
+  isAutoIncrement: false,
+  isUniqueKey: false,
+  isUnsigned: false,
+  isZerofill: false,
 };
 
 // 針對數值型 Column Type 驗證是否已開啟 Unsigned
@@ -54,10 +53,25 @@ function shouldEnableZerofill(column: ColumnData): boolean {
   return numericTypes.includes(column.columnType) && column.isUnsigned;
 }
 
+// Column Options keys 顯示格式化，ex: isPrimaryKey => Primary Key
+function formatLabel(key: string): string {
+  let formattedLabel = key.replace(/^is/, "");
+
+  formattedLabel = formattedLabel.replace(/([A-Z])/g, " $1");
+
+  // formattedLabel = formattedLabel
+  //   .toLowerCase()
+  //   .split(' ')
+  //   .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+  //   .join(' ');
+
+  return formattedLabel;
+}
+
 const CreateTable: React.FC = () => {
   const [dbName, setDbName] = useState<string>("");
   const [tableName, setTableName] = useState<string>("");
-  const [columns, setColumns] = useState<ColumnData[]>([]);
+  const [columns, setColumns] = useState<ColumnData[]>([defaultColumn]);
   const { dbsAndTablesElement } = useDbsAndTables();
   const { setMessage, setOpenSnackbar, setSeverity } = useMessage();
   const renewDbsAndTables = useRenewDbsAndTables();
@@ -119,7 +133,7 @@ const CreateTable: React.FC = () => {
     let numericValue = Number(value);
     const columnType = columns[index].columnType;
     const typeDetails =
-      mysqlDataTypes[columnType as keyof typeof mysqlDataTypes];
+      MysqlDataTypes[columnType as keyof typeof MysqlDataTypes];
     const minLimit = typeDetails?.displaySize?.min ?? 0;
     const maxLimit = typeDetails?.displaySize?.max ?? Number.MAX_SAFE_INTEGER;
 
@@ -156,6 +170,33 @@ const CreateTable: React.FC = () => {
       setOpenSnackbar(true);
     }
   };
+
+  // 根據規則決定是否禁用某個選項
+  function shouldDisableCheckbox(column: ColumnData, key: string): boolean {
+    switch (key) {
+      // 從進來的條件，取得互鎖條件的 boolean 來決定是否禁用
+      case "isMultipleKey":
+        return column.isPrimaryKey;
+      case "isPrimaryKey":
+        // return havePrimaryKey || newColumn.isBlob;
+        return column.isUniqueKey;
+      case "isAutoIncrement":
+        return !column.isPrimaryKey;
+      case "isUniqueKey":
+        // return newColumn.isBlob;
+        return column.isPrimaryKey;
+      // case "isUnsigned":
+      //   // case "isZerofill":
+      //   // 禁用於 Blob 或 Binary 類型
+      //   return newColumn.isBlob || newColumn.isBinary;
+      case "isBlob":
+        return column.isUniqueKey || column.isUnsigned;
+      case "isBinary":
+        return column.isUnsigned;
+      default:
+        return false;
+    }
+  }
 
   return (
     <Box width="100%" margin="auto" padding={"2px"}>
@@ -200,7 +241,7 @@ const CreateTable: React.FC = () => {
         // Columns 參數輸入位置
         // currentType 上下限渲染前置
         const currentType =
-          mysqlDataTypes[column.columnType as keyof typeof mysqlDataTypes];
+          MysqlDataTypes[column.columnType as keyof typeof MysqlDataTypes];
         const needsLimit = currentType?.needsLimit;
         const displaySize = currentType?.displaySize;
 
@@ -235,7 +276,7 @@ const CreateTable: React.FC = () => {
                       )
                     }
                   >
-                    {Object.keys(mysqlDataTypes).map((typeName) => (
+                    {Object.keys(MysqlDataTypes).map((typeName) => (
                       <MenuItem key={typeName} value={typeName}>
                         {typeName}
                       </MenuItem>
@@ -279,165 +320,38 @@ const CreateTable: React.FC = () => {
                 <RemoveCircleOutlineIcon />
               </IconButton>
             </Grid>
-            <Grid item xs={6} sm={4} md={3} lg={2}>
-              <FormControlLabel
-                sx={{ m: 0, paddingLeft: "8px" }}
-                control={
-                  <Checkbox
-                    sx={{ m: 0, padding: "2px" }}
-                    checked={column.isPrimaryKey}
-                    onChange={(event) =>
-                      handleColumnChange(
-                        index,
-                        "isPrimaryKey",
-                        event.target.checked
-                      )
+
+            {Object.keys(column)
+              .filter(
+                (key) =>
+                  key !== "columnName" &&
+                  key !== "columnType" &&
+                  key !== "columnSizeLimit" &&
+                  key !== "defaultValue" &&
+                  key !== "isZerofill"
+              )
+              .map((key) => (
+                <Grid key={key} item xs={6} sm={4} md={3} lg={2}>
+                  <FormControlLabel
+                    sx={{ m: 0, paddingLeft: "8px" }}
+                    control={
+                      <Checkbox
+                        sx={{ m: 0, padding: "2px" }}
+                        checked={column[key as keyof ColumnData] as boolean}
+                        onChange={(event) =>
+                          handleColumnChange(
+                            index,
+                            key as keyof ColumnData,
+                            event.target.checked
+                          )
+                        }
+                        disabled={shouldDisableCheckbox(column, key)}
+                      />
                     }
+                    label={formatLabel(key)}
                   />
-                }
-                label="Primary Key"
-                disabled={column.isUniqueKey}
-              />
-            </Grid>
-            <Grid item xs={6} sm={4} md={3} lg={2}>
-              <FormControlLabel
-                sx={{ m: 0, paddingLeft: "8px" }}
-                control={
-                  <Checkbox
-                    sx={{ m: 0, padding: "2px" }}
-                    checked={column.isAutoIncrement}
-                    onChange={(event) =>
-                      handleColumnChange(
-                        index,
-                        "isAutoIncrement",
-                        event.target.checked
-                      )
-                    }
-                    disabled={!column.isPrimaryKey || column.isZerofill} // 只有 isPrimaryKey === True 時才能勾選AI
-                  />
-                }
-                label="Auto Increment"
-              />
-            </Grid>
-            <Grid item xs={6} sm={4} md={3} lg={2}>
-              <FormControlLabel
-                sx={{ m: 0, paddingLeft: "8px" }}
-                control={
-                  <Checkbox
-                    sx={{ m: 0, padding: "2px" }}
-                    checked={column.isUnsigned}
-                    onChange={(event) =>
-                      handleColumnChange(
-                        index,
-                        "isUnsigned",
-                        event.target.checked
-                      )
-                    }
-                  />
-                }
-                label="Unsigned"
-              />
-            </Grid>
-            <Grid item xs={6} sm={4} md={3} lg={2}>
-              <FormControlLabel
-                sx={{ m: 0, paddingLeft: "8px" }}
-                control={
-                  <Checkbox
-                    sx={{ m: 0, padding: "2px" }}
-                    checked={column.isNotNull}
-                    onChange={(event) =>
-                      handleColumnChange(
-                        index,
-                        "isNotNull",
-                        event.target.checked
-                      )
-                    }
-                  />
-                }
-                label="Not Null"
-              />
-            </Grid>
-            <Grid item xs={6} sm={4} md={3} lg={2}>
-              <FormControlLabel
-                sx={{ m: 0, paddingLeft: "8px" }}
-                control={
-                  <Checkbox
-                    sx={{ m: 0, padding: "2px" }}
-                    checked={column.isZerofill}
-                    onChange={(event) =>
-                      handleColumnChange(
-                        index,
-                        "isZerofill",
-                        event.target.checked
-                      )
-                    }
-                    disabled={column.isAutoIncrement} // Auto Increment 跟 Zerofill 衝突
-                  />
-                }
-                label="Zerofill"
-              />
-            </Grid>
-            <Grid item xs={6} sm={4} md={3} lg={2}>
-              <FormControlLabel
-                sx={{ m: 0, paddingLeft: "8px" }}
-                control={
-                  <Checkbox
-                    sx={{ m: 0, padding: "2px" }}
-                    checked={column.isUniqueKey}
-                    onChange={(event) =>
-                      handleColumnChange(
-                        index,
-                        "isUniqueKey",
-                        event.target.checked
-                      )
-                    }
-                    disabled={column.isPrimaryKey} // Unique 跟 PK 不同時存在
-                  />
-                }
-                label="Unique Key"
-              />
-            </Grid>
-            {/* <FormControlLabel
-              control={
-                <Checkbox
-                  checked={column.isForeignKey}
-                  onChange={(event) =>
-                    handleColumnChange(
-                      index,
-                      "isForeignKey",
-                      event.target.checked
-                    )
-                  }
-                />
-              }
-              label="外鍵"
-            />
-            {column.isForeignKey && (
-              <>
-                <TextField
-                  label="參考表"
-                  value={column.foreignKeyReference?.referencedTable}
-                  onChange={(event) =>
-                    handleFkReferenceChange(
-                      index,
-                      "referencedTable",
-                      event.target.value
-                    )
-                  }
-                />
-                <TextField
-                  label="參考列"
-                  value={column.foreignKeyReference?.referencedColumnName}
-                  onChange={(event) =>
-                    handleFkReferenceChange(
-                      index,
-                      "referencedColumnName",
-                      event.target.value
-                    )
-                  }
-                />
-              </>
-            )} */}
+                </Grid>
+              ))}
           </Grid>
         );
       })}

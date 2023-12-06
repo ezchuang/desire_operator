@@ -51,7 +51,7 @@ export default async function userApiInit() {
             break;
 
           case "DuplicateEmail":
-            msg = "e-mail 重複申請";
+            msg = "event-mail 重複申請";
             break;
 
           case "InvitationCodeDoesNotExist":

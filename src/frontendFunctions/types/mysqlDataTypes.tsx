@@ -1,27 +1,27 @@
-export const mysqlDataTypes = {
+export const MysqlDataTypes = {
   // 數字型別
   TINYINT: {
-    needsLimit: true,
+    needsLimit: false,
     displaySize: { min: 1, max: 4 },
     valueRange: { min: -128, max: 127 },
   },
   SMALLINT: {
-    needsLimit: true,
+    needsLimit: false,
     displaySize: { min: 1, max: 6 },
     valueRange: { min: -32768, max: 32767 },
   },
   MEDIUMINT: {
-    needsLimit: true,
+    needsLimit: false,
     displaySize: { min: 1, max: 9 },
     valueRange: { min: -8388608, max: 8388607 },
   },
   INT: {
-    needsLimit: true,
+    needsLimit: false,
     displaySize: { min: 1, max: 11 },
     valueRange: { min: -2147483648, max: 2147483647 },
   },
   BIGINT: {
-    needsLimit: true,
+    needsLimit: false,
     displaySize: { min: 1, max: 20 },
     valueRange: {
       min: BigInt("-9223372036854775808"),
@@ -29,7 +29,7 @@ export const mysqlDataTypes = {
     },
   },
 
-  // 小數型別
+  // 小數型別，M: 總數字長度, D: 小數點後的位數
   FLOAT: {
     needsLimit: true,
     displaySize: { min: 1, max: 12 },

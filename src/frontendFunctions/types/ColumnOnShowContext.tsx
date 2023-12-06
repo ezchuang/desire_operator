@@ -4,6 +4,8 @@ export interface ColumnOnShowElement {
   id: string;
   label: string;
   type: string;
+  length: number | null;
+  default: string | number | null;
   options: object;
 }
 

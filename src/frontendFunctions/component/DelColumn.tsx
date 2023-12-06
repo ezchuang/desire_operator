@@ -117,8 +117,8 @@ const DelColumn: React.FC = () => {
               label="Column 名稱"
               name="name"
               value={delColumnName.name}
-              onChange={(e) =>
-                setDelColumnName({ ...delColumnName, name: e.target.value })
+              onChange={(event) =>
+                setDelColumnName({ ...delColumnName, name: event.target.value })
               }
               fullWidth
             /> */}

@@ -27,14 +27,7 @@ import { useRefreshDataFlag } from "../types/RefreshDataFlagContext";
 import { useReadData } from "../types/ReadDataContext";
 import { readTableData } from "../models/readData";
 import { useMessage } from "../types/MessageContext";
-
-interface Column {
-  id: string;
-  label: string;
-  type: string;
-  selected?: boolean;
-  options: object;
-}
+import { ColumnDataElement } from "../types/ColumnDataContext";
 
 interface FormState {
   orderBy: string;
@@ -100,7 +93,7 @@ const QueryCombineTool: React.FC = () => {
   // 選取 Column
   const handleColumnSelect = (columnId: string) => {
     setColumnDataElement((previous) =>
-      previous.map((column: Column) => {
+      previous.map((column: ColumnDataElement) => {
         if (column.id === columnId) {
           return { ...column, selected: !column.selected };
         }
@@ -133,13 +126,15 @@ const QueryCombineTool: React.FC = () => {
   // 送出需求
   const handleSubmit = () => {
     const selectedColumns = columnDataElement.filter(
-      (column: Column) => column.selected
+      (column: ColumnDataElement) => column.selected
     );
     setColumnOnShowElement(selectedColumns);
 
     const whereConditions = columnDataElement
-      .filter((column: Column) => rowCondition[column.id] && row[column.id]) // 篩選出設定了條件和值的欄位
-      .map((column: Column) => ({
+      .filter(
+        (column: ColumnDataElement) => rowCondition[column.id] && row[column.id]
+      ) // 篩選出設定了條件和值的欄位
+      .map((column: ColumnDataElement) => ({
         column: column.id,
         operator: rowCondition[column.id] as ">" | "<" | "=" | ">=" | "<=",
         value: row[column.id],
@@ -166,15 +161,57 @@ const QueryCombineTool: React.FC = () => {
     });
   };
 
+  const renewColumnsDataMain = async () => {
+    const response = await readTableData(readDataElement);
+
+    const columnNames = response[1].map((column: any) => {
+      return {
+        id: column.name,
+        label: column.name.toUpperCase(),
+        type: column.type,
+        length: column.length,
+        default: column.default,
+        options: column.flags,
+      };
+    });
+    const columnNamesWithSelected = columnNames.map((column: any) => ({
+      ...column,
+      selected: true,
+    }));
+
+    console.log(columnNames);
+
+    setColumnDataElement(columnNamesWithSelected);
+    setColumnOnShowElement(columnNames);
+
+    setTableParams({
+      db: readDataElement.dbName,
+      table: readDataElement.table,
+    });
+
+    const initialCondition: any = {};
+    const initialRow: any = {};
+
+    columnNames.forEach((column: any) => {
+      initialCondition[column.id] = "";
+      initialRow[column.id] = "";
+    });
+
+    setRowCondition(initialCondition);
+    setRow(initialRow);
+  };
+
+  // 由 轉換目標 Table 變更事件 toggle
   useEffect(() => {
     const renewColumnsData = async () => {
+      // 阻擋 純 Select 產生的變更
       if (
         readDataElement.dbName === tableParams.db &&
         readDataElement.table === tableParams.table
       ) {
         return;
       }
-
+      // 若轉換到 DBs and Tables 樹狀圖，則清空既有資訊
       if (!readDataElement.dbName || !readDataElement.table) {
         setColumnDataElement([]);
         setColumnOnShowElement([]);
@@ -185,90 +222,21 @@ const QueryCombineTool: React.FC = () => {
         return;
       }
 
-      const response = await readTableData(readDataElement);
-
-      const columnNames = response[1].map((column: any) => {
-        return {
-          id: column.name,
-          label: column.name.toUpperCase(),
-          type: column.type,
-          options: column.flags,
-        };
-      });
-      const columnNamesWithSelected = columnNames.map((column: any) => ({
-        ...column,
-        selected: true,
-      }));
-
-      // console.log(response[1]);
-      // console.log(columnNamesWithSelected);
-
-      setColumnDataElement(columnNamesWithSelected);
-      setColumnOnShowElement(columnNames);
-
-      setTableParams({
-        db: readDataElement.dbName,
-        table: readDataElement.table,
-      });
-
-      const initialCondition: any = {};
-      const initialRow: any = {};
-
-      columnNames.forEach((column: any) => {
-        initialCondition[column.id] = "";
-        initialRow[column.id] = "";
-      });
-
-      setRowCondition(initialCondition);
-      setRow(initialRow);
+      await renewColumnsDataMain();
     };
 
     renewColumnsData();
   }, [readDataElement]);
 
+  // 由 Column 變更事件 toggle
   useEffect(() => {
     const renewColumnsData = async () => {
-      if (readDataElement.dbName === "" && readDataElement.table === "") {
-        return;
-      }
-
+      // 沒指定 Table(或是dbName) 此處不作為
       if (!readDataElement.dbName || !readDataElement.table) {
         return;
       }
 
-      const response = await readTableData(readDataElement);
-
-      const columnNames: Column[] = response[1].map((column: any) => {
-        return {
-          id: column.name,
-          label: column.name.toUpperCase(),
-          type: column.type,
-          options: column.flags,
-        };
-      });
-      const columnNamesWithSelected = columnNames.map((column: any) => ({
-        ...column,
-        selected: true,
-      }));
-
-      setColumnDataElement(columnNamesWithSelected);
-      setColumnOnShowElement(columnNames);
-
-      setTableParams({
-        db: readDataElement.dbName,
-        table: readDataElement.table,
-      });
-
-      const initialCondition: any = {};
-      const initialRow: any = {};
-
-      columnNames.forEach((column: any) => {
-        initialCondition[column.id] = "";
-        initialRow[column.id] = "";
-      });
-
-      setRowCondition(initialCondition);
-      setRow(initialRow);
+      await renewColumnsDataMain();
     };
 
     renewColumnsData();
@@ -281,7 +249,7 @@ const QueryCombineTool: React.FC = () => {
           <TableHead>
             <TableRow>
               <StyledTableCell size="small"></StyledTableCell>
-              {columnDataElement.map((column: Column) => (
+              {columnDataElement.map((column: ColumnDataElement) => (
                 <StyledInnerTableCell
                   key={column.id}
                   selected={column.selected}
@@ -312,7 +280,7 @@ const QueryCombineTool: React.FC = () => {
                   WHERE
                 </div>
               </StyledTableCell>
-              {columnDataElement.map((column: Column) => {
+              {columnDataElement.map((column: ColumnDataElement) => {
                 return (
                   <StyledTableCell key={column.id}>
                     <div className="flex">
@@ -366,7 +334,7 @@ const QueryCombineTool: React.FC = () => {
             name="orderBy"
             onChange={handleSelectChange}
           >
-            {columnDataElement.map((column: Column) => (
+            {columnDataElement.map((column: ColumnDataElement) => (
               <MenuItem key={column.id} value={column.id}>
                 {column.label}
               </MenuItem>

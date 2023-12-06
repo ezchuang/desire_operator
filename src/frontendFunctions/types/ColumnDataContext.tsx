@@ -1,11 +1,27 @@
 import React, { createContext, useState, useContext, ReactNode } from "react";
+interface typeOptions {
+  isNotNull: boolean;
+  isPrimaryKey: boolean;
+  isUniqueKey: boolean;
+  isAutoIncrement: boolean;
+  isUnsigned: boolean;
+  isZerofill: boolean;
+  isMultipleKey: boolean;
+  isBlob: boolean;
+  isBinary: boolean;
+  isEnum: boolean;
+  isTimestamp: boolean;
+  isSet: boolean;
+}
 
 export interface ColumnDataElement {
   id: string;
   label: string;
   type: string;
+  length: number | null;
+  default: string | number | null;
   selected?: boolean;
-  options: object;
+  options: typeOptions;
 }
 
 interface ColumnDataContextType {

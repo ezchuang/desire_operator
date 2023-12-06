@@ -1,22 +1,15 @@
-// interface ForeignKeyReference {
-//   referencedTable?: string;
-//   referencedColumnName?: string;
-// }
-
 export interface ColumnData {
   columnName: string;
   columnType: string;
   columnSizeLimit?: number;
   defaultValue?: string;
 
-  isNotNull: boolean;
   isPrimaryKey: boolean;
+  isNotNull: boolean;
   isUniqueKey: boolean;
   isUnsigned: boolean;
   isAutoIncrement: boolean;
   isZerofill: boolean;
-  // isForeignKey: boolean;
-  // foreignKeyReference?: ForeignKeyReference;
 }
 
 export interface TableData {

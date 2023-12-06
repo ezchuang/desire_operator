@@ -77,10 +77,10 @@ class ReadUtility extends DBUtilityBase {
     return await this.execute(queryStr, values);
   }
 
-  // 取得 [{COLUMN_NAME, DATA_TYPE}]
+  // 取得 [{COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH, COLUMN_DEFAULT}]
   async readTableStructures(obj: ReadObj) {
     const { dbName, table } = obj;
-    let queryStr = `SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?`;
+    let queryStr = `SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH, COLUMN_DEFAULT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?`;
 
     console.log(queryStr, [dbName, table]);
     return await this.execute(queryStr, [dbName, table]);

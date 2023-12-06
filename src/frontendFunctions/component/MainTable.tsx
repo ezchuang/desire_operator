@@ -152,20 +152,23 @@ const MainTable: React.FC = () => {
       (column) => column.id === edit.cell
     ); // 獲取正在編輯的列(列名稱)
 
+    // 數值不變，直接結束
+    if (editingColumn && editingRow[editingColumn.id] === editValue) {
+      // 重置編輯狀態
+      setEdit({ row: -1, cell: "" });
+      return;
+    }
+
+    const updateValue =
+      editValue === `""` ? "" : editValue === "0" ? "0" : editValue || null;
+
     if (editingColumn) {
       const updateObj = {
         dbName: readDataElement.dbName!,
         table: readDataElement.table!,
         data: {
-          [editingColumn.id]: editValue,
+          [editingColumn.id]: updateValue,
         },
-        // where: [
-        //   {
-        //     column: editingColumn.id,
-        //     operator: "=",
-        //     value: editingRow[editingColumn.id],
-        //   },
-        // ],
         where: columnDataElement.map((cell: ColumnDataElement) => ({
           column: cell.id,
           operator: "=",
@@ -206,15 +209,6 @@ const MainTable: React.FC = () => {
 
         setData(response[0]);
         // console.log(response);
-
-        // const columnNames = columnData.map((column: any) => {
-        //   return {
-        //     id: column.name,
-        //     label: column.name.toUpperCase(),
-        //   };
-        // });
-
-        // setColumnOnShowElement(columnNames);
       } catch (error) {
         console.error("Error reading data: ", error);
       }
@@ -230,20 +224,32 @@ const MainTable: React.FC = () => {
         <TableHead>
           <TableRow>
             {columnOnShowElement.map((column: ColumnOnShowElement) => {
+              // 取得 options 中 value === true 的 key:value
+              // 並將其轉換成 顯示用字串 的 ARR
               const columnOptionsDetail = Object.entries(column.options)
                 // eslint-disable-next-line no-unused-vars
                 .filter(([key, value]) => value !== false)
                 .map(([key, value]) => formatColumnOption(key, value));
 
-              // 將 columnOptionsDetail 元素和 column.type 合併成一個元素陣列，並收進 ARR 中
+              // 將 columnOptionsDetail 元素和 column 的 type, length(顯示上限), default 合併成一個元素陣列
+              // 於下方 return 中 展開
               const columnDetailElements = [
-                <Typography
-                  key="type"
-                  variant="body2"
-                  style={{ textAlign: "center" }}
-                >
-                  {`type: ${column.type}`}
-                </Typography>,
+                ["type", "length", "default"]
+                  .filter(
+                    (element: string) =>
+                      !!column[element as keyof ColumnOnShowElement]
+                  )
+                  .map((element: string) => (
+                    <Typography
+                      key={element}
+                      variant="body2"
+                      style={{ textAlign: "center" }}
+                    >
+                      {`${
+                        element !== "length" ? element : `${element}(顯示上限)`
+                      }: ${column[element as keyof ColumnOnShowElement]}`}
+                    </Typography>
+                  )),
                 [...columnOptionsDetail].map((line, index) => (
                   <Typography
                     key={index}
@@ -258,6 +264,7 @@ const MainTable: React.FC = () => {
               return (
                 <BootstrapTooltip
                   key={column.id}
+                  // 展開上方寫在 ARR 中的 Column 參數
                   title={<div>{columnDetailElements}</div>}
                   placement="bottom"
                   arrow
@@ -287,18 +294,17 @@ const MainTable: React.FC = () => {
                   >
                     {isEditing ? (
                       <TextField
-                        value={editValue}
+                        value={editValue ?? ""}
                         onChange={handleInputChange}
                         onBlur={handleEditConfirm}
                         onKeyDown={handleKeyPress}
                         autoFocus
                         fullWidth
+                        label={`修改中，空字串請輸入 "" `}
                         size="small"
                       />
-                    ) : value === null || value === undefined ? (
-                      <NullSign />
                     ) : (
-                      value
+                      value ?? <NullSign />
                     )}
                   </StyledTableCell>
                 );

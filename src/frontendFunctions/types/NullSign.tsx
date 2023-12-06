@@ -1,7 +1,12 @@
 import React from "react";
 
 const NullSign: React.FC = () => (
-  <img className=" h-6 " src="https://d2ndnbzl6dhb4z.cloudfront.net/null.png" />
+  <img
+    className="h-6"
+    src="https://d2ndnbzl6dhb4z.cloudfront.net/null.png"
+    alt="描述性文字"
+    onError={(event) => (event.currentTarget.src = "預設圖片的URL")}
+  />
 );
 
 export default NullSign;

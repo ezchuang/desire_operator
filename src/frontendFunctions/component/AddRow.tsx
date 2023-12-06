@@ -13,6 +13,7 @@ import {
   TextField,
   Paper,
   Grid,
+  Tooltip,
 } from "@mui/material";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
@@ -133,12 +134,39 @@ const AddRow: React.FC = () => {
                 <TableRow key={rowIndex}>
                   {columnDataElement.map((column) => (
                     <StyledTableCell key={column.id}>
-                      <TextField
-                        size="small"
-                        name={column.id}
-                        value={row[column.id] || ""}
-                        onChange={(event) => handleRowChange(event, rowIndex)}
-                      />
+                      <Tooltip
+                        title={
+                          (column.options.isNotNull ||
+                            column.options.isPrimaryKey) &&
+                          !row[column.id]
+                            ? "This field cannot be empty"
+                            : ""
+                        }
+                        placement="bottom"
+                        disableHoverListener={
+                          !(
+                            column.options.isNotNull ||
+                            column.options.isPrimaryKey
+                          ) || !!row[column.id]
+                        }
+                      >
+                        <TextField
+                          size="small"
+                          name={column.id}
+                          value={row[column.id] || ""}
+                          onChange={(event) => handleRowChange(event, rowIndex)}
+                          error={
+                            (column.options.isNotNull ||
+                              column.options.isPrimaryKey) &&
+                            !row[column.id]
+                          }
+                          // helperText={
+                          //   column.options.isNotNull && !row[column.id]
+                          //     ? "This field cannot be empty"
+                          //     : ""
+                          // }
+                        />
+                      </Tooltip>
                     </StyledTableCell>
                   ))}
                   <StyledTableCell key={rowIndex}>
