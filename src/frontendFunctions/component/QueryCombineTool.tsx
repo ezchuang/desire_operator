@@ -54,8 +54,8 @@ const StyledTableCell = styled(TableCell)({
     fontSize: 14,
     minWidth: 60,
     padding: "2px",
-    paddingTop: "2px",
-    paddingBottom: "2px",
+    // paddingTop: "2px",
+    // paddingBottom: "2px",
   },
 });
 
@@ -283,7 +283,7 @@ const QueryCombineTool: React.FC = () => {
               {columnDataElement.map((column: ColumnDataElement) => {
                 return (
                   <StyledTableCell key={column.id}>
-                    <div className="flex">
+                    <div className="flex w-full">
                       <Select
                         size="small"
                         variant="outlined"
@@ -307,6 +307,7 @@ const QueryCombineTool: React.FC = () => {
                         name={column.id}
                         value={row[column.id] || ""}
                         onChange={handleInputChange}
+                        fullWidth
                       />
                     </div>
                   </StyledTableCell>

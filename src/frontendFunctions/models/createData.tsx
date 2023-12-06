@@ -1,5 +1,5 @@
 import fetchPackager from "./fetchPackager";
-import { TableData } from "../types/Interfaces";
+import { ColumnData, OutputColumnData, TableData } from "../types/Interfaces";
 
 // 新建 DB
 export async function createDb(element: string): Promise<boolean> {
@@ -25,11 +25,11 @@ export async function createDb(element: string): Promise<boolean> {
 function refactorCreateDataParams(element: TableData) {
   console.log("refactorCreateDataParams處理前: ", element);
   // 額外從 input 資料拉出 PK 資料來處理
-  const primaryKeys = element.columns
-    .filter((column) => column.isPrimaryKey)
+  const primaryKeys = (element.columns as ColumnData[])
+    .filter((column: ColumnData) => column.isPrimaryKey)
     .map((column) => `\`${column.columnName}\``);
 
-  element.columns = element.columns
+  (element.columns as OutputColumnData[]) = (element.columns as ColumnData[])
     .filter((column) => column.columnName && column.columnType)
     .map((column) => {
       const options = [
@@ -45,7 +45,7 @@ function refactorCreateDataParams(element: TableData) {
         column.isZerofill ? "ZEROFILL" : "",
         column.isAutoIncrement ? "AUTO_INCREMENT" : "",
         // 根據列的設置添加 UNIQUE 約束
-        column.isUnique ? "UNIQUE" : "",
+        column.isUniqueKey ? "UNIQUE" : "",
       ].filter(Boolean); // 移除 ""
 
       return {
@@ -63,7 +63,7 @@ function refactorCreateDataParams(element: TableData) {
     element.columns.push({
       name: "PRIMARY KEY",
       type: `PRIMARY KEY (${primaryKeys.join(", ")})`,
-      options: "",
+      options: [],
     });
   }
 

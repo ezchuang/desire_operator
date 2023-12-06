@@ -12,10 +12,16 @@ export interface ColumnData {
   isZerofill: boolean;
 }
 
+export interface OutputColumnData {
+  name: string;
+  type: string;
+  options: string[];
+}
+
 export interface TableData {
   dbName: string;
   table: string;
-  columns: any[];
+  columns: (ColumnData | OutputColumnData)[];
 }
 
 export interface RowData {

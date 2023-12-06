@@ -11,10 +11,8 @@ import {
   TableHead,
   TableRow,
   TextField,
-  Typography,
 } from "@mui/material";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
-import Tooltip, { TooltipProps, tooltipClasses } from "@mui/material/Tooltip";
 
 import { useMessage } from "../types/MessageContext";
 import { useReadData } from "../types/ReadDataContext";
@@ -27,13 +25,8 @@ import { useRefreshDataFlag } from "../types/RefreshDataFlagContext";
 import { readTableData } from "../models/readData";
 import { updateData } from "../models/updateData";
 import { deleteData } from "../models/deleteData";
-import formatColumnOption from "../models/formatColumnOption";
 import NullSign from "../types/NullSign";
-
-// interface Column {
-//   id: string;
-//   label: string;
-// }
+import ColumnWithTooltip from "./ColumnWithTooltip";
 
 interface WhereCluster {
   column: string;
@@ -60,18 +53,6 @@ const StyledTableCell = styled(TableCell)(() => ({
     padding: 14,
     paddingTop: 6,
     paddingBottom: 6,
-  },
-}));
-
-const BootstrapTooltip = styled(({ className, ...props }: TooltipProps) => (
-  <Tooltip {...props} arrow classes={{ popper: className }} />
-))(({ theme }) => ({
-  [`& .${tooltipClasses.arrow}`]: {
-    color: theme.palette.common.black,
-  },
-  [`& .${tooltipClasses.tooltip}`]: {
-    backgroundColor: theme.palette.common.black,
-    textAlign: "center",
   },
 }));
 
@@ -160,7 +141,13 @@ const MainTable: React.FC = () => {
     }
 
     const updateValue =
-      editValue === `""` ? "" : editValue === "0" ? "0" : editValue || null;
+      editValue === `""`
+        ? ""
+        : editValue === "0"
+        ? "0"
+        : editValue
+        ? editValue
+        : null;
 
     if (editingColumn) {
       const updateObj = {
@@ -223,60 +210,10 @@ const MainTable: React.FC = () => {
       <Table stickyHeader aria-label="main table">
         <TableHead>
           <TableRow>
-            {columnOnShowElement.map((column: ColumnOnShowElement) => {
-              // 取得 options 中 value === true 的 key:value
-              // 並將其轉換成 顯示用字串 的 ARR
-              const columnOptionsDetail = Object.entries(column.options)
-                // eslint-disable-next-line no-unused-vars
-                .filter(([key, value]) => value !== false)
-                .map(([key, value]) => formatColumnOption(key, value));
-
-              // 將 columnOptionsDetail 元素和 column 的 type, length(顯示上限), default 合併成一個元素陣列
-              // 於下方 return 中 展開
-              const columnDetailElements = [
-                ["type", "length", "default"]
-                  .filter(
-                    (element: string) =>
-                      !!column[element as keyof ColumnOnShowElement]
-                  )
-                  .map((element: string) => (
-                    <Typography
-                      key={element}
-                      variant="body2"
-                      style={{ textAlign: "center" }}
-                    >
-                      {`${
-                        element !== "length" ? element : `${element}(顯示上限)`
-                      }: ${column[element as keyof ColumnOnShowElement]}`}
-                    </Typography>
-                  )),
-                [...columnOptionsDetail].map((line, index) => (
-                  <Typography
-                    key={index}
-                    variant="body2"
-                    style={{ textAlign: "center" }}
-                  >
-                    {line}
-                  </Typography>
-                )),
-              ];
-
-              return (
-                <BootstrapTooltip
-                  key={column.id}
-                  // 展開上方寫在 ARR 中的 Column 參數
-                  title={<div>{columnDetailElements}</div>}
-                  placement="bottom"
-                  arrow
-                >
-                  <StyledTableCell key={column.id} size="small">
-                    {`${column.label}`}
-                    <br />
-                    {`(${column.type})`}
-                  </StyledTableCell>
-                </BootstrapTooltip>
-              );
-            })}
+            {/* 建立表格 Columns */}
+            {columnOnShowElement.map((column: ColumnOnShowElement) => (
+              <ColumnWithTooltip key={column.id} column={column} />
+            ))}
             <StyledTableCell size="small">DELETE DATA</StyledTableCell>
           </TableRow>
         </TableHead>

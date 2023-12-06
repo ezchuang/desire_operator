@@ -11,6 +11,7 @@ import {
   Select,
   MenuItem,
   Grid,
+  InputAdornment,
 } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
@@ -21,7 +22,12 @@ import useRenewDbsAndTables from "../types/RenewDbsAndTables";
 import { MysqlDataTypes } from "../types/MysqlDataTypes";
 import { createTable } from "../models/createData";
 import { ColumnData } from "../types/Interfaces";
+import NullSign from "../types/NullSign";
 // import { TableData } from "../types/Interfaces";
+
+interface EditState {
+  idx: number;
+}
 
 const defaultColumn: ColumnData = {
   columnName: "",
@@ -39,19 +45,19 @@ const defaultColumn: ColumnData = {
 
 // 針對數值型 Column Type 驗證是否已開啟 Unsigned
 // 若兩者皆滿足，才能啟用 Zerofill 選項
-function shouldEnableZerofill(column: ColumnData): boolean {
-  const numericTypes = [
-    "INT",
-    "SMALLINT",
-    "TINYINT",
-    "MEDIUMINT",
-    "BIGINT",
-    "DECIMAL",
-    "FLOAT",
-    "DOUBLE",
-  ];
-  return numericTypes.includes(column.columnType) && column.isUnsigned;
-}
+// function shouldEnableZerofill(column: ColumnData): boolean {
+//   const numericTypes = [
+//     "INT",
+//     "SMALLINT",
+//     "TINYINT",
+//     "MEDIUMINT",
+//     "BIGINT",
+//     "DECIMAL",
+//     "FLOAT",
+//     "DOUBLE",
+//   ];
+//   return numericTypes.includes(column.columnType) && column.isUnsigned;
+// }
 
 // Column Options keys 顯示格式化，ex: isPrimaryKey => Primary Key
 function formatLabel(key: string): string {
@@ -72,6 +78,8 @@ const CreateTable: React.FC = () => {
   const [dbName, setDbName] = useState<string>("");
   const [tableName, setTableName] = useState<string>("");
   const [columns, setColumns] = useState<ColumnData[]>([defaultColumn]);
+
+  const [edit, setEdit] = useState<EditState>({ idx: -1 });
   const { dbsAndTablesElement } = useDbsAndTables();
   const { setMessage, setOpenSnackbar, setSeverity } = useMessage();
   const renewDbsAndTables = useRenewDbsAndTables();
@@ -98,12 +106,17 @@ const CreateTable: React.FC = () => {
         ? updatedColumn.isAutoIncrement
         : false;
     }
+
     // 針對 型別 與 Unsigned 屬性 檢查是否適用 ZeroFill
-    if (
-      (field === "columnType" || field === "isUnsigned") &&
-      updatedColumn.isZerofill
-    ) {
-      updatedColumn.isZerofill = shouldEnableZerofill(updatedColumn);
+    // if (
+    //   (field === "columnType" || field === "isUnsigned") &&
+    //   updatedColumn.isZerofill
+    // ) {
+    //   updatedColumn.isZerofill = shouldEnableZerofill(updatedColumn);
+    // }
+
+    if (field === "defaultValue") {
+      updatedColumn.defaultValue = value;
     }
 
     updatedColumns[index] = updatedColumn;
@@ -156,13 +169,18 @@ const CreateTable: React.FC = () => {
         columns: columns,
       });
 
-      if (response) {
-        setSeverity("success");
-        setMessage(`新增 Table ${dbName} 成功`);
-        setOpenSnackbar(true);
-
-        renewDbsAndTables();
+      if (!response) {
+        throw Error("創建異常");
       }
+
+      setSeverity("success");
+      setMessage(`新增 Table ${dbName} 成功`);
+      setOpenSnackbar(true);
+
+      renewDbsAndTables();
+      setColumns([defaultColumn]);
+      setTableName("");
+      setDbName("");
     } catch (error) {
       console.error("資料庫創建失敗:", error);
       setSeverity("error");
@@ -244,9 +262,10 @@ const CreateTable: React.FC = () => {
           MysqlDataTypes[column.columnType as keyof typeof MysqlDataTypes];
         const needsLimit = currentType?.needsLimit;
         const displaySize = currentType?.displaySize;
+        const isEditing = edit.idx === index;
 
         return (
-          <Grid container spacing={2} alignItems="center" key={index}>
+          <Grid container spacing={1} alignItems="center" mb={1} key={index}>
             <Grid item xs={3}>
               <TextField
                 fullWidth
@@ -307,12 +326,42 @@ const CreateTable: React.FC = () => {
             <Grid item xs={3}>
               <TextField
                 fullWidth
-                label="預設值"
-                value={column.defaultValue}
+                label={`預設值，空字串請輸入 "" `}
+                value={column.defaultValue || ""}
                 onChange={(event) =>
                   handleColumnChange(index, "defaultValue", event.target.value)
                 }
                 size="small"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment
+                      position="start"
+                      className={
+                        isEditing || column.defaultValue ? "w-0" : "w-full"
+                      }
+                    >
+                      {isEditing || column.defaultValue === "" ? (
+                        <NullSign />
+                      ) : null}
+                    </InputAdornment>
+                  ),
+                }}
+                onClick={() => {
+                  setEdit({ idx: index });
+                  if (
+                    column.defaultValue === null ||
+                    column.defaultValue === undefined
+                  ) {
+                    setColumns(
+                      columns.map((c, idx) =>
+                        idx === index ? { ...c, defaultValue: "" } : c
+                      )
+                    );
+                  }
+                }}
+                onBlur={() => {
+                  setEdit({ idx: -1 });
+                }}
               />
             </Grid>
             <Grid item xs={1}>
@@ -321,6 +370,7 @@ const CreateTable: React.FC = () => {
               </IconButton>
             </Grid>
 
+            {/* <Grid container spacing={1} key={index}> */}
             {Object.keys(column)
               .filter(
                 (key) =>
@@ -328,7 +378,7 @@ const CreateTable: React.FC = () => {
                   key !== "columnType" &&
                   key !== "columnSizeLimit" &&
                   key !== "defaultValue" &&
-                  key !== "isZerofill"
+                  key !== "isZerofill" // 因為 MySQL 準備要移除此特性了，直接禁用
               )
               .map((key) => (
                 <Grid key={key} item xs={6} sm={4} md={3} lg={2}>
@@ -353,9 +403,10 @@ const CreateTable: React.FC = () => {
                 </Grid>
               ))}
           </Grid>
+          // </Grid>
         );
       })}
-      <Box mt={1}>
+      <Box>
         <Button
           startIcon={<AddCircleOutlineIcon />}
           variant="contained"

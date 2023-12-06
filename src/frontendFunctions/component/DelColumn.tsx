@@ -105,11 +105,13 @@ const DelColumn: React.FC = () => {
                   setDelColumnName({ columnName: event.target.value })
                 }
               >
-                {columnDataElement.map((column) => (
-                  <MenuItem key={column.id} value={column.label}>
-                    {column.label}
-                  </MenuItem>
-                ))}
+                {columnDataElement
+                  .filter((column) => !column.options.isPrimaryKey)
+                  .map((column) => (
+                    <MenuItem key={column.id} value={column.label}>
+                      {column.label}
+                    </MenuItem>
+                  ))}
               </Select>
             </FormControl>
             {/* <TextField

@@ -235,7 +235,7 @@ const AddColumn: React.FC = () => {
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = event.target;
-    setNewColumn((prev) => ({ ...prev, [name]: value === "" ? null : value }));
+    setNewColumn((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -326,7 +326,12 @@ const AddColumn: React.FC = () => {
               fullWidth
               InputProps={{
                 startAdornment: (
-                  <InputAdornment position="start">
+                  <InputAdornment
+                    position="start"
+                    className={
+                      edit || newColumn.defaultValue ? "w-0" : "w-full"
+                    }
+                  >
                     {edit || newColumn.defaultValue ? null : <NullSign />}
                   </InputAdornment>
                 ),
