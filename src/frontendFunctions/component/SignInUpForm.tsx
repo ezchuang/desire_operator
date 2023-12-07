@@ -155,10 +155,14 @@ const SignInUpForm: React.FC = () => {
         setIsVerified(false);
 
         // 轉跳判斷
-        if (window.location.pathname !== "/") {
-          const url = "/";
-          linkToUrl(url);
-        }
+        // if (window.location.pathname !== "/") {
+        //   const url = "/";
+        //   linkToUrl(url);
+        // }
+
+        // 因為錯誤了，無論如何都轉跳
+        const url = "/";
+        linkToUrl(url);
       }
     } catch (error) {
       console.error("Error verifying user:", error);

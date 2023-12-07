@@ -16,6 +16,11 @@ export default async function historyApiInit() {
       try {
         let userGroup = global.userGroupMap.get(req.user!.userId) as string;
 
+        // Guest 身分直接中斷此程序
+        if (req.user!.isGuest) {
+          return res.status(200).json({ data: [], structure: [] });
+        }
+
         const [data, structure] = await historyUtility.getHistoryByGroupId(
           userGroup
         );

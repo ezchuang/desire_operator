@@ -11,6 +11,10 @@ export default async function addHistory(
   values: string[]
 ) {
   try {
+    if (userId.startsWith("G")) {
+      return;
+    }
+
     const record = {
       id: userId,
       actionType: actionType,

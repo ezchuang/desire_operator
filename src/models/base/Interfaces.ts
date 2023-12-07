@@ -35,6 +35,7 @@ export interface getUserDbObj {
   userPw?: string;
   userId?: string;
   dbUser?: string;
+  host?: string;
 }
 
 export interface CreateDbObj {

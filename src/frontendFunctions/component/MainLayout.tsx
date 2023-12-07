@@ -19,6 +19,7 @@ import AddToolEntry from "./AddToolEntry";
 import ModifyToolEntry from "./ModifyToolEntry";
 import HistoryTable from "./HistoryTable";
 import SignInUpForm from "./SignInUpForm";
+import GuestSignInForm from "./GuestSignInForm";
 
 const StyledAccordion = styled(Accordion)({
   width: "100%",
@@ -99,7 +100,10 @@ const MainLayout: React.FC = () => {
                 </div>
               </div>
               {/* Content for Verify User */}
-              <SignInUpForm />
+              <div className="flex gap-10">
+                <GuestSignInForm />
+                <SignInUpForm />
+              </div>
             </div>
           </div>
         </nav>

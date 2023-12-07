@@ -12,14 +12,14 @@ class CreateUtility extends DbUtilityBase {
     console.log(queryStr, []);
     await this.execute(queryStr, []);
 
+    // Guest 路徑，因為只有超級使用者能創建Database，所以跳過刷新行為
+    if (userId.startsWith("G")) {
+      return true;
+    }
+
     await addHistory(userId, "Create Database", queryStr, []);
 
-    // 配套新增
-    // queryStr = `SELECT signin_user FROM user_info.user_groups WHERE group_name = ?`;
-    // const signinUser = (await this.execute(queryStr, [dbUser]))[0][0]
-    //   .signin_user;
     const signinUser = groupSigninUser;
-
     // 超級使用者尾綴不同，且根本不用特別加權限
     if (signinUser === "admin" || signinUser === "root") {
       return true;

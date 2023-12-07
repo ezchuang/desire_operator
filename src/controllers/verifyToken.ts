@@ -12,9 +12,28 @@ const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
   }
 
   try {
-    const decoded = jwt.verify(token, global.secretKey) as jwt.JwtPayload;
+    const decoded = jwt.verify(token, global.publicKey, {
+      algorithms: ["RS256"],
+    }) as jwt.JwtPayload;
     req.user = decoded;
 
+    if (req.user.isGuest) {
+      // 建一個 boolean 紀錄是否是 Guest
+
+      // 是否撈的到 userGroup(dbUser)，撈不到則丟出 Error 到 無效 Token
+      let userGroup = global.userGroupMap.get(req.user!.userId) as string;
+      if (!userGroup) {
+        throw new jwt.JsonWebTokenError("Invalid token or user group");
+      }
+
+      req.userGroup = userGroup; // group access account
+      req.db = global.groupDbMap.get(userGroup);
+
+      next();
+      return;
+    }
+
+    // 撈 userGroup(dbUser)
     let userGroup = global.userGroupMap.get(req.user!.userId) as string;
 
     // 若是伺服器有重啟，就需要走這裡，由 Token 建立 DB Connection

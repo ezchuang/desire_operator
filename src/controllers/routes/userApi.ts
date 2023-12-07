@@ -6,7 +6,11 @@ import {
 } from "../../models/base/Interfaces";
 import UserUtility from "../../models/utility/UserUtility";
 import rootDb from "../../models/dbConstructor/rootDb";
+import guestDb from "../../models/dbConstructor/guestDb";
 import jwt from "jsonwebtoken";
+
+const Snowflake = require("snowflake-id").default;
+const generator = new Snowflake({ mid: 2 });
 
 export default async function userApiInit() {
   const userApi: IRouter = express.Router();
@@ -96,7 +100,9 @@ export default async function userApiInit() {
       // 撈出 [使用者群組, 群組DB]
       const [groupName, dbUser, invitationCode, groupDb] =
         await rootUtility.getUserDb(params);
+      // 群組與資料庫連接池的映射，[群組登入者, 群組DB]
       global.groupDbMap.set(dbUser, groupDb);
+      // 群組與資料庫連接池的映射，[使用者編號, 群組登入者]
       global.userGroupMap.set(userInfo[0], dbUser);
 
       const token = jwt.sign(
@@ -108,8 +114,8 @@ export default async function userApiInit() {
           invitationCode: invitationCode,
           groupName: groupName,
         },
-        global.secretKey,
-        { expiresIn: "7d" }
+        global.privateKey,
+        { algorithm: "RS256", expiresIn: "7d" }
       );
 
       return res.status(200).json({
@@ -150,14 +156,30 @@ export default async function userApiInit() {
         throw new Error("NoTokenProvided");
       }
 
-      const decoded = jwt.verify(token, global.secretKey) as UserPayload;
-      const resData = {
-        userName: decoded.userName,
-        groupName: decoded.groupName,
-        invitationCode: decoded.invitationCode,
-      };
+      const decoded = jwt.verify(token, global.publicKey, {
+        algorithms: ["RS256"],
+      }) as UserPayload;
 
+      req.user = decoded;
       console.log("decoded: ", decoded);
+
+      // Guest 路徑
+      if (req.user.isGuest) {
+        const resData = {
+          userName: req.user.userName,
+          groupName: "Guest",
+          invitationCode: "None",
+        };
+
+        return res.status(200).json({ success: true, data: resData });
+      }
+
+      // 標準路徑
+      const resData = {
+        userName: req.user.userName,
+        groupName: req.user.groupName,
+        invitationCode: req.user.invitationCode,
+      };
 
       return res.status(200).json({ success: true, data: resData });
     } catch (error) {
@@ -178,6 +200,81 @@ export default async function userApiInit() {
         }
       }
       return res.status(401).json({ error: true, message: msg });
+    }
+  });
+
+  // 登入
+  userApi.post("/guestSignin", async (req: Request, res: Response) => {
+    try {
+      const params: getUserDbObj = {
+        userMail: req.body.account, // 減少更動區域，此項無直接作用
+        dbUser: req.body.account, // 減少更動區域，將 account 轉至 dbUser 使用
+        userPw: req.body.password,
+        host: req.body.dbHost,
+      };
+      console.log(params);
+
+      if (!(params.userMail && params.userPw && params.host)) {
+        throw new Error("MissingCredentials");
+      }
+
+      // 撈出 [使用者編號, 使用者暱稱]
+      const userId = `G${String(generator.generate())}`; // G 開頭做標示
+      const userName = req.body.userName;
+
+      let guestDbInstance;
+      try {
+        guestDbInstance = guestDb(params.dbUser!, params.userPw, params.host);
+      } catch (err) {
+        console.log(err);
+        throw new Error("InvalidCredentials");
+      }
+      // 群組與資料庫連接池的映射，[群組登入者, 群組DB]
+      global.groupDbMap.set(params.dbUser!, guestDbInstance);
+      // 群組與資料庫連接池的映射，[使用者編號, 群組登入者]
+      global.userGroupMap.set(userId, params.dbUser!);
+
+      const token = jwt.sign(
+        {
+          userId: userId,
+          userEmail: params.userMail,
+          userName: userName,
+          dbUser: params.dbUser!, // 取得 DB 映射用，不呈現在一般資料中
+          invitationCode: "None",
+          groupName: "Guest",
+          isGuest: true, // Guest 標記
+        },
+        global.privateKey,
+        { algorithm: "RS256", expiresIn: "7d" }
+      );
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          token: token,
+          userName: userName,
+          groupName: "Guest",
+          invitationCode: "None",
+        },
+      });
+    } catch (error) {
+      let msg = "";
+      if (error instanceof Error) {
+        switch (error.message) {
+          case "MissingCredentials":
+            msg = "資料未填寫";
+            break;
+
+          case "InvalidCredentials":
+            msg = "資料庫連接失敗，可能是帳號或密碼錯誤";
+            break;
+
+          default:
+            console.error(error);
+            return res.status(500).json({ error: true, message: "伺服器錯誤" });
+        }
+      }
+      return res.status(400).json({ error: true, message: msg });
     }
   });
 

@@ -850,6 +850,10 @@ video {
   justify-content: space-between;
 }
 
+.gap-10 {
+  gap: 2.5rem;
+}
+
 .gap-\[1px\] {
   gap: 1px;
 }
@@ -1120,7 +1124,7 @@ video {
   position: absolute;
   top: 5rem;
   left: 50%;
-  width: 20rem;
+  width: 500px;
   --tw-translate-x: -50%;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
   overflow: hidden;
