@@ -13,7 +13,7 @@ class CreateUtility extends DbUtilityBase {
     await this.execute(queryStr, []);
 
     // Guest 路徑，因為只有超級使用者能創建Database，所以跳過刷新行為
-    if (userId.startsWith("G")) {
+    if (String(userId).startsWith("G")) {
       return true;
     }
 

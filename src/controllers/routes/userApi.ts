@@ -230,9 +230,11 @@ export default async function userApiInit() {
         throw new Error("InvalidCredentials");
       }
       // 群組與資料庫連接池的映射，[群組登入者, 群組DB]
-      global.groupDbMap.set(params.dbUser!, guestDbInstance);
+      // Guest dbUser 改以雪花 ID 生成，並加上 "D" 前墜
+      const dbUser = `D${String(generator.generate())}`; // D 開頭做標示
+      global.groupDbMap.set(dbUser, guestDbInstance);
       // 群組與資料庫連接池的映射，[使用者編號, 群組登入者]
-      global.userGroupMap.set(userId, params.dbUser!);
+      global.userGroupMap.set(userId, dbUser);
 
       const token = jwt.sign(
         {
