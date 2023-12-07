@@ -6,7 +6,11 @@ import {
 } from "../../models/base/Interfaces";
 import UserUtility from "../../models/utility/UserUtility";
 import rootDb from "../../models/dbConstructor/rootDb";
+import guestDb from "../../models/dbConstructor/guestDb";
 import jwt from "jsonwebtoken";
+
+const Snowflake = require("snowflake-id").default;
+const generator = new Snowflake({ mid: 2 });
 
 export default async function userApiInit() {
   const userApi: IRouter = express.Router();
@@ -21,11 +25,19 @@ export default async function userApiInit() {
         userPw: req.body.password,
         userName: req.body.name,
         invitationCode: req.body.invitationCode,
-        groupName: req.body.newGroupName,
+        groupName: req.body.invitationCode ? null : req.body.newGroupName, // 邀請碼優先
       };
 
       if (!params.userMail || !params.userPw || !params.userName) {
         throw new Error("ValidationError");
+      }
+
+      if (!params.invitationCode && !params.groupName) {
+        throw new Error("ValidationError");
+      }
+
+      if (await rootUtility.checkExist(params)) {
+        throw new Error("DuplicateEmail");
       }
 
       const result = await rootUtility.createUser(params);
@@ -43,7 +55,15 @@ export default async function userApiInit() {
             break;
 
           case "DuplicateEmail":
-            msg = "e-mail 重複申請";
+            msg = "event-mail 重複申請";
+            break;
+
+          case "InvitationCodeDoesNotExist":
+            msg = "邀請碼不存在";
+            break;
+
+          case "DuplicateGroupName":
+            msg = "群組名稱重複";
             break;
 
           default:
@@ -55,7 +75,7 @@ export default async function userApiInit() {
         console.error("Unexpected error", error);
         return res.status(500).json({ error: true, message: "未知錯誤" });
       }
-      res.status(400).json({ error: true, message: msg });
+      return res.status(400).json({ error: true, message: msg });
     }
   });
 
@@ -78,23 +98,35 @@ export default async function userApiInit() {
       }
 
       // 撈出 [使用者群組, 群組DB]
-      const [groupName, groupDb] = await rootUtility.getUserDb(params);
-      global.groupDbMap.set(groupName, groupDb);
-      global.userGroupMap.set(userInfo[0], groupName);
+      const [groupName, dbUser, invitationCode, groupDb] =
+        await rootUtility.getUserDb(params);
+      // 群組與資料庫連接池的映射，[群組登入者, 群組DB]
+      global.groupDbMap.set(dbUser, groupDb);
+      // 群組與資料庫連接池的映射，[使用者編號, 群組登入者]
+      global.userGroupMap.set(userInfo[0], dbUser);
 
       const token = jwt.sign(
         {
           userId: userInfo[0],
           userEmail: params.userMail,
           userName: userInfo[1],
+          dbUser: dbUser, // 取得 DB 映射用，不呈現在一般資料中
+          invitationCode: invitationCode,
+          groupName: groupName,
         },
-        global.secretKey,
-        { expiresIn: "7d" }
+        global.privateKey,
+        { algorithm: "RS256", expiresIn: "7d" }
       );
 
-      res
-        .status(200)
-        .json({ success: true, data: { token: token, userName: userInfo[1] } });
+      return res.status(200).json({
+        success: true,
+        data: {
+          token: token,
+          userName: userInfo[1],
+          groupName: groupName,
+          invitationCode: invitationCode,
+        },
+      });
     } catch (error) {
       let msg = "";
       if (error instanceof Error) {
@@ -112,7 +144,7 @@ export default async function userApiInit() {
             return res.status(500).json({ error: true, message: "伺服器錯誤" });
         }
       }
-      res.status(400).json({ error: true, message: msg });
+      return res.status(400).json({ error: true, message: msg });
     }
   });
 
@@ -124,13 +156,32 @@ export default async function userApiInit() {
         throw new Error("NoTokenProvided");
       }
 
-      const decoded = jwt.verify(token, global.secretKey) as UserPayload;
+      const decoded = jwt.verify(token, global.publicKey, {
+        algorithms: ["RS256"],
+      }) as UserPayload;
+
+      req.user = decoded;
+      console.log("decoded: ", decoded);
+
+      // Guest 路徑
+      if (req.user.isGuest) {
+        const resData = {
+          userName: req.user.userName,
+          groupName: "Guest",
+          invitationCode: "None",
+        };
+
+        return res.status(200).json({ success: true, data: resData });
+      }
+
+      // 標準路徑
       const resData = {
-        userEmail: decoded.userEmail,
-        userId: decoded.userId,
-        userName: decoded.userName,
+        userName: req.user.userName,
+        groupName: req.user.groupName,
+        invitationCode: req.user.invitationCode,
       };
-      res.status(200).json({ success: true, data: resData });
+
+      return res.status(200).json({ success: true, data: resData });
     } catch (error) {
       let msg = "";
       if (error instanceof Error) {
@@ -148,7 +199,82 @@ export default async function userApiInit() {
             return res.status(500).json({ error: true, message: "伺服器錯誤" });
         }
       }
-      res.status(401).json({ error: true, message: msg });
+      return res.status(401).json({ error: true, message: msg });
+    }
+  });
+
+  // 登入
+  userApi.post("/guestSignin", async (req: Request, res: Response) => {
+    try {
+      const params: getUserDbObj = {
+        userMail: req.body.account, // 減少更動區域，此項無直接作用
+        dbUser: req.body.account, // 減少更動區域，將 account 轉至 dbUser 使用
+        userPw: req.body.password,
+        host: req.body.dbHost,
+      };
+      console.log(params);
+
+      if (!(params.userMail && params.userPw && params.host)) {
+        throw new Error("MissingCredentials");
+      }
+
+      // 撈出 [使用者編號, 使用者暱稱]
+      const userId = `G${String(generator.generate())}`; // G 開頭做標示
+      const userName = req.body.userName;
+
+      let guestDbInstance;
+      try {
+        guestDbInstance = guestDb(params.dbUser!, params.userPw, params.host);
+      } catch (err) {
+        console.log(err);
+        throw new Error("InvalidCredentials");
+      }
+      // 群組與資料庫連接池的映射，[群組登入者, 群組DB]
+      global.groupDbMap.set(params.dbUser!, guestDbInstance);
+      // 群組與資料庫連接池的映射，[使用者編號, 群組登入者]
+      global.userGroupMap.set(userId, params.dbUser!);
+
+      const token = jwt.sign(
+        {
+          userId: userId,
+          userEmail: params.userMail,
+          userName: userName,
+          dbUser: params.dbUser!, // 取得 DB 映射用，不呈現在一般資料中
+          invitationCode: "None",
+          groupName: "Guest",
+          isGuest: true, // Guest 標記
+        },
+        global.privateKey,
+        { algorithm: "RS256", expiresIn: "7d" }
+      );
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          token: token,
+          userName: userName,
+          groupName: "Guest",
+          invitationCode: "None",
+        },
+      });
+    } catch (error) {
+      let msg = "";
+      if (error instanceof Error) {
+        switch (error.message) {
+          case "MissingCredentials":
+            msg = "資料未填寫";
+            break;
+
+          case "InvalidCredentials":
+            msg = "資料庫連接失敗，可能是帳號或密碼錯誤";
+            break;
+
+          default:
+            console.error(error);
+            return res.status(500).json({ error: true, message: "伺服器錯誤" });
+        }
+      }
+      return res.status(400).json({ error: true, message: msg });
     }
   });
 

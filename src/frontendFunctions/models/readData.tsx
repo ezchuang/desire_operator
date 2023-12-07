@@ -12,11 +12,9 @@ export async function readDbsOrTables(
       bodyFetch: JSON.stringify(element),
     });
 
-    const result = await response.json();
-
     // console.log("rowData: ", result.data);
     // console.log("columnData: ", result.structure);
-    return [result.data, result.structure];
+    return [response.data, response.structure];
   } catch (err) {
     console.error("There was an error fetching the DBs and Tables: ", err);
     throw err;
@@ -32,11 +30,9 @@ export async function readDbsAndTables(): Promise<any[]> {
       bodyFetch: JSON.stringify({}),
     });
 
-    const result = await response.json();
-
     // console.log("rowData: ", result.data);
     // console.log("columnData: ", result.structure);
-    return [result.data, result.structure];
+    return [response.data, response.structure];
   } catch (err) {
     console.error("There was an error fetching the DBs and Tables: ", err);
     throw err;
@@ -51,11 +47,10 @@ export async function readTableData(element: ReadDataElement): Promise<any[]> {
       bodyFetch: JSON.stringify(element),
     });
 
-    const result = await response.json();
     // console.log(result.data);
     // console.log(result.structure);
 
-    return [result.data, result.structure];
+    return [response.data, response.structure];
   } catch (err) {
     console.error("There was an error fetching the Tables: ", err);
     throw err;
@@ -69,11 +64,10 @@ export async function readHistoryData(): Promise<any[]> {
       methodFetch: "GET",
     });
 
-    const result = await response.json();
     // console.log(result.data);
     // console.log(result.structure);
 
-    return [result.data, result.structure];
+    return [response.data, response.structure];
   } catch (err) {
     console.error("There was an error fetching the Tables: ", err);
     throw err;

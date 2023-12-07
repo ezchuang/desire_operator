@@ -7,8 +7,10 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
+import { useReadData } from "../types/ReadDataContext";
 import AddRow from "./AddRow";
 import AddColumn from "./AddColumn";
+import DelColumn from "./DelColumn";
 
 const StyledAccordionSummary = styled(AccordionSummary)({
   "& .MuiAccordionSummary-expandIconWrapper.Mui-expanded": {
@@ -27,6 +29,10 @@ const StyledAccordionDetails = styled(AccordionDetails)({
 const AddToolEntry: React.FC = () => {
   const [addRowExpanded, setAddRowExpanded] = useState(false);
   const [addColumnExpanded, setAddColumnExpanded] = useState(false);
+  const [delColumnExpanded, setDelColumnExpanded] = useState(false);
+
+  const { readDataElement } = useReadData();
+
   return (
     <>
       {/* ADD ROW */}
@@ -38,7 +44,7 @@ const AddToolEntry: React.FC = () => {
           <div>新增 Row</div>
         </StyledAccordionSummary>
         <StyledAccordionDetails>
-          <AddRow />
+          {readDataElement.dbName && readDataElement.table ? <AddRow /> : <></>}
         </StyledAccordionDetails>
       </Accordion>
       {/* ADD COLUMN */}
@@ -50,7 +56,27 @@ const AddToolEntry: React.FC = () => {
           <div>新增 Column</div>
         </StyledAccordionSummary>
         <StyledAccordionDetails>
-          <AddColumn />
+          {readDataElement.dbName && readDataElement.table ? (
+            <AddColumn />
+          ) : (
+            <></>
+          )}
+        </StyledAccordionDetails>
+      </Accordion>
+      {/* DELETE COLUMN */}
+      <Accordion
+        expanded={delColumnExpanded}
+        onChange={() => setDelColumnExpanded(!delColumnExpanded)}
+      >
+        <StyledAccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <div>刪除 Column</div>
+        </StyledAccordionSummary>
+        <StyledAccordionDetails>
+          {readDataElement.dbName && readDataElement.table ? (
+            <DelColumn />
+          ) : (
+            <></>
+          )}
         </StyledAccordionDetails>
       </Accordion>
     </>

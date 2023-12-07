@@ -16,17 +16,23 @@ import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 
 import { useMessage } from "../types/MessageContext";
 import { useReadData } from "../types/ReadDataContext";
-// import { useColumnData } from "../types/ColumnDataContext";
-import { useColumnOnShow } from "../types/ColumnOnShowContext";
+import { ColumnDataElement, useColumnData } from "../types/ColumnDataContext";
+import {
+  ColumnOnShowElement,
+  useColumnOnShow,
+} from "../types/ColumnOnShowContext";
 import { useRefreshDataFlag } from "../types/RefreshDataFlagContext";
 import { readTableData } from "../models/readData";
 import { updateData } from "../models/updateData";
 import { deleteData } from "../models/deleteData";
+import NullSign from "../types/NullSign";
+import ColumnWithTooltip from "./ColumnWithTooltip";
 
-// interface Column {
-//   id: string;
-//   label: string;
-// }
+interface WhereCluster {
+  column: string;
+  operator: string;
+  value: any;
+}
 
 interface EditState {
   row: number;
@@ -37,20 +43,25 @@ const StyledTableCell = styled(TableCell)(() => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: "#d0d0d0",
     minWidth: 60,
-    padding: 10,
+    lineHeight: "1rem",
+    textAlign: "center",
+    whiteSpace: "nowrap",
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
     minWidth: 60,
     padding: 14,
+    paddingTop: 6,
+    paddingBottom: 6,
   },
 }));
 
 const MainTable: React.FC = () => {
   const { setMessage, setOpenSnackbar, setSeverity } = useMessage();
   const { readDataElement } = useReadData();
+  const { columnDataElement } = useColumnData();
   const { columnOnShowElement } = useColumnOnShow();
-  const { refreshDataFlag } = useRefreshDataFlag();
+  const { refreshDataFlag, setRefreshDataFlag } = useRefreshDataFlag();
 
   const [data, setData] = useState<any[]>([]);
   const [edit, setEdit] = useState<EditState>({ row: -1, cell: "" });
@@ -71,18 +82,22 @@ const MainTable: React.FC = () => {
     setEditValue(event.target.value);
   };
 
-  //
+  // 送出 delete row 的需求
   const handleRemoveRow = async (row: any, index: number) => {
+    const whereCluster: WhereCluster[] = columnDataElement
+      .filter((column) => row[column.id] !== "")
+      .map((column) => ({
+        column: column.id,
+        operator: "=",
+        value: row[column.id],
+      }));
+
+    // console.log(whereCluster);
+
     const removeRow = {
       dbName: readDataElement.dbName,
       table: readDataElement.table,
-      where: [
-        {
-          column: "id",
-          operator: "=",
-          value: row.id,
-        },
-      ],
+      where: whereCluster,
     };
 
     try {
@@ -104,27 +119,48 @@ const MainTable: React.FC = () => {
     }
   };
 
+  // 按下 enter 送出需求
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      handleEditConfirm();
+    }
+  };
+
   // 處理編輯確認
   const handleEditConfirm = async () => {
-    const editingRow = data[edit.row]; // 獲取正在編輯的行(第幾行)
+    const editingRow = data[edit.row]; // 獲取正在編輯的行(第幾行/哪一行)
     const editingColumn = columnOnShowElement.find(
       (column) => column.id === edit.cell
     ); // 獲取正在編輯的列(列名稱)
+
+    // 數值不變，直接結束
+    if (editingColumn && editingRow[editingColumn.id] === editValue) {
+      // 重置編輯狀態
+      setEdit({ row: -1, cell: "" });
+      return;
+    }
+
+    const updateValue =
+      editValue === `""`
+        ? ""
+        : editValue === "0"
+        ? "0"
+        : editValue
+        ? editValue
+        : null;
 
     if (editingColumn) {
       const updateObj = {
         dbName: readDataElement.dbName!,
         table: readDataElement.table!,
         data: {
-          [editingColumn.id]: editValue,
+          [editingColumn.id]: updateValue,
         },
-        where: [
-          {
-            column: editingColumn.id,
-            operator: "=",
-            value: editingRow[editingColumn.id],
-          },
-        ],
+        where: columnDataElement.map((cell: ColumnDataElement) => ({
+          column: cell.id,
+          operator: "=",
+          value: editingRow[cell.id],
+        })),
       };
 
       try {
@@ -138,6 +174,7 @@ const MainTable: React.FC = () => {
         };
 
         setData(updatedData); // 刷新
+        setRefreshDataFlag([]);
       } catch (error) {
         console.error("Error updating data: ", error);
       }
@@ -150,19 +187,15 @@ const MainTable: React.FC = () => {
   useEffect(() => {
     const readData = async () => {
       try {
+        if (!readDataElement.dbName || !readDataElement.table) {
+          return;
+        }
+
         // read 修改數據的地方，return [列資料, 表頭資料 / 行分類 + CSS Style]
         const response = await readTableData(readDataElement);
 
         setData(response[0]);
-
-        // const columnNames = columnData.map((column: any) => {
-        //   return {
-        //     id: column.name,
-        //     label: column.name.toUpperCase(),
-        //   };
-        // });
-
-        // setColumnOnShowElement(columnNames);
+        // console.log(response);
       } catch (error) {
         console.error("Error reading data: ", error);
       }
@@ -177,10 +210,11 @@ const MainTable: React.FC = () => {
       <Table stickyHeader aria-label="main table">
         <TableHead>
           <TableRow>
-            {columnOnShowElement.map((column) => (
-              <StyledTableCell key={column.id}>{column.label}</StyledTableCell>
+            {/* 建立表格 Columns */}
+            {columnOnShowElement.map((column: ColumnOnShowElement) => (
+              <ColumnWithTooltip key={column.id} column={column} />
             ))}
-            <StyledTableCell>DELETE DATA</StyledTableCell>
+            <StyledTableCell size="small">DELETE DATA</StyledTableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -197,29 +231,34 @@ const MainTable: React.FC = () => {
                   >
                     {isEditing ? (
                       <TextField
-                        value={editValue}
+                        value={editValue ?? ""}
                         onChange={handleInputChange}
                         onBlur={handleEditConfirm}
+                        onKeyDown={handleKeyPress}
                         autoFocus
                         fullWidth
+                        label={`修改中，空字串請輸入 "" `}
+                        size="small"
                       />
                     ) : (
-                      value
+                      value ?? <NullSign />
                     )}
                   </StyledTableCell>
                 );
               })}
               <StyledTableCell>
-                <Box>
-                  <Button
-                    variant="contained"
-                    sx={{ padding: "2px" }}
-                    onClick={() => handleRemoveRow(row, index)}
-                    color="secondary"
-                  >
-                    <RemoveCircleOutlineIcon />
-                  </Button>
-                </Box>
+                <div className="flex justify-center">
+                  <Box>
+                    <Button
+                      variant="contained"
+                      sx={{ padding: "2px" }}
+                      onClick={() => handleRemoveRow(row, index)}
+                      color="secondary"
+                    >
+                      <RemoveCircleOutlineIcon />
+                    </Button>
+                  </Box>
+                </div>
               </StyledTableCell>
             </TableRow>
           ))}

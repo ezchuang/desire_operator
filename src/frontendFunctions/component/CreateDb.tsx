@@ -34,8 +34,9 @@ const CreateDatabase: React.FC = () => {
       <TextField
         label="資料庫名稱"
         value={dbName}
-        onChange={(e) => setDbName(e.target.value)}
+        onChange={(event) => setDbName(event.target.value)}
         fullWidth
+        size="small"
       />
       <Box mt={1}>
         <Grid item xs={12}>

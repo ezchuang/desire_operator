@@ -1,5 +1,6 @@
 import React from "react";
 import SignInUpForm from "./SignInUpForm";
+import GuestSignInForm from "./GuestSignInForm";
 
 const IndexLayout: React.FC = () => {
   // const { isVerified } = useVerification();
@@ -13,7 +14,10 @@ const IndexLayout: React.FC = () => {
             {/* Content for NAV */}
             <div className="font-bold text-2xl">MySQL Speaker</div>
             {/* Content for Verify User */}
-            <SignInUpForm />
+            <div className="flex gap-10">
+              <GuestSignInForm />
+              <SignInUpForm />
+            </div>
           </div>
         </nav>
       </div>

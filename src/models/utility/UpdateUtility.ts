@@ -1,5 +1,10 @@
 import DBUtilityBase from "./DbUtilityBase";
-import { UpdateObj, InsertObj, AddColumnObj } from "../base/Interfaces";
+import {
+  UpdateObj,
+  InsertObj,
+  AddColumnObj,
+  delColumnObj,
+} from "../base/Interfaces";
 import addHistory from "../../controllers/addHistory";
 
 class UpdateUtility extends DBUtilityBase {
@@ -10,7 +15,11 @@ class UpdateUtility extends DBUtilityBase {
     const setData: string[] = [];
 
     Object.entries(data).map(([key, val]) => {
-      setData.push(`${key} = ?`);
+      if (val === null) {
+        setData.push(`\`${key}\` = null`); // 保留 null
+        return;
+      }
+      setData.push(`\`${key}\` = ?`);
       values.push(val);
     });
 
@@ -20,8 +29,12 @@ class UpdateUtility extends DBUtilityBase {
 
     if (where && where.length > 0) {
       const whereClauses = where.map((condition) => {
-        values.push(condition.value);
-        return `${condition.column} ${condition.operator} ?`;
+        if (condition.value === null) {
+          return `\`${condition.column}\` IS NULL`;
+        } else {
+          values.push(condition.value);
+          return `\`${condition.column}\` ${condition.operator} ?`;
+        }
       });
       queryStr += " WHERE " + whereClauses.join(" AND ");
     }
@@ -67,11 +80,11 @@ class UpdateUtility extends DBUtilityBase {
 
       let queryStr = `ALTER TABLE \`${dbName}\`.\`${table}\` ADD COLUMN \`${columnName}\` ${columnType}`;
 
-      if (columnOption) {
+      if (columnOption && columnOption.length > 0) {
         queryStr += ` ${columnOption.join(" ")}`;
       }
 
-      if (defaultValue !== undefined) {
+      if (defaultValue !== undefined && defaultValue !== null) {
         queryStr += ` DEFAULT '${defaultValue}'`;
       }
 
@@ -83,6 +96,24 @@ class UpdateUtility extends DBUtilityBase {
       return true;
     } catch (err) {
       console.error("Error in addColumn:", err);
+      throw err;
+    }
+  }
+
+  async delColumn(userId: string, obj: delColumnObj) {
+    try {
+      const { dbName, table, columnName } = obj;
+
+      let queryStr = `ALTER TABLE \`${dbName}\`.\`${table}\` DROP COLUMN \`${columnName}\``;
+
+      console.log(queryStr);
+      await this.execute(queryStr, []);
+
+      await addHistory(userId, "Delete Column", queryStr, []);
+
+      return true;
+    } catch (err) {
+      console.error("Error in delColumn:", err);
       throw err;
     }
   }

@@ -45,6 +45,7 @@ const StyledTableCell = styled(TableCell)(() => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: "#d0d0d0",
     minWidth: 10,
+    textAlign: "center",
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
@@ -149,7 +150,9 @@ const ShortcutTable: React.FC = () => {
       <Table stickyHeader aria-label="collapsible table" size="small">
         <TableHead>
           <TableRow>
-            <StyledTableCell colSpan={2}>{"Shortcut Tree"}</StyledTableCell>
+            <StyledTableCell colSpan={2}>
+              {"Databases and Tables Structure Tree"}
+            </StyledTableCell>
           </TableRow>
         </TableHead>
         <TableBody>

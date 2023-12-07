@@ -9,16 +9,11 @@ export async function deleteData(element: any): Promise<any> {
       bodyFetch: JSON.stringify(element),
     });
 
-    if (!response.ok) {
-      throw new Error(
-        `Error with status ${response.status} in delete operation`
-      );
+    if (response.data) {
+      return response.data;
+    } else {
+      throw Error;
     }
-
-    const result = await response.json();
-    // console.log("updateData: ", response);
-
-    return result.data;
   } catch (err) {
     console.error(`There was an error in the delete operation: `, err);
     throw err;
@@ -34,15 +29,11 @@ export async function deleteTable(element: any): Promise<any> {
       bodyFetch: JSON.stringify(element),
     });
 
-    if (!response.ok) {
-      throw new Error(
-        `Error with status ${response.status} while dropping table`
-      );
+    if (response.data) {
+      return response.data;
+    } else {
+      throw Error;
     }
-
-    const result = await response.json();
-
-    return result.data;
   } catch (err) {
     console.error("There was an error dropping the table: ", err);
     throw err;
@@ -58,15 +49,11 @@ export async function deleteDb(element: any): Promise<any> {
       bodyFetch: JSON.stringify(element),
     });
 
-    if (!response.ok) {
-      throw new Error(
-        `Error with status ${response.status} while dropping database`
-      );
+    if (response.data) {
+      return response.data;
+    } else {
+      throw Error;
     }
-
-    const result = await response.json();
-
-    return result.data;
   } catch (err) {
     console.error("There was an error dropping the database: ", err);
     throw err;

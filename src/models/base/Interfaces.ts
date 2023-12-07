@@ -34,11 +34,13 @@ export interface getUserDbObj {
   userMail: string;
   userPw?: string;
   userId?: string;
+  dbUser?: string;
+  host?: string;
 }
 
 export interface CreateDbObj {
   dbName: string;
-  groupName: string;
+  groupSigninUser: string;
 }
 
 export interface CreateObj {
@@ -59,7 +61,8 @@ export interface ReadObj {
   groupBy?: string;
   orderBy?: string;
   orderDirection?: "ASC" | "DESC";
-  limit?: number;
+  offset?: number | 0;
+  limit?: number | 100;
 }
 
 export interface UpdateObj {
@@ -84,6 +87,12 @@ export interface AddColumnObj {
   defaultValue: string;
 }
 
+export interface delColumnObj {
+  dbName: string;
+  table: string;
+  columnName: string;
+}
+
 export interface DeleteObj {
   dbName: string;
   table?: string;
@@ -97,7 +106,10 @@ export interface HistoryRecord {
 }
 
 export interface UserPayload {
-  userEmail: string;
   userId: number;
+  userEmail: string;
   userName: string;
+  dbUser: string;
+  invitationCode: string;
+  groupName: string;
 }

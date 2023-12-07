@@ -16,14 +16,21 @@ export default async function createApiInit() {
     async (req: Request, res: Response) => {
       console.log("createDb");
       try {
-        const userGroup = req.userGroup;
+        const dbUser = req.userGroup;
         const userId = req.user!.userId;
 
         const params: CreateDbObj = {
           dbName: req.body.dbName,
-          groupName: userGroup,
+          groupSigninUser: dbUser,
         };
-        const data = await rootCreateUtility.createDb(userId, params);
+
+        let data;
+        if (req.user!.isGuest) {
+          const guestCreateUtility = new CreateUtility(req.db);
+          data = await guestCreateUtility.createDb(userId, params);
+        } else {
+          data = await rootCreateUtility.createDb(userId, params);
+        }
 
         return res.status(200).json({ data: data }); // data: true or error
       } catch (err) {

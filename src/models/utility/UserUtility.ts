@@ -43,23 +43,39 @@ class UserUtility extends DbUtilityBase {
   async createUser(userObj: CreateUserObj) {
     const { userMail, userPw, userName, invitationCode, groupName } = userObj;
 
-    const insertUserQuery = `INSERT INTO user_info.users (user_mail, user_pw, user_name) VALUES (?, ?, ?)`;
-    await this.execute(insertUserQuery, [userMail, userPw, userName]);
-
-    const getUserIdQuery = `SELECT id FROM user_info.users WHERE user_mail = ? AND user_pw = ?`;
-    const userId = (
-      await this.execute(getUserIdQuery, [userMail, userPw])
-    )[0][0].id;
-
     if (invitationCode) {
       // 加入既有 Group
-      const getGroupIdQuery = `SELECT id FROM user_info.user_groups WHERE invitation_code=?`;
-      const groupId = (
-        await this.execute(getGroupIdQuery, [invitationCode])
+      // 從提供的邀請碼 搜尋群組 ID
+      const getGroupIdQuery = `SELECT id FROM user_info.user_groups WHERE invitation_code = ?`;
+
+      const groupIdResponse = await this.execute(getGroupIdQuery, [
+        invitationCode,
+      ]);
+
+      if (groupIdResponse[0].length <= 0) {
+        throw new Error("InvitationCodeDoesNotExist");
+      }
+      const groupId = groupIdResponse[0][0].id;
+
+      const insertUserQuery = `
+        INSERT INTO 
+          user_info.users (user_mail, user_pw, user_name) 
+        VALUES 
+          (?, ?, ?)`;
+      console.log(insertUserQuery, [userMail, userPw, userName]);
+      await this.execute(insertUserQuery, [userMail, userPw, userName]);
+
+      const getUserIdQuery = `SELECT id FROM user_info.users WHERE user_mail = ? AND user_pw = ?`;
+      const userId = (
+        await this.execute(getUserIdQuery, [userMail, userPw])
       )[0][0].id;
 
       // verify 有機會再回頭加
-      const insertGroupQuery = `INSERT INTO user_info.user_groups_to_users (user_groups_id, users_id, verify) VALUES (?, ?, ?)`;
+      const insertGroupQuery = `
+        INSERT INTO 
+          user_info.user_groups_to_users (user_groups_id, users_id, verify) 
+        VALUES 
+          (?, ?, ?)`;
       await this.execute(insertGroupQuery, [groupId, userId, 1]);
     } else if (groupName) {
       // 建立新的 Group
@@ -71,7 +87,31 @@ class UserUtility extends DbUtilityBase {
         userPw
       );
 
-      const insertGroupQuery = `INSERT INTO user_info.user_groups (group_name, owner_mail, signin_user, signin_pw, invitation_code) VALUES (?, ?, ?, ?, ?)`;
+      const selectGroupName = `SELECT group_name AS groupName FROM user_info.user_groups WHERE group_name = ?`;
+      const duplicateGroupName = await this.execute(selectGroupName, [
+        groupName,
+      ]);
+      if (duplicateGroupName[0].length >= 1) {
+        throw new Error("DuplicateGroupName");
+      }
+
+      const insertUserQuery = `
+        INSERT INTO 
+          user_info.users (user_mail, user_pw, user_name) 
+        VALUES 
+          (?, ?, ?)`;
+      await this.execute(insertUserQuery, [userMail, userPw, userName]);
+
+      const getUserIdQuery = `SELECT id FROM user_info.users WHERE user_mail = ? AND user_pw = ?`;
+      const userId = (
+        await this.execute(getUserIdQuery, [userMail, userPw])
+      )[0][0].id;
+
+      const insertGroupQuery = `
+        INSERT INTO 
+          user_info.user_groups (group_name, owner_mail, signin_user, signin_pw, invitation_code) 
+        VALUES 
+          (?, ?, ?, ?, ?)`;
       await this.execute(insertGroupQuery, [
         groupName,
         userMail,
@@ -85,7 +125,11 @@ class UserUtility extends DbUtilityBase {
         await this.execute(getGroupIdQuery, [newInvitationCode])
       )[0][0].id;
 
-      const insertGToUQuery = `INSERT INTO user_info.user_groups_to_users (user_groups_id, users_id, verify) VALUES (?, ?, ?)`;
+      const insertGToUQuery = `
+        INSERT INTO 
+          user_info.user_groups_to_users (user_groups_id, users_id, verify) 
+        VALUES 
+          (?, ?, ?)`;
       await this.execute(insertGToUQuery, [groupId, userId, 1]);
 
       await this.createMySQLUser(groupUserName, groupPw);
@@ -94,26 +138,34 @@ class UserUtility extends DbUtilityBase {
       throw new Error("資料異常");
     }
 
-    return {
-      success: true,
-      message: "User and MySQL access created successfully.",
-    };
+    return true;
   }
 
   // 取得既有 DB 連線(不是直接回傳 Pool)
-  async getUserDb(userObj: getUserDbObj): Promise<[string, Database]> {
+  async getUserDb(
+    userObj: getUserDbObj
+  ): Promise<[string, string, string, Database]> {
     const { userMail, userPw } = userObj;
-    const getUserDbQuery =
-      "SELECT user_groups.group_name AS groupName,user_groups.signin_user AS dbUser, user_groups.signin_pw AS dbPw\
-      FROM user_info.user_groups LEFT JOIN user_info.user_groups_to_users ON user_groups.id = user_groups_to_users.user_groups_id \
-      LEFT JOIN user_info.users ON users.id = user_groups_to_users.users_id \
-      WHERE users.user_mail = ? AND users.user_pw = ?";
-    const { groupName, dbUser, dbPw } = (
+    const getUserDbQuery = `
+      SELECT 
+        user_groups.group_name AS groupName,
+        user_groups.signin_user AS dbUser,
+        user_groups.signin_pw AS dbPw,
+        user_groups.invitation_code AS invitationCode
+      FROM 
+        user_info.user_groups 
+      LEFT JOIN 
+        user_info.user_groups_to_users ON user_groups.id = user_groups_to_users.user_groups_id
+      LEFT JOIN 
+        user_info.users ON users.id = user_groups_to_users.users_id
+      WHERE 
+        users.user_mail = ? AND users.user_pw = ?`;
+    const { groupName, dbUser, dbPw, invitationCode } = (
       await this.execute(getUserDbQuery, [userMail, userPw])
     )[0][0];
 
-    if (globalThis.groupDbMap.has(groupName)) {
-      return [groupName, globalThis.groupDbMap.get(groupName)];
+    if (global.groupDbMap.has(dbUser)) {
+      return [groupName, dbUser, invitationCode, global.groupDbMap.get(dbUser)];
     }
 
     // 沒建立過該群組的 DB
@@ -124,19 +176,24 @@ class UserUtility extends DbUtilityBase {
     };
     const groupDb = new Database(config);
 
-    return [groupName, groupDb];
+    return [groupName, dbUser, invitationCode, groupDb];
   }
 
   // 取得使用者資料
   async getUserInfo(userObj: getUserDbObj): Promise<string[]> {
     const { userMail, userPw } = userObj;
-    const getUserInfoQuery =
-      "SELECT users.id AS userId, users.user_name AS userName FROM user_info.users WHERE users.user_mail = ? AND users.user_pw = ?";
+    const getUserInfoQuery = `
+      SELECT 
+        users.id AS userId, 
+        users.user_name AS userName 
+      FROM 
+        user_info.users 
+      WHERE 
+        users.user_mail = ? AND users.user_pw = ?`;
     const results = await this.execute(getUserInfoQuery, [userMail, userPw]);
 
     if (results.length > 0 && results[0].length > 0) {
       const { userId, userName } = results[0][0];
-      console.log("userId, userName: ", userId, userName);
       return [userId, userName];
     } else {
       // throw new Error('User not found.');
@@ -146,28 +203,48 @@ class UserUtility extends DbUtilityBase {
 
   // 在有 Token 的情況下使用
   async getUserDbByToken(userObj: getUserDbObj): Promise<[string, Database]> {
-    const { userId, userMail } = userObj;
-    const getUserDbQuery = `SELECT user_groups.group_name AS groupName,user_groups.signin_user AS dbUser, user_groups.signin_pw AS dbPw
-      FROM user_info.user_groups LEFT JOIN user_info.user_groups_to_users ON user_groups.id = user_groups_to_users.user_groups_id
-      LEFT JOIN user_info.users ON users.id = user_groups_to_users.users_id
-      WHERE users.id = ? AND users.user_mail = ?`;
-    const { groupName, dbUser, dbPw } = (
-      await this.execute(getUserDbQuery, [userId, userMail])
+    const { userId, userMail, dbUser } = userObj;
+    const getUserDbQuery = `
+      SELECT 
+        user_groups.signin_pw AS dbPw
+      FROM 
+        user_info.user_groups 
+      LEFT JOIN 
+        user_info.user_groups_to_users ON user_groups.id = user_groups_to_users.user_groups_id
+      LEFT JOIN 
+        user_info.users ON users.id = user_groups_to_users.users_id
+      WHERE 
+        users.id = ? AND users.user_mail = ? AND user_groups.signin_user = ?`;
+    const { dbPw } = (
+      await this.execute(getUserDbQuery, [userId, userMail, dbUser])
     )[0][0];
 
-    if (globalThis.groupDbMap.has(groupName)) {
-      return [groupName, globalThis.groupDbMap.get(groupName)];
+    if (global.groupDbMap.has(dbUser!)) {
+      return [dbUser!, global.groupDbMap.get(dbUser!)];
     }
 
-    // 沒建立過該群組的 DB
+    // 沒建立過該群組的 DB instance
     const config: DatabaseConfigObj = {
-      user: dbUser,
+      user: dbUser!,
       password: dbPw,
       host: process.env.USERDB_HOST!,
     };
     const groupDb = new Database(config);
 
-    return [groupName, groupDb];
+    return [dbUser!, groupDb];
+  }
+
+  // 建立 User 前先檢查是否既存
+  async checkExist(userObj: CreateUserObj) {
+    const { userMail } = userObj;
+
+    const queryStr = `SELECT user_mail FROM user_info.users WHERE user_mail = ?`;
+
+    if ((await this.execute(queryStr, [userMail]))[0].length <= 0) {
+      return false;
+    }
+
+    return true;
   }
 }
 

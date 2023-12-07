@@ -153,4 +153,7 @@ Thumbs.db
 *.sql
 
 # tsc
-bulid
+build
+
+# JWT Keys
+*.pem

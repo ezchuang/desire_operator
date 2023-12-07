@@ -11,6 +11,7 @@ import {
   Select,
   MenuItem,
   Grid,
+  InputAdornment,
 } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
@@ -18,53 +19,73 @@ import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import { useMessage } from "../types/MessageContext";
 import { useDbsAndTables } from "../types/DbsAndTablesContext";
 import useRenewDbsAndTables from "../types/RenewDbsAndTables";
+import { MysqlDataTypes } from "../types/MysqlDataTypes";
 import { createTable } from "../models/createData";
+import { ColumnData } from "../types/Interfaces";
+import NullSign from "../types/NullSign";
+// import { TableData } from "../types/Interfaces";
 
-interface ForeignKeyReference {
-  referencedTable?: string;
-  referencedColumnName?: string;
+interface EditState {
+  idx: number;
 }
 
-export interface ColumnData {
-  columnName: string;
-  columnType: string;
-  isUnsigned: boolean;
-  isPrimaryKey: boolean;
-  isForeignKey: boolean;
-  isNotNull: boolean;
-  foreignKeyReference?: ForeignKeyReference;
-}
-const defaultColumn = {
+const defaultColumn: ColumnData = {
   columnName: "",
   columnType: "",
-  isUnsigned: false,
+  columnSizeLimit: 0,
+  defaultValue: "",
+
   isPrimaryKey: false,
-  isForeignKey: false,
   isNotNull: false,
-  foreignKeyReference: { referencedTable: "", referencedColumnName: "" },
+  isAutoIncrement: false,
+  isUniqueKey: false,
+  isUnsigned: false,
+  isZerofill: false,
 };
+
+// 針對數值型 Column Type 驗證是否已開啟 Unsigned
+// 若兩者皆滿足，才能啟用 Zerofill 選項
+// function shouldEnableZerofill(column: ColumnData): boolean {
+//   const numericTypes = [
+//     "INT",
+//     "SMALLINT",
+//     "TINYINT",
+//     "MEDIUMINT",
+//     "BIGINT",
+//     "DECIMAL",
+//     "FLOAT",
+//     "DOUBLE",
+//   ];
+//   return numericTypes.includes(column.columnType) && column.isUnsigned;
+// }
+
+// Column Options keys 顯示格式化，ex: isPrimaryKey => Primary Key
+function formatLabel(key: string): string {
+  let formattedLabel = key.replace(/^is/, "");
+
+  formattedLabel = formattedLabel.replace(/([A-Z])/g, " $1");
+
+  // formattedLabel = formattedLabel
+  //   .toLowerCase()
+  //   .split(' ')
+  //   .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+  //   .join(' ');
+
+  return formattedLabel;
+}
 
 const CreateTable: React.FC = () => {
   const [dbName, setDbName] = useState<string>("");
   const [tableName, setTableName] = useState<string>("");
   const [columns, setColumns] = useState<ColumnData[]>([defaultColumn]);
+
+  const [edit, setEdit] = useState<EditState>({ idx: -1 });
   const { dbsAndTablesElement } = useDbsAndTables();
   const { setMessage, setOpenSnackbar, setSeverity } = useMessage();
   const renewDbsAndTables = useRenewDbsAndTables();
 
   const handleAddColumn = () => {
-    setColumns([
-      ...columns,
-      {
-        columnName: "",
-        columnType: "",
-        isUnsigned: false,
-        isPrimaryKey: false,
-        isForeignKey: false,
-        isNotNull: false,
-        foreignKeyReference: { referencedTable: "", referencedColumnName: "" },
-      },
-    ]);
+    setColumns([...columns, defaultColumn]);
   };
 
   const handleRemoveColumn = (index: number) => {
@@ -78,7 +99,28 @@ const CreateTable: React.FC = () => {
     value: any
   ) => {
     const updatedColumns = [...columns];
-    updatedColumns[index] = { ...updatedColumns[index], [field]: value };
+    const updatedColumn = { ...updatedColumns[index], [field]: value };
+
+    if (field === "isPrimaryKey") {
+      updatedColumn.isAutoIncrement = value
+        ? updatedColumn.isAutoIncrement
+        : false;
+    }
+
+    // 針對 型別 與 Unsigned 屬性 檢查是否適用 ZeroFill
+    // if (
+    //   (field === "columnType" || field === "isUnsigned") &&
+    //   updatedColumn.isZerofill
+    // ) {
+    //   updatedColumn.isZerofill = shouldEnableZerofill(updatedColumn);
+    // }
+
+    if (field === "defaultValue") {
+      updatedColumn.defaultValue = value;
+    }
+
+    updatedColumns[index] = updatedColumn;
+
     setColumns(updatedColumns);
   };
 
@@ -95,22 +137,50 @@ const CreateTable: React.FC = () => {
   //   setColumns(updatedColumns);
   // };
 
+  // 檢查是否會超過極限
+  const handleLimitChange = (
+    index: number,
+    field: keyof ColumnData,
+    value: any
+  ) => {
+    let numericValue = Number(value);
+    const columnType = columns[index].columnType;
+    const typeDetails =
+      MysqlDataTypes[columnType as keyof typeof MysqlDataTypes];
+    const minLimit = typeDetails?.displaySize?.min ?? 0;
+    const maxLimit = typeDetails?.displaySize?.max ?? Number.MAX_SAFE_INTEGER;
+
+    if (numericValue >= minLimit && numericValue <= maxLimit) {
+      handleColumnChange(index, field, numericValue);
+    } else {
+      setSeverity("error");
+      setMessage(`輸入值不在允許的範圍內`);
+      setOpenSnackbar(true);
+    }
+  };
+
   const handleSubmit = async () => {
     try {
-      const tableData = {
+      console.log("原始 Columns: ", columns);
+
+      const response = await createTable({
         dbName: dbName,
         table: tableName,
         columns: columns,
-      };
-      const response = await createTable(tableData);
+      });
 
-      if (response) {
-        setSeverity("success");
-        setMessage(`新增 Database ${dbName} 成功`);
-        setOpenSnackbar(true);
-
-        renewDbsAndTables();
+      if (!response) {
+        throw Error("創建異常");
       }
+
+      setSeverity("success");
+      setMessage(`新增 Table ${dbName} 成功`);
+      setOpenSnackbar(true);
+
+      renewDbsAndTables();
+      setColumns([defaultColumn]);
+      setTableName("");
+      setDbName("");
     } catch (error) {
       console.error("資料庫創建失敗:", error);
       setSeverity("error");
@@ -119,13 +189,50 @@ const CreateTable: React.FC = () => {
     }
   };
 
+  // 根據規則決定是否禁用某個選項
+  function shouldDisableCheckbox(column: ColumnData, key: string): boolean {
+    switch (key) {
+      // 從進來的條件，取得互鎖條件的 boolean 來決定是否禁用
+      case "isMultipleKey":
+        return column.isPrimaryKey;
+      case "isPrimaryKey":
+        // return havePrimaryKey || newColumn.isBlob;
+        return column.isUniqueKey;
+      case "isAutoIncrement":
+        return !column.isPrimaryKey;
+      case "isUniqueKey":
+        // return newColumn.isBlob;
+        return column.isPrimaryKey;
+      // case "isUnsigned":
+      //   // case "isZerofill":
+      //   // 禁用於 Blob 或 Binary 類型
+      //   return newColumn.isBlob || newColumn.isBinary;
+      case "isBlob":
+        return column.isUniqueKey || column.isUnsigned;
+      case "isBinary":
+        return column.isUnsigned;
+      default:
+        return false;
+    }
+  }
+
   return (
     <Box width="100%" margin="auto" padding={"2px"}>
-      <FormControl fullWidth margin="normal" sx={{ mt: 0, mb: 1 }}>
+      <FormControl
+        fullWidth
+        margin="normal"
+        sx={{ mt: 0, mb: 1 }}
+        // margin={"1"}
+        size="small"
+        variant="outlined"
+      >
         <InputLabel id="database-select-label">選擇資料庫</InputLabel>
         <Select
+          style={{ width: "100%" }}
           labelId="database-select-label"
           value={dbName}
+          variant="outlined"
+          label="選擇資料庫"
           onChange={(event) => setDbName(event.target.value)}
         >
           {dbsAndTablesElement
@@ -145,120 +252,161 @@ const CreateTable: React.FC = () => {
         label="表名稱"
         value={tableName}
         onChange={(event) => setTableName(event.target.value)}
+        size="small"
       />
 
-      {columns.map((column, index) => (
-        <Grid container spacing={2} alignItems="center" key={index}>
-          <Grid item xs={3}>
-            <TextField
-              fullWidth
-              label="列名稱"
-              value={column.columnName}
-              onChange={(event) =>
-                handleColumnChange(index, "columnName", event.target.value)
-              }
-            />
+      {columns.map((column, index) => {
+        // Columns 參數輸入位置
+        // currentType 上下限渲染前置
+        const currentType =
+          MysqlDataTypes[column.columnType as keyof typeof MysqlDataTypes];
+        const needsLimit = currentType?.needsLimit;
+        const displaySize = currentType?.displaySize;
+        const isEditing = edit.idx === index;
+
+        return (
+          <Grid container spacing={1} alignItems="center" mb={1} key={index}>
+            <Grid item xs={3}>
+              <TextField
+                fullWidth
+                label="Column 名稱"
+                value={column.columnName}
+                onChange={(event) =>
+                  handleColumnChange(index, "columnName", event.target.value)
+                }
+                size="small"
+              />
+            </Grid>
+            <Grid item xs={4}>
+              <div className="flex justify-center items-center gap-[1px]">
+                <FormControl fullWidth size="small">
+                  <InputLabel id="columnType-select-label">
+                    Column 型別
+                  </InputLabel>
+                  <Select
+                    value={column.columnType}
+                    labelId="columnType-select-label"
+                    label="Column 型別"
+                    onChange={(event) =>
+                      handleColumnChange(
+                        index,
+                        "columnType",
+                        event.target.value
+                      )
+                    }
+                  >
+                    {Object.keys(MysqlDataTypes).map((typeName) => (
+                      <MenuItem key={typeName} value={typeName}>
+                        {typeName}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                {needsLimit && (
+                  <TextField
+                    fullWidth
+                    type="number"
+                    label={`顯示上限 ${displaySize?.min ?? "無"} ~ ${
+                      displaySize?.max ?? "無"
+                    }`}
+                    value={column.columnSizeLimit || ""}
+                    onChange={(event) =>
+                      handleLimitChange(
+                        index,
+                        "columnSizeLimit",
+                        event.target.value
+                        // displaySize
+                      )
+                    }
+                    size="small"
+                  />
+                )}
+              </div>
+            </Grid>
+            <Grid item xs={3}>
+              <TextField
+                fullWidth
+                label={`預設值，空字串請輸入 "" `}
+                value={column.defaultValue || ""}
+                onChange={(event) =>
+                  handleColumnChange(index, "defaultValue", event.target.value)
+                }
+                size="small"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment
+                      position="start"
+                      className={
+                        isEditing || column.defaultValue ? "w-0" : "w-full"
+                      }
+                    >
+                      {isEditing || column.defaultValue === "" ? (
+                        <NullSign />
+                      ) : null}
+                    </InputAdornment>
+                  ),
+                }}
+                onClick={() => {
+                  setEdit({ idx: index });
+                  if (
+                    column.defaultValue === null ||
+                    column.defaultValue === undefined
+                  ) {
+                    setColumns(
+                      columns.map((c, idx) =>
+                        idx === index ? { ...c, defaultValue: "" } : c
+                      )
+                    );
+                  }
+                }}
+                onBlur={() => {
+                  setEdit({ idx: -1 });
+                }}
+              />
+            </Grid>
+            <Grid item xs={1}>
+              <IconButton onClick={() => handleRemoveColumn(index)}>
+                <RemoveCircleOutlineIcon />
+              </IconButton>
+            </Grid>
+
+            {/* <Grid container spacing={1} key={index}> */}
+            {Object.keys(column)
+              .filter(
+                (key) =>
+                  key !== "columnName" &&
+                  key !== "columnType" &&
+                  key !== "columnSizeLimit" &&
+                  key !== "defaultValue" &&
+                  key !== "isZerofill" // 因為 MySQL 準備要移除此特性了，直接禁用
+              )
+              .map((key) => (
+                <Grid key={key} item xs={6} sm={4} md={3} lg={2}>
+                  <FormControlLabel
+                    sx={{ m: 0, paddingLeft: "8px" }}
+                    control={
+                      <Checkbox
+                        sx={{ m: 0, padding: "2px" }}
+                        checked={column[key as keyof ColumnData] as boolean}
+                        onChange={(event) =>
+                          handleColumnChange(
+                            index,
+                            key as keyof ColumnData,
+                            event.target.checked
+                          )
+                        }
+                        disabled={shouldDisableCheckbox(column, key)}
+                      />
+                    }
+                    label={formatLabel(key)}
+                  />
+                </Grid>
+              ))}
           </Grid>
-          <Grid item xs={2}>
-            <TextField
-              fullWidth
-              label="數據類型"
-              value={column.columnType}
-              onChange={(event) =>
-                handleColumnChange(index, "columnType", event.target.value)
-              }
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={column.isPrimaryKey}
-                  onChange={(event) =>
-                    handleColumnChange(
-                      index,
-                      "isPrimaryKey",
-                      event.target.checked
-                    )
-                  }
-                />
-              }
-              label="主鍵"
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={column.isUnsigned}
-                  onChange={(event) =>
-                    handleColumnChange(
-                      index,
-                      "isUnsigned",
-                      event.target.checked
-                    )
-                  }
-                />
-              }
-              label="無符號"
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={column.isNotNull}
-                  onChange={(event) =>
-                    handleColumnChange(index, "isNotNull", event.target.checked)
-                  }
-                />
-              }
-              label="不為空"
-            />
-            {/* <FormControlLabel
-              control={
-                <Checkbox
-                  checked={column.isForeignKey}
-                  onChange={(event) =>
-                    handleColumnChange(
-                      index,
-                      "isForeignKey",
-                      event.target.checked
-                    )
-                  }
-                />
-              }
-              label="外鍵"
-            />
-            {column.isForeignKey && (
-              <>
-                <TextField
-                  label="參考表"
-                  value={column.foreignKeyReference?.referencedTable}
-                  onChange={(event) =>
-                    handleFkReferenceChange(
-                      index,
-                      "referencedTable",
-                      event.target.value
-                    )
-                  }
-                />
-                <TextField
-                  label="參考列"
-                  value={column.foreignKeyReference?.referencedColumnName}
-                  onChange={(event) =>
-                    handleFkReferenceChange(
-                      index,
-                      "referencedColumnName",
-                      event.target.value
-                    )
-                  }
-                />
-              </>
-            )} */}
-            <IconButton onClick={() => handleRemoveColumn(index)}>
-              <RemoveCircleOutlineIcon />
-            </IconButton>
-          </Grid>
-        </Grid>
-      ))}
-      <Box mt={1}>
+          // </Grid>
+        );
+      })}
+      <Box>
         <Button
           startIcon={<AddCircleOutlineIcon />}
           variant="contained"

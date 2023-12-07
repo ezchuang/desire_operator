@@ -10,7 +10,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 import { useVerification } from "../types/VerificationContext";
 import { useReadData } from "../types/ReadDataContext";
-import { useUserName } from "../types/UserNameContext";
+import { useUserInfo } from "../types/UserInfoContext";
 import CustomizedSnackbars from "./Alert";
 import MainTable from "./MainTable";
 import ShortcutTable from "./ShortcutTable";
@@ -19,6 +19,7 @@ import AddToolEntry from "./AddToolEntry";
 import ModifyToolEntry from "./ModifyToolEntry";
 import HistoryTable from "./HistoryTable";
 import SignInUpForm from "./SignInUpForm";
+import GuestSignInForm from "./GuestSignInForm";
 
 const StyledAccordion = styled(Accordion)({
   width: "100%",
@@ -62,7 +63,7 @@ const Type2ShortcutStyledPaper = styled(Paper)({
 const MainLayout: React.FC = () => {
   const { isVerified } = useVerification();
   const { readDataElement, setReadDataElement } = useReadData();
-  const { userName } = useUserName();
+  const { userInfo } = useUserInfo();
 
   const [mainTableExpanded, setMainTableExpanded] = useState(true);
   const [queryCombineToolExpanded, setQueryCombineToolExpanded] =
@@ -93,13 +94,16 @@ const MainLayout: React.FC = () => {
                 <div
                   id="userInfo"
                   className="bg-purple-600 w-8 h-8 rounded-full cursor-pointer flex items-center justify-center mr-2"
-                  title={userName}
+                  title={userInfo.userName}
                 >
-                  {userName.charAt(0)}
+                  {userInfo.userName.charAt(0)}
                 </div>
               </div>
               {/* Content for Verify User */}
-              <SignInUpForm />
+              <div className="flex gap-10">
+                <GuestSignInForm />
+                <SignInUpForm />
+              </div>
             </div>
           </div>
         </nav>
@@ -107,51 +111,61 @@ const MainLayout: React.FC = () => {
         {isVerified && (
           <>
             {/* PATH */}
-            <div className="bg-blue-200 p-2 text-blue-900 text-sm sticky top-16 z-20">
-              <div className="max-w-7xl mx-auto">
-                {/* Content for PATH */}
-                {/* <div>Breadcrumb / Path</div> */}
-                <div>
-                  <span
-                    className="cursor-pointer"
-                    onClick={() => {
-                      setReadDataElement({});
-                      return false;
-                    }}
-                  >
-                    {userName}
-                  </span>
-                  {readDataElement.dbName && readDataElement.table ? (
-                    <>
-                      <span> / </span>
-                      <span
-                        className="cursor-pointer"
-                        onClick={() => {
-                          setReadDataElement({
-                            dbName: readDataElement.dbName,
-                          });
-                          return false;
-                        }}
-                      >
-                        {readDataElement.dbName}
-                      </span>
-                      <span> / </span>
-                      <span
-                        className="cursor-pointer"
-                        onClick={() => {
-                          setReadDataElement({
-                            dbName: readDataElement.dbName,
-                            table: readDataElement.table,
-                          });
-                          return false;
-                        }}
-                      >
-                        {readDataElement.table}
-                      </span>
-                    </>
-                  ) : (
-                    <></>
-                  )}
+            <div className="bg-blue-200 p-2 text-blue-900 text-sm sticky top-16 z-20 flex ">
+              <div className=" max-w-7xl w-full justify-between m-auto flex">
+                <div className="max-w-7xl my-auto ml-1 mr-auto">
+                  {/* Content for PATH */}
+                  {/* <div>Breadcrumb / Path</div> */}
+                  <div>
+                    <span
+                      className="cursor-pointer"
+                      onClick={() => {
+                        setReadDataElement({});
+                        return false;
+                      }}
+                    >
+                      {userInfo.userName}
+                    </span>
+                    {readDataElement.dbName && readDataElement.table ? (
+                      <>
+                        <span> / </span>
+                        <span
+                          className="cursor-pointer"
+                          onClick={() => {
+                            setReadDataElement({
+                              dbName: readDataElement.dbName,
+                            });
+                            return false;
+                          }}
+                        >
+                          {readDataElement.dbName}
+                        </span>
+                        <span> / </span>
+                        <span
+                          className="cursor-pointer"
+                          onClick={() => {
+                            setReadDataElement({
+                              dbName: readDataElement.dbName,
+                              table: readDataElement.table,
+                            });
+                            return false;
+                          }}
+                        >
+                          {readDataElement.table}
+                        </span>
+                      </>
+                    ) : (
+                      <></>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex justify-between">
+                  <div className=" m-1">{`群組名稱: ${userInfo.groupName}`}</div>
+                  <div className=" m-1">{` / `}</div>
+                  <div className=" m-1">
+                    {`群組邀請碼: ${userInfo.invitationCode}`}
+                  </div>
                 </div>
               </div>
             </div>
@@ -163,7 +177,7 @@ const MainLayout: React.FC = () => {
                 onChange={() => setMainTableExpanded(!mainTableExpanded)}
               >
                 <StyledAccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <div>主表格</div>
+                  <div>表格主要工作區</div>
                 </StyledAccordionSummary>
                 <StyledAccordionDetails>
                   {readDataElement.table ? (
@@ -186,7 +200,7 @@ const MainLayout: React.FC = () => {
                 }
               >
                 <StyledAccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <div>查詢組合工具</div>
+                  <div>查詢組合工具 (請先選定 Table)</div>
                 </StyledAccordionSummary>
                 <StyledAccordionDetails>
                   <QueryCombineTool />
@@ -199,7 +213,7 @@ const MainLayout: React.FC = () => {
                 onChange={() => setAddToolEntryExpanded(!addToolEntryExpanded)}
               >
                 <StyledAccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <div>表格修改工具</div>
+                  <div>表格修改工具 (請先選定 Table)</div>
                 </StyledAccordionSummary>
                 <StyledAccordionDetails>
                   <AddToolEntry />
@@ -227,7 +241,7 @@ const MainLayout: React.FC = () => {
                 onChange={() => seHistoryTableExpanded(!historyTableExpanded)}
               >
                 <StyledAccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <div>歷史紀錄 (更新機制未完成)</div>
+                  <div>歷史紀錄</div>
                 </StyledAccordionSummary>
                 <StyledAccordionDetails>
                   <HistoryTable />
@@ -245,7 +259,7 @@ const MainLayout: React.FC = () => {
               className="floating-btn text-white"
               onClick={toggleShortcutPage}
             >
-              Shortcut
+              Tables 捷徑
             </button>
             <div
               className="bg-white shadow-lg p-4 mb-4 overflow-auto hidden floating-panel"

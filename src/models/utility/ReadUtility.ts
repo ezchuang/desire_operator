@@ -10,20 +10,28 @@ class ReadUtility extends DBUtilityBase {
     if (dbName) {
       queryStr += `TABLES FROM \`${dbName}\``;
 
-      // console.log(queryStr, []);
+      console.log(queryStr, []);
       return await this.execute(queryStr, []);
     } else {
       queryStr += "DATABASES";
 
-      // console.log(queryStr, []);
+      console.log(queryStr, []);
       return await this.execute(queryStr, []);
     }
   }
 
   // 讀取 Table 內部資料
   async read(obj: ReadObj) {
-    const { dbName, table, select, where, orderBy, orderDirection, limit } =
-      obj;
+    const {
+      dbName,
+      table,
+      select,
+      where,
+      orderBy,
+      orderDirection,
+      offset,
+      limit,
+    } = obj;
     const values: any[] = [];
     let queryStr = "SELECT ";
 
@@ -33,12 +41,17 @@ class ReadUtility extends DBUtilityBase {
       queryStr += "*";
     }
 
-    queryStr += ` FROM ${dbName}.${table}`;
+    // 這段要再改，看是改成 return [false, errMsg] 如何
+    if (!dbName || !table) {
+      throw new Error("Database name or table name is missing or invalid.");
+    }
+
+    queryStr += ` FROM \`${dbName}\`.\`${table}\``;
 
     if (where && where.length > 0) {
       const whereClauses = where.map((condition) => {
         values.push(condition.value);
-        return `\`${condition.column}\` \`${condition.operator}\` ?`;
+        return `\`${condition.column}\` ${condition.operator} ?`;
       });
       queryStr += " WHERE " + whereClauses.join(" AND ");
     }
@@ -46,25 +59,30 @@ class ReadUtility extends DBUtilityBase {
     if (orderBy) {
       queryStr += ` ORDER BY \`${orderBy}\``;
       if (orderDirection) {
-        queryStr += ` \`${orderDirection}\``;
+        queryStr += ` ${orderDirection}`;
       }
     }
 
-    if (limit) {
+    if (limit && offset) {
       queryStr += " LIMIT ?";
       values.push(limit);
     }
 
-    // console.log(queryStr, values);
+    if (offset) {
+      queryStr += " OFFSET ?";
+      values.push(offset);
+    }
+
+    console.log(queryStr, values);
     return await this.execute(queryStr, values);
   }
 
-  // 取得 [{COLUMN_NAME, DATA_TYPE}]
+  // 取得 [{COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH, COLUMN_DEFAULT}]
   async readTableStructures(obj: ReadObj) {
     const { dbName, table } = obj;
-    let queryStr = `SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?`;
+    let queryStr = `SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH, COLUMN_DEFAULT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?`;
 
-    // console.log(queryStr, [dbName, table]);
+    console.log(queryStr, [dbName, table]);
     return await this.execute(queryStr, [dbName, table]);
   }
 }

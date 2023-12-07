@@ -28,7 +28,7 @@ const HistoryTable: React.FC = () => {
     const fetchHistory = async () => {
       try {
         const historyData = await readHistoryData();
-        console.log(historyData[0]);
+        // console.log(historyData[0]);
 
         setRecords(historyData[0]);
       } catch (error) {
@@ -39,8 +39,13 @@ const HistoryTable: React.FC = () => {
     fetchHistory();
   }, [dbsAndTablesElement, readDataElement, refreshDataFlag]);
 
+  const convertTimestampToTaipeiTime = (timestamp: number) => {
+    const date = new Date(timestamp);
+    return date.toLocaleString("zh-TW", { timeZone: "Asia/Taipei" });
+  };
+
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Paper} sx={{ maxHeight: 440 }}>
       <Table aria-label="歷史記錄表格">
         <TableHead>
           <TableRow>
@@ -62,7 +67,9 @@ const HistoryTable: React.FC = () => {
               <TableCell component="th" scope="row" size="small">
                 {record.query}
               </TableCell>
-              <TableCell size="small">{record.timestamp}</TableCell>
+              <TableCell size="small">
+                {`${convertTimestampToTaipeiTime(record.timestamp)}`}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
