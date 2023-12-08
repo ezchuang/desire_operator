@@ -114,7 +114,7 @@ const MainTable: React.FC = () => {
     } catch (error) {
       console.error("資料刪除失敗:", error);
       setSeverity("error");
-      setMessage(`刪除失敗`);
+      setMessage(`刪除失敗: ${error}`);
       setOpenSnackbar(true);
     }
   };

@@ -21,8 +21,15 @@ export default async function deleteApiInit() {
         const data = await deleteUtility.dropDatabase(userId, params);
 
         return res.status(200).json({ data: data });
-      } catch (err) {
-        return res.status(500).json({ error: err });
+      } catch (err: any) {
+        console.error("Error in deleteDatabase: ", err);
+
+        if ("sqlMessage" in err[0]) {
+          return res
+            .status(400)
+            .json({ error: true, message: err[0].sqlMessage });
+        }
+        return res.status(500).json({ error: true, message: err });
       }
     }
   );
@@ -43,8 +50,15 @@ export default async function deleteApiInit() {
         const data = await deleteUtility.dropTable(userId, params);
 
         return res.status(200).json({ data: data });
-      } catch (err) {
-        return res.status(500).json({ error: err });
+      } catch (err: any) {
+        console.error("Error in deleteTable: ", err);
+
+        if ("sqlMessage" in err[0]) {
+          return res
+            .status(400)
+            .json({ error: true, message: err[0].sqlMessage });
+        }
+        return res.status(500).json({ error: true, message: err });
       }
     }
   );
@@ -68,8 +82,15 @@ export default async function deleteApiInit() {
         const data = await deleteUtility.delete(userId, params);
 
         return res.status(200).json({ data: data });
-      } catch (err) {
-        return res.status(500).json({ error: err });
+      } catch (err: any) {
+        console.error("Error in deleteData: ", err);
+
+        if ("sqlMessage" in err[0]) {
+          return res
+            .status(400)
+            .json({ error: true, message: err[0].sqlMessage });
+        }
+        return res.status(500).json({ error: true, message: err });
       }
     }
   );

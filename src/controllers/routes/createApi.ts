@@ -33,8 +33,15 @@ export default async function createApiInit() {
         }
 
         return res.status(200).json({ data: data }); // data: true or error
-      } catch (err) {
-        return res.status(500).json({ error: err });
+      } catch (err: any) {
+        console.error("Error in createDb: ", err);
+
+        if ("sqlMessage" in err[0]) {
+          return res
+            .status(400)
+            .json({ error: true, message: err[0].sqlMessage });
+        }
+        return res.status(500).json({ error: true, message: err });
       }
     }
   );
@@ -57,8 +64,15 @@ export default async function createApiInit() {
         const data = await userCreateUtility.create(userId, params);
 
         return res.status(200).json({ data: data });
-      } catch (err) {
-        return res.status(500).json({ error: err });
+      } catch (err: any) {
+        console.error("Error in createTable: ", err);
+
+        if ("sqlMessage" in err[0]) {
+          return res
+            .status(400)
+            .json({ error: true, message: err[0].sqlMessage });
+        }
+        return res.status(500).json({ error: true, message: err });
       }
     }
   );

@@ -19,9 +19,9 @@ const useRenewDbsAndTables = () => {
       setDbsAndTablesElement(dbsAndTablesData);
     } catch (error) {
       if (error instanceof Error) {
-        console.log(error.message);
+        console.log(error);
         setSeverity("error");
-        setMessage(`讀取 Database 失敗，錯誤訊息: ${error.message}`);
+        setMessage(`讀取失敗: ${error}`);
         setOpenSnackbar(true);
       }
     }

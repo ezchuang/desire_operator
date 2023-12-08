@@ -46,7 +46,7 @@ const DeleteDatabase: React.FC = () => {
     } catch (error) {
       console.error("Database 刪除失敗:", error);
       setSeverity("error");
-      setMessage(`刪除 Database ${dbName} 失敗`);
+      setMessage(`刪除失敗: ${error}`);
       setOpenSnackbar(true);
     }
   };

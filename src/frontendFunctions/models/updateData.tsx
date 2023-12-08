@@ -17,7 +17,7 @@ export async function updateData(element: UpdateObj): Promise<any> {
     if (response.data) {
       return response.data;
     } else {
-      throw Error;
+      throw new Error(response.message);
     }
   } catch (err) {
     console.error("Error in updateData: ", err);
@@ -36,7 +36,7 @@ export async function insertData(element: InsertObj): Promise<any> {
     if (response.data) {
       return response.data;
     } else {
-      throw Error;
+      throw new Error(response.message);
     }
   } catch (err) {
     console.error("Error in insertData: ", err);
@@ -55,10 +55,10 @@ export async function addColumn(element: AddColumnObj): Promise<any> {
     if (response.data) {
       return response.data;
     } else {
-      throw Error;
+      throw new Error(response.message);
     }
-  } catch (err) {
-    console.error("Error in addColumn:", err);
+  } catch (err: any) {
+    console.error("Error in addColumn:", err.message);
     throw err;
   }
 }
@@ -74,7 +74,7 @@ export async function delColumn(element: delColumnObj): Promise<any> {
     if (response.data) {
       return response.data;
     } else {
-      throw Error;
+      throw new Error(response.message);
     }
   } catch (err) {
     console.error("Error in delColumn:", err);

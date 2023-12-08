@@ -123,7 +123,7 @@ const AddRow: React.FC = () => {
     } catch (error) {
       console.error("Error saving rows:", error);
       setSeverity("error");
-      setMessage("新增失敗");
+      setMessage(`新增失敗: ${error}`);
       setOpenSnackbar(true);
     }
   };

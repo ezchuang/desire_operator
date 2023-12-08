@@ -13,7 +13,7 @@ export async function createDb(element: string): Promise<boolean> {
     if (response.data) {
       return response.data;
     } else {
-      throw Error;
+      throw new Error(response.message);
     }
   } catch (err) {
     console.error("There was an error fetching the DBs and Tables: ", err);
@@ -86,7 +86,7 @@ export async function createTable(element: TableData): Promise<boolean> {
     if (response.data) {
       return response.data;
     } else {
-      throw Error;
+      throw new Error(response.message);
     }
   } catch (err) {
     console.error("There was an error fetching the DBs and Tables: ", err);

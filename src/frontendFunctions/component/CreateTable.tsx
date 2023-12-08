@@ -170,7 +170,7 @@ const CreateTable: React.FC = () => {
       });
 
       if (!response) {
-        throw Error("創建異常");
+        throw new Error("創建異常");
       }
 
       setSeverity("success");
@@ -184,7 +184,7 @@ const CreateTable: React.FC = () => {
     } catch (error) {
       console.error("資料庫創建失敗:", error);
       setSeverity("error");
-      setMessage(`新增 Database ${dbName} 失敗`);
+      setMessage(`新增失敗: ${error}`);
       setOpenSnackbar(true);
     }
   };

@@ -224,9 +224,9 @@ const AddColumn: React.FC = () => {
       setReadDataElement({ ...readDataElement });
       setRefreshDataFlag([]);
     } catch (error) {
-      console.error("Error adding column:", error);
+      console.error("Error adding column: ", error);
       setSeverity("error");
-      setMessage("新增失敗");
+      setMessage(`新增失敗: ${error}`);
       setOpenSnackbar(true);
     }
   };

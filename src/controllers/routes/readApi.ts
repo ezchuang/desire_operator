@@ -25,9 +25,15 @@ export default async function readApiInit() {
         // console.log(data);
         // console.log(structure);
         return res.status(200).json({ data: data, structure: structure });
-      } catch (err) {
-        console.log(err);
-        return res.status(500).json({ error: err });
+      } catch (err: any) {
+        console.error("Error in readDbsOrTables: ", err);
+
+        if ("sqlMessage" in err[0]) {
+          return res
+            .status(400)
+            .json({ error: true, message: err[0].sqlMessage });
+        }
+        return res.status(500).json({ error: true, message: err });
       }
     }
   );
@@ -73,9 +79,15 @@ export default async function readApiInit() {
         return res
           .status(200)
           .json({ data: dataCluster, structure: structure });
-      } catch (err) {
-        console.log(err);
-        return res.status(500).json({ error: err });
+      } catch (err: any) {
+        console.error("Error in readDbsAndTables: ", err);
+
+        if ("sqlMessage" in err[0]) {
+          return res
+            .status(400)
+            .json({ error: true, message: err[0].sqlMessage });
+        }
+        return res.status(500).json({ error: true, message: err });
       }
     }
   );
@@ -110,9 +122,15 @@ export default async function readApiInit() {
         return res
           .status(200)
           .json({ data: data, structure: cleanedStructure });
-      } catch (err) {
-        console.log(err);
-        return res.status(500).json({ error: err });
+      } catch (err: any) {
+        console.error("Error in readData: ", err);
+
+        if ("sqlMessage" in err[0]) {
+          return res
+            .status(400)
+            .json({ error: true, message: err[0].sqlMessage });
+        }
+        return res.status(500).json({ error: true, message: err });
       }
     }
   );

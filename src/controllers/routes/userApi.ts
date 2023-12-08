@@ -127,10 +127,16 @@ export default async function userApiInit() {
           invitationCode: invitationCode,
         },
       });
-    } catch (error) {
+    } catch (err: any) {
       let msg = "";
-      if (error instanceof Error) {
-        switch (error.message) {
+      if (err) {
+        if ("sqlMessage" in err[0]) {
+          return res
+            .status(400)
+            .json({ error: true, message: err[0].sqlMessage });
+        }
+
+        switch (err.message) {
           case "MissingCredentials":
             msg = "資料未填寫";
             break;
@@ -140,7 +146,7 @@ export default async function userApiInit() {
             break;
 
           default:
-            console.error(error);
+            console.error(err);
             return res.status(500).json({ error: true, message: "伺服器錯誤" });
         }
       }
@@ -182,10 +188,16 @@ export default async function userApiInit() {
       };
 
       return res.status(200).json({ success: true, data: resData });
-    } catch (error) {
+    } catch (err: any) {
       let msg = "";
-      if (error instanceof Error) {
-        switch (error.message) {
+      if (err) {
+        if ("sqlMessage" in err[0]) {
+          return res
+            .status(400)
+            .json({ error: true, message: err[0].sqlMessage });
+        }
+
+        switch (err.message) {
           case "NoTokenProvided":
             msg = "No token provided";
             break;
@@ -195,7 +207,7 @@ export default async function userApiInit() {
             break;
 
           default:
-            console.error(error);
+            console.error(err);
             return res.status(500).json({ error: true, message: "伺服器錯誤" });
         }
       }
@@ -259,10 +271,16 @@ export default async function userApiInit() {
           invitationCode: "None",
         },
       });
-    } catch (error) {
+    } catch (err: any) {
       let msg = "";
-      if (error instanceof Error) {
-        switch (error.message) {
+      if (err) {
+        if ("sqlMessage" in err[0]) {
+          return res
+            .status(400)
+            .json({ error: true, message: err[0].sqlMessage });
+        }
+
+        switch (err.message) {
           case "MissingCredentials":
             msg = "資料未填寫";
             break;
@@ -272,7 +290,7 @@ export default async function userApiInit() {
             break;
 
           default:
-            console.error(error);
+            console.error(err);
             return res.status(500).json({ error: true, message: "伺服器錯誤" });
         }
       }

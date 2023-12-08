@@ -51,7 +51,7 @@ const DeleteTable: React.FC = () => {
     } catch (error) {
       console.error("Table 刪除失敗:", error);
       setSeverity("error");
-      setMessage(`刪除 Table ${tableName} 失敗`);
+      setMessage(`刪除失敗: ${error}`);
       setOpenSnackbar(true);
     }
   };

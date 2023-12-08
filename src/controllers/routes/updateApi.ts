@@ -30,8 +30,15 @@ export default async function updateApiInit() {
         const data = await updateUtility.update(userId, params);
 
         return res.status(200).json({ data: data });
-      } catch (err) {
-        return res.status(500).json({ error: err });
+      } catch (err: any) {
+        console.error("Error in updateData: ", err);
+
+        if ("sqlMessage" in err[0]) {
+          return res
+            .status(400)
+            .json({ error: true, message: err[0].sqlMessage });
+        }
+        return res.status(500).json({ error: true, message: err });
       }
     }
   );
@@ -50,7 +57,9 @@ export default async function updateApiInit() {
         ];
 
         if (!dbName || !table || !values) {
-          return res.status(400).json({ error: "缺少必要的參數" });
+          return res
+            .status(400)
+            .json({ error: true, message: "缺少必要的參數" });
         }
 
         const updateUtility = new UpdateUtility(req.db);
@@ -64,8 +73,15 @@ export default async function updateApiInit() {
         const data = await updateUtility.insert(userId, params);
 
         return res.status(200).json({ data: data });
-      } catch (err) {
-        return res.status(500).json({ error: err });
+      } catch (err: any) {
+        console.error("Error in insertData: ", err);
+
+        if ("sqlMessage" in err[0]) {
+          return res
+            .status(400)
+            .json({ error: true, message: err[0].sqlMessage });
+        }
+        return res.status(500).json({ error: true, message: err });
       }
     }
   );
@@ -88,7 +104,9 @@ export default async function updateApiInit() {
 
         // 驗證參數
         if (!dbName || !table || !columnName || !columnType) {
-          return res.status(400).json({ error: "缺少必要的參數" });
+          return res
+            .status(400)
+            .json({ error: true, message: "缺少必要的參數" });
         }
 
         const updateUtility = new UpdateUtility(req.db);
@@ -105,9 +123,15 @@ export default async function updateApiInit() {
         const data = await updateUtility.addColumn(userId, params);
 
         return res.status(200).json({ data: data });
-      } catch (err) {
+      } catch (err: any) {
         console.error("Error in addColumn: ", err);
-        return res.status(500).json({ error: "內部服務器錯誤" });
+
+        if ("sqlMessage" in err[0]) {
+          return res
+            .status(400)
+            .json({ error: true, message: err[0].sqlMessage });
+        }
+        return res.status(500).json({ error: true, message: "內部服務器錯誤" });
       }
     }
   );
@@ -123,7 +147,9 @@ export default async function updateApiInit() {
 
         // 驗證參數
         if (!dbName || !table || !columnName) {
-          return res.status(400).json({ error: "缺少必要的參數" });
+          return res
+            .status(400)
+            .json({ error: true, message: "缺少必要的參數" });
         }
 
         const updateUtility = new UpdateUtility(req.db);
@@ -137,9 +163,15 @@ export default async function updateApiInit() {
         const data = await updateUtility.delColumn(userId, params);
 
         return res.status(200).json({ data: data });
-      } catch (err) {
+      } catch (err: any) {
         console.error("Error in delColumn: ", err);
-        return res.status(500).json({ error: "內部服務器錯誤" });
+
+        if ("sqlMessage" in err[0]) {
+          return res
+            .status(400)
+            .json({ error: true, message: err[0].sqlMessage });
+        }
+        return res.status(500).json({ error: true, message: "內部服務器錯誤" });
       }
     }
   );

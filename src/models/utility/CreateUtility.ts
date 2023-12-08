@@ -32,7 +32,7 @@ class CreateUtility extends DbUtilityBase {
     await this.execute(queryStr, []);
 
     // 因為跟其他函式結構不同，這邊在成功後 return true
-    // 失敗理應會由 this.execute() throw error
+    // 失敗理應會由 this.execute() throw new Error
     return true;
   }
 
