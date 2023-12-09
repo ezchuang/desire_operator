@@ -90,11 +90,18 @@ const AddRow: React.FC = () => {
   };
 
   const saveRows = async () => {
+    // 將 null 與 "" / 0 / 有值 作區別
+    // 此處 input "" 視為 null、input `""` 視為 ""
     const newRowValues = rows.map((row) =>
       Object.fromEntries(
         Object.entries(row).map(([key, value]) => [
           key,
-          value === `""` ? "" : value ?? null,
+          // value === `""` ? "" : value === "0" || value === 0 ? "0": value ? value : null,
+          value === null || value === undefined || value === ""
+            ? null
+            : value === `""`
+            ? ""
+            : value,
         ])
       )
     );
@@ -179,9 +186,11 @@ const AddRow: React.FC = () => {
                             onChange={(event) =>
                               handleRowChange(event, rowIndex)
                             }
+                            // 欄位不可為空 && Auto Increment && 欄位空值，若為 AI 直接 Bypass 整個 error 判斷
                             error={
                               (column.options.isNotNull ||
                                 column.options.isPrimaryKey) &&
+                              !column.options.isAutoIncrement &&
                               !row[column.id]
                             }
                             InputProps={{

@@ -7,7 +7,8 @@ class CreateUtility extends DbUtilityBase {
   async createDb(userId: string, obj: CreateDbObj) {
     const { dbName, groupSigninUser } = obj;
     // 主要新增
-    let queryStr = `CREATE DATABASE IF NOT EXISTS \`${dbName}\``;
+    // let queryStr = `CREATE DATABASE IF NOT EXISTS \`${dbName}\``; // 重複創建不會跳 Error
+    let queryStr = `CREATE DATABASE \`${dbName}\``;
 
     console.log(queryStr, []);
     await this.execute(queryStr, []);

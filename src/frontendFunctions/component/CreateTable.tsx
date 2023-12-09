@@ -33,6 +33,7 @@ const defaultColumn: ColumnData = {
   columnName: "",
   columnType: "",
   columnSizeLimit: 0,
+  precisionLimit: 0,
   defaultValue: "",
 
   isPrimaryKey: false,
@@ -101,6 +102,7 @@ const CreateTable: React.FC = () => {
     const updatedColumns = [...columns];
     const updatedColumn = { ...updatedColumns[index], [field]: value };
 
+    // 若是將 PK 消除則一併消除 AI
     if (field === "isPrimaryKey") {
       updatedColumn.isAutoIncrement = value
         ? updatedColumn.isAutoIncrement
@@ -115,9 +117,9 @@ const CreateTable: React.FC = () => {
     //   updatedColumn.isZerofill = shouldEnableZerofill(updatedColumn);
     // }
 
-    if (field === "defaultValue") {
-      updatedColumn.defaultValue = value;
-    }
+    // if (field === "defaultValue") {
+    //   updatedColumn.defaultValue = value;
+    // }
 
     updatedColumns[index] = updatedColumn;
 
@@ -151,6 +153,34 @@ const CreateTable: React.FC = () => {
     const maxLimit = typeDetails?.displaySize?.max ?? Number.MAX_SAFE_INTEGER;
 
     if (numericValue >= minLimit && numericValue <= maxLimit) {
+      handleColumnChange(index, field, numericValue);
+    } else {
+      setSeverity("error");
+      setMessage(`輸入值不在允許的範圍內`);
+      setOpenSnackbar(true);
+    }
+  };
+
+  // 檢查是否會超過極限 DECIMAL 專項
+  const handleDecimalLimitChange = (
+    index: number,
+    field: keyof ColumnData,
+    value: any
+  ) => {
+    let numericValue = Number(value);
+    const columnSizeLimit = columns[index].columnSizeLimit ?? 1;
+    const minLimit = 0;
+    const maxLimit = 30;
+    // 下面的運算有點多餘(畢竟是針對性功能)，所以直接改成 30
+    // 若 Decimal data structure 有變化要對應修改
+    // const maxLimit = typeDetails && 'precision' in typeDetails ? typeDetails?.precision.D! : 30;
+
+    if (
+      numericValue >= 0 &&
+      numericValue <= columnSizeLimit &&
+      numericValue >= minLimit &&
+      numericValue <= maxLimit
+    ) {
       handleColumnChange(index, field, numericValue);
     } else {
       setSeverity("error");
@@ -262,6 +292,10 @@ const CreateTable: React.FC = () => {
           MysqlDataTypes[column.columnType as keyof typeof MysqlDataTypes];
         const needsLimit = currentType?.needsLimit;
         const displaySize = currentType?.displaySize;
+        let precision =
+          currentType && "precision" in currentType
+            ? currentType.precision.D
+            : undefined;
         const isEditing = edit.idx === index;
 
         return (
@@ -277,7 +311,7 @@ const CreateTable: React.FC = () => {
                 size="small"
               />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={6}>
               <div className="flex justify-center items-center gap-[1px]">
                 <FormControl fullWidth size="small">
                   <InputLabel id="columnType-select-label">
@@ -302,7 +336,8 @@ const CreateTable: React.FC = () => {
                     ))}
                   </Select>
                 </FormControl>
-                {needsLimit && (
+                {/* 需寫入上限，非小數類型 */}
+                {needsLimit && !precision && (
                   <TextField
                     fullWidth
                     type="number"
@@ -321,9 +356,46 @@ const CreateTable: React.FC = () => {
                     size="small"
                   />
                 )}
+                {/* 需寫入上限，小數類型 */}
+                {precision && (
+                  <>
+                    <TextField
+                      fullWidth
+                      type="number"
+                      label={`顯示上限(含小數) ${displaySize?.min ?? "無"} ~ ${
+                        displaySize?.max ?? "無"
+                      }`}
+                      value={column.columnSizeLimit || ""}
+                      onChange={(event) =>
+                        handleLimitChange(
+                          index,
+                          "columnSizeLimit",
+                          event.target.value
+                          // displaySize
+                        )
+                      }
+                      size="small"
+                    />
+                    <TextField
+                      fullWidth
+                      type="number"
+                      label={`小數位數上限 0 ~ ${precision}`}
+                      value={column.precisionLimit || ""}
+                      onChange={(event) =>
+                        handleDecimalLimitChange(
+                          index,
+                          "precisionLimit",
+                          event.target.value
+                          // displaySize
+                        )
+                      }
+                      size="small"
+                    />
+                  </>
+                )}
               </div>
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={2}>
               <TextField
                 fullWidth
                 label={`預設值，空字串請輸入 "" `}
@@ -378,7 +450,8 @@ const CreateTable: React.FC = () => {
                   key !== "columnType" &&
                   key !== "columnSizeLimit" &&
                   key !== "defaultValue" &&
-                  key !== "isZerofill" // 因為 MySQL 準備要移除此特性了，直接禁用
+                  key !== "isZerofill" && // 因為 MySQL 準備要移除此特性了，直接禁用
+                  key !== "precisionLimit"
               )
               .map((key) => (
                 <Grid key={key} item xs={6} sm={4} md={3} lg={2}>

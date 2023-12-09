@@ -26,10 +26,12 @@ import NullSign from "../types/NullSign";
 
 // 因為不開放部分功能，所以不用 Interfaces 中的 ColumnData
 interface Column {
-  name: string;
+  columnName: string;
   type: string;
   columnSizeLimit?: number;
+  precisionLimit?: number;
   needsLimit?: boolean;
+  needsPrecision?: boolean;
   defaultValue?: string;
 
   isPrimaryKey: boolean;
@@ -47,10 +49,12 @@ interface Column {
 }
 
 const initialColumnState: Column = {
-  name: "",
+  columnName: "",
   type: "",
   columnSizeLimit: 0,
+  precisionLimit: 0,
   needsLimit: false,
+  needsPrecision: false,
   defaultValue: "",
 
   isPrimaryKey: false,
@@ -115,7 +119,10 @@ const AddColumn: React.FC = () => {
       ...prev,
       type: selectedType,
       needsLimit: typeDetails.needsLimit,
+      needsPrecision: "precision" in typeDetails,
       columnSizeLimit: typeDetails.needsLimit ? prev.columnSizeLimit : 0,
+      precisionLimit:
+        typeDetails && "precision" in typeDetails ? prev.precisionLimit : 0,
     }));
 
     if (
@@ -178,7 +185,7 @@ const AddColumn: React.FC = () => {
 
   const handleSubmit = async () => {
     try {
-      if (!newColumn.name || !newColumn.type) {
+      if (!newColumn.columnName || !newColumn.type) {
         setSeverity("warning");
         setMessage("請填寫列名和列類型");
         setOpenSnackbar(true);
@@ -194,16 +201,26 @@ const AddColumn: React.FC = () => {
       if (newColumn.isUniqueKey) columnOptions.push("UNIQUE");
 
       const updateValue =
-        newColumn.defaultValue === `""` ? "" : newColumn.defaultValue || null;
+        newColumn.defaultValue === `""`
+          ? ""
+          : newColumn.defaultValue === "0"
+          ? "0"
+          : newColumn.defaultValue
+          ? newColumn.defaultValue
+          : null;
 
       const requestOptions: AddColumnObj = {
         dbName: readDataElement.dbName!,
         table: readDataElement.table!,
-        columnName: newColumn.name,
+        columnName: newColumn.columnName,
         columnType:
           newColumn.type +
           (newColumn.needsLimit && newColumn.columnSizeLimit
-            ? `(${newColumn.columnSizeLimit})`
+            ? `(${newColumn.columnSizeLimit}${
+                newColumn.needsPrecision && newColumn.precisionLimit
+                  ? "," + String(newColumn.precisionLimit)
+                  : ""
+              })`
             : ""),
         columnOption: columnOptions,
         defaultValue: updateValue,
@@ -243,6 +260,50 @@ const AddColumn: React.FC = () => {
     setNewColumn((prev) => ({ ...prev, [name]: checked }));
   };
 
+  const handleOthersInputChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = event.target;
+    let numericValue = Number(value);
+
+    // 檢查並應用大小限制
+    if (
+      name === "columnSizeLimit" &&
+      newColumn.needsLimit &&
+      newColumn.type !== ""
+    ) {
+      if (
+        numericValue <
+          MysqlDataTypes[newColumn.type as keyof typeof MysqlDataTypes]
+            .displaySize.min! ||
+        numericValue >
+          MysqlDataTypes[newColumn.type as keyof typeof MysqlDataTypes]
+            .displaySize.max!
+      ) {
+        setSeverity("error");
+        setMessage(`輸入值不在允許的範圍內`);
+        setOpenSnackbar(true);
+        return;
+      }
+    }
+
+    if (name === "precisionLimit" && newColumn.needsPrecision) {
+      // 例如，如果小數精度的範圍是 0 到 30
+      if (
+        numericValue < 0 ||
+        numericValue > 30 ||
+        numericValue > newColumn.columnSizeLimit!
+      ) {
+        setSeverity("error");
+        setMessage(`輸入值不在允許的範圍內`);
+        setOpenSnackbar(true);
+        return;
+      }
+    }
+
+    setNewColumn((prev) => ({ ...prev, [name]: numericValue }));
+  };
+
   // 根據規則決定是否禁用某個選項
   function shouldDisableCheckbox(key: string): boolean {
     switch (key) {
@@ -278,8 +339,8 @@ const AddColumn: React.FC = () => {
             <TextField
               size="small"
               label="Column 名稱"
-              name="name"
-              value={newColumn.name}
+              name="columnName"
+              value={newColumn.columnName}
               onChange={handleInputChange}
               fullWidth
             />
@@ -311,7 +372,21 @@ const AddColumn: React.FC = () => {
                 name="columnSizeLimit"
                 type="number"
                 value={newColumn.columnSizeLimit}
-                onChange={handleInputChange}
+                onChange={handleOthersInputChange}
+                fullWidth
+              />
+            </Grid>
+          )}
+          {newColumn.needsPrecision && (
+            <Grid item xs={12}>
+              <TextField
+                size="small"
+                // label={`小數位數上限 0 ~ ${maxPrecision}`} // 顯示最大精度值
+                label={`小數位數上限 0 ~ 30`} // 顯示最大精度值
+                name="precisionLimit"
+                type="number"
+                value={newColumn.precisionLimit}
+                onChange={handleOthersInputChange}
                 fullWidth
               />
             </Grid>

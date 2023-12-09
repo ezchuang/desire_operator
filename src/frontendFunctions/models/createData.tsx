@@ -52,7 +52,11 @@ function refactorCreateDataParams(element: TableData) {
         name: column.columnName,
         type:
           column.columnType +
-          (column.columnSizeLimit ? `(${column.columnSizeLimit})` : ""),
+          (column.columnSizeLimit
+            ? `(${column.columnSizeLimit}${
+                column.precisionLimit ? "," + String(column.precisionLimit) : ""
+              })`
+            : ""),
         options: options,
       };
     })
