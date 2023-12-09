@@ -29,10 +29,8 @@ export default async function historyApiInit() {
       } catch (err: any) {
         console.error("Error in getHistoryByUser: ", err);
 
-        if ("sqlMessage" in err[0]) {
-          return res
-            .status(400)
-            .json({ error: true, message: err[0].sqlMessage });
+        if ("sqlMessage" in err) {
+          return res.status(400).json({ error: true, message: err.sqlMessage });
         }
         return res.status(500).json({ error: true, message: err });
       }

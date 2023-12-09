@@ -30,7 +30,7 @@ class DbUtilityBase {
         (resolve, reject) => {
           // console.log(queryStr, values);
           connection.query(queryStr, values, (err, res, fields) => {
-            if (err) reject([err]);
+            if (err) reject(err);
             else resolve([res, fields]);
           });
         }

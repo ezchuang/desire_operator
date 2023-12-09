@@ -33,10 +33,8 @@ export default async function updateApiInit() {
       } catch (err: any) {
         console.error("Error in updateData: ", err);
 
-        if ("sqlMessage" in err[0]) {
-          return res
-            .status(400)
-            .json({ error: true, message: err[0].sqlMessage });
+        if ("sqlMessage" in err) {
+          return res.status(400).json({ error: true, message: err.sqlMessage });
         }
         return res.status(500).json({ error: true, message: err });
       }
@@ -76,10 +74,8 @@ export default async function updateApiInit() {
       } catch (err: any) {
         console.error("Error in insertData: ", err);
 
-        if ("sqlMessage" in err[0]) {
-          return res
-            .status(400)
-            .json({ error: true, message: err[0].sqlMessage });
+        if ("sqlMessage" in err) {
+          return res.status(400).json({ error: true, message: err.sqlMessage });
         }
         return res.status(500).json({ error: true, message: err });
       }
@@ -126,10 +122,8 @@ export default async function updateApiInit() {
       } catch (err: any) {
         console.error("Error in addColumn: ", err);
 
-        if ("sqlMessage" in err[0]) {
-          return res
-            .status(400)
-            .json({ error: true, message: err[0].sqlMessage });
+        if ("sqlMessage" in err) {
+          return res.status(400).json({ error: true, message: err.sqlMessage });
         }
         return res.status(500).json({ error: true, message: "內部服務器錯誤" });
       }
@@ -166,10 +160,8 @@ export default async function updateApiInit() {
       } catch (err: any) {
         console.error("Error in delColumn: ", err);
 
-        if ("sqlMessage" in err[0]) {
-          return res
-            .status(400)
-            .json({ error: true, message: err[0].sqlMessage });
+        if ("sqlMessage" in err) {
+          return res.status(400).json({ error: true, message: err.sqlMessage });
         }
         return res.status(500).json({ error: true, message: "內部服務器錯誤" });
       }

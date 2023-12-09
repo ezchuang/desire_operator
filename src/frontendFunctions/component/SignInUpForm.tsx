@@ -28,6 +28,7 @@ const SignInUpForm: React.FC = () => {
 
       if (response.status !== 200 && !result.success) {
         setErrorMessage(result.message || "未知錯誤");
+        return;
       }
 
       // 將 Token 寫入 localStorage

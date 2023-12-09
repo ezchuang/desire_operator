@@ -130,10 +130,8 @@ export default async function userApiInit() {
     } catch (err: any) {
       let msg = "";
       if (err) {
-        if ("sqlMessage" in err[0]) {
-          return res
-            .status(400)
-            .json({ error: true, message: err[0].sqlMessage });
+        if ("sqlMessage" in err) {
+          return res.status(400).json({ error: true, message: err.sqlMessage });
         }
 
         switch (err.message) {
@@ -191,10 +189,8 @@ export default async function userApiInit() {
     } catch (err: any) {
       let msg = "";
       if (err) {
-        if ("sqlMessage" in err[0]) {
-          return res
-            .status(400)
-            .json({ error: true, message: err[0].sqlMessage });
+        if ("sqlMessage" in err) {
+          return res.status(400).json({ error: true, message: err.sqlMessage });
         }
 
         switch (err.message) {
@@ -274,10 +270,8 @@ export default async function userApiInit() {
     } catch (err: any) {
       let msg = "";
       if (err) {
-        if ("sqlMessage" in err[0]) {
-          return res
-            .status(400)
-            .json({ error: true, message: err[0].sqlMessage });
+        if ("sqlMessage" in err) {
+          return res.status(400).json({ error: true, message: err.sqlMessage });
         }
 
         switch (err.message) {
