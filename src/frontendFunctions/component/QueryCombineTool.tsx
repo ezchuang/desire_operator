@@ -179,7 +179,7 @@ const QueryCombineTool: React.FC = () => {
       selected: true,
     }));
 
-    console.log(columnNames);
+    // console.log(columnNames);
 
     setColumnDataElement(columnNamesWithSelected);
     setColumnOnShowElement(columnNames);

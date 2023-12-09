@@ -32,7 +32,7 @@ class DeleteUtility extends DBUtilityBase {
     const values: any[] = [];
     let queryStr = `DELETE FROM ${dbName}.${table}`;
 
-    console.log(where);
+    // console.log(where);
     if (where && where.length > 0) {
       const whereClauses = where.map((condition) => {
         if (condition.value !== 0 && !condition.value) {

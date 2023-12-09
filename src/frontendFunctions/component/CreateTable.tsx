@@ -191,7 +191,7 @@ const CreateTable: React.FC = () => {
 
   const handleSubmit = async () => {
     try {
-      console.log("原始 Columns: ", columns);
+      // console.log("原始 Columns: ", columns);
 
       const response = await createTable({
         dbName: dbName,

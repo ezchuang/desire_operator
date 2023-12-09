@@ -227,7 +227,7 @@ const AddColumn: React.FC = () => {
       };
 
       const response = await addColumn(requestOptions);
-      console.log(response);
+      // console.log(response);
       if (!response) {
         throw new Error(`Add Column Error!`);
       }
