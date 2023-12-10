@@ -6,14 +6,13 @@ import jwt from "jsonwebtoken";
 
 interface UserListElement {
   userName: string;
-  userColor: string;
+  userColor: string | undefined;
 }
-
-const colorList = ["#FF5733", "#33FF57", "#3357FF", "#FFFF33", "#33FFFF"];
 
 class SocketManager extends EventEmitter {
   private io: SocketServer | null = null;
   private roomUserList = new Map<string, UserListElement[]>([]); // 每個房間的用戶列表
+  private colorList = ["#FF5733", "#33FF57", "#3357FF", "#FFFF33", "#33FFFF"];
 
   initialize(server: HttpServer): void {
     if (!this.io) {
@@ -22,8 +21,13 @@ class SocketManager extends EventEmitter {
     }
   }
 
-  private getColorForUser(userIndex: number) {
-    return colorList[userIndex % colorList.length];
+  private getColorForUser() {
+    // private getColorForUser(colorList:string[], userIndex: number) {
+    const color = this.colorList.shift();
+    if (color) {
+      this.colorList.push(color);
+    }
+    return color;
   }
 
   // get room id from token when new connection connected
@@ -67,15 +71,15 @@ class SocketManager extends EventEmitter {
         if (userList) {
           userList.push({
             userName,
-            userColor: this.getColorForUser(userList.length),
+            userColor: this.getColorForUser(),
           });
           this.roomUserList.set(roomId, userList);
         }
 
-        this.io?.emit("userListUpdated", userList);
+        this.io?.to(roomId).emit("userListUpdated", userList);
       }
 
-      // 向同一房間的所有用戶廣播新歷史記錄的布林值
+      // 向同一房間的所有用戶廣播新歷史記錄
       socket.on("refreshHistory", () => {
         console.log("refreshHistory on socket");
 
