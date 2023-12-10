@@ -18,7 +18,7 @@ const CustomizedSnackbars: React.FC = () => {
     <Stack spacing={2} sx={{ width: "100%" }}>
       <Snackbar
         open={openSnackbar}
-        autoHideDuration={3000}
+        autoHideDuration={10000}
         onClose={() => setOpenSnackbar(false)}
         // sx={{ zIndex: 40 }}
       >

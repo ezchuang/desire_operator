@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+// import React, { useState, useEffect } from "react";
 import {
   styled,
   Paper,
@@ -10,7 +11,9 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 import { useVerification } from "../types/VerificationContext";
 import { useReadData } from "../types/ReadDataContext";
-import { useUserInfo } from "../types/UserInfoContext";
+import { UserListElement, useUserInfo } from "../types/UserInfoContext";
+import { useSocket } from "../types/SocketContext";
+
 import CustomizedSnackbars from "./Alert";
 import MainTable from "./MainTable";
 import ShortcutTable from "./ShortcutTable";
@@ -63,7 +66,8 @@ const Type2ShortcutStyledPaper = styled(Paper)({
 const MainLayout: React.FC = () => {
   const { isVerified } = useVerification();
   const { readDataElement, setReadDataElement } = useReadData();
-  const { userInfo } = useUserInfo();
+  const { userInfo, setUserInfo } = useUserInfo();
+  const { socket } = useSocket();
 
   const [mainTableExpanded, setMainTableExpanded] = useState(true);
   const [queryCombineToolExpanded, setQueryCombineToolExpanded] =
@@ -81,6 +85,28 @@ const MainLayout: React.FC = () => {
     }
   };
 
+  socket?.on("userListUpdated", (newUserList: UserListElement[]) => {
+    setUserInfo((prevInfo) => ({ ...prevInfo, userList: newUserList }));
+  });
+
+  // useEffect(() => {
+  //   console.log("socket auth: ", socket);
+
+  //   console.log("UserInfo: ", userInfo);
+  // }, [socket, setUserInfo]);
+
+  // 群組內使用者登入狀況圓圈渲染
+  const renderUserList = userInfo.userList?.map((user, index) => (
+    <div
+      key={index}
+      className="rounded-full cursor-pointer flex items-center justify-center mr-2"
+      style={{ backgroundColor: user.userColor, width: "30px", height: "30px" }}
+      title={user.userName}
+    >
+      {user.userName.charAt(0)}
+    </div>
+  ));
+
   return (
     <>
       <div className="flex flex-col">
@@ -90,14 +116,8 @@ const MainLayout: React.FC = () => {
             {/* Content for NAV */}
             <div className="font-bold text-2xl">MySQL Speaker</div>
             <div className="flex items-center">
-              <div className="w-auto">
-                <div
-                  id="userInfo"
-                  className="bg-purple-600 w-8 h-8 rounded-full cursor-pointer flex items-center justify-center mr-2"
-                  title={userInfo.userName}
-                >
-                  {userInfo.userName.charAt(0)}
-                </div>
+              <div className="w-auto flex items-center gap-1 text-black">
+                {renderUserList}
               </div>
               {/* Content for Verify User */}
               <div className="flex gap-10">

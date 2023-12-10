@@ -80,7 +80,7 @@ const DelColumn: React.FC = () => {
     } catch (error) {
       console.error("Error deleting column:", error);
       setSeverity("error");
-      setMessage("刪除失敗");
+      setMessage(`刪除失敗: ${error}`);
       setOpenSnackbar(true);
     }
   };

@@ -1,10 +1,10 @@
 // 封裝 fetch 請求
 const requestCache = new Map();
-const cacheTimeout = 2000; // 快取存在時限
+const cacheTimeout = 200; // 快取存在時限
 
 interface FetchPackagerConfig {
-  urlFetch: string;
-  methodFetch: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  urlFetch?: string;
+  methodFetch?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   headersFetch?: Record<string, string>;
   bodyFetch?: string | null;
 }
@@ -42,9 +42,13 @@ export default function fetchPackager(
       headers: headers,
       body: config.bodyFetch || null,
     })
-      .then((response) => {
+      .then(async (response) => {
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          return response.json().then((errorData) => {
+            throw new Error(
+              errorData.message || `HTTP error! status: ${response.status}`
+            );
+          });
         }
         return response.json();
       })
@@ -53,10 +57,6 @@ export default function fetchPackager(
       })
       .catch((err) => {
         reject(err);
-      })
-      .catch((err) => {
-        requestCache.delete(cacheKey); // 失敗時，刪除快取中的 Promise
-        throw err;
       })
       .finally(() => {
         setTimeout(() => requestCache.delete(cacheKey), cacheTimeout);

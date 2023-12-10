@@ -127,10 +127,14 @@ export default async function userApiInit() {
           invitationCode: invitationCode,
         },
       });
-    } catch (error) {
+    } catch (err: any) {
       let msg = "";
-      if (error instanceof Error) {
-        switch (error.message) {
+      if (err) {
+        if ("sqlMessage" in err) {
+          return res.status(400).json({ error: true, message: err.sqlMessage });
+        }
+
+        switch (err.message) {
           case "MissingCredentials":
             msg = "資料未填寫";
             break;
@@ -140,7 +144,7 @@ export default async function userApiInit() {
             break;
 
           default:
-            console.error(error);
+            console.error(err);
             return res.status(500).json({ error: true, message: "伺服器錯誤" });
         }
       }
@@ -149,7 +153,7 @@ export default async function userApiInit() {
   });
 
   // 已登入驗證
-  userApi.get("/auth", (req: Request, res: Response) => {
+  userApi.get("/auth", async (req: Request, res: Response) => {
     try {
       const token = req.headers.authorization?.split(" ")[1];
       if (!token) {
@@ -175,6 +179,20 @@ export default async function userApiInit() {
       }
 
       // 標準路徑
+      // 撈 userGroup(dbUser)
+      const userGroup = global.userGroupMap.get(req.user!.userId) as string;
+
+      // 若是伺服器有重啟，就需要走這裡，由 Token 建立 DB Connection
+      if (!userGroup) {
+        const [dbUser, groupDb] = await rootUtility.getUserDbByToken({
+          userId: req.user.userId,
+          userMail: req.user.userEmail,
+          dbUser: req.user.dbUser,
+        });
+        global.groupDbMap.set(dbUser, groupDb);
+        global.userGroupMap.set(req.user.userId, dbUser);
+      }
+
       const resData = {
         userName: req.user.userName,
         groupName: req.user.groupName,
@@ -182,10 +200,14 @@ export default async function userApiInit() {
       };
 
       return res.status(200).json({ success: true, data: resData });
-    } catch (error) {
+    } catch (err: any) {
       let msg = "";
-      if (error instanceof Error) {
-        switch (error.message) {
+      if (err) {
+        if ("sqlMessage" in err) {
+          return res.status(400).json({ error: true, message: err.sqlMessage });
+        }
+
+        switch (err.message) {
           case "NoTokenProvided":
             msg = "No token provided";
             break;
@@ -195,7 +217,7 @@ export default async function userApiInit() {
             break;
 
           default:
-            console.error(error);
+            console.error(err);
             return res.status(500).json({ error: true, message: "伺服器錯誤" });
         }
       }
@@ -230,9 +252,11 @@ export default async function userApiInit() {
         throw new Error("InvalidCredentials");
       }
       // 群組與資料庫連接池的映射，[群組登入者, 群組DB]
-      global.groupDbMap.set(params.dbUser!, guestDbInstance);
+      // Guest dbUser 改以雪花 ID 生成，並加上 "D" 前墜
+      const dbUser = `D${String(generator.generate())}`; // D 開頭做標示
+      global.groupDbMap.set(dbUser, guestDbInstance);
       // 群組與資料庫連接池的映射，[使用者編號, 群組登入者]
-      global.userGroupMap.set(userId, params.dbUser!);
+      global.userGroupMap.set(userId, dbUser);
 
       const token = jwt.sign(
         {
@@ -257,10 +281,14 @@ export default async function userApiInit() {
           invitationCode: "None",
         },
       });
-    } catch (error) {
+    } catch (err: any) {
       let msg = "";
-      if (error instanceof Error) {
-        switch (error.message) {
+      if (err) {
+        if ("sqlMessage" in err) {
+          return res.status(400).json({ error: true, message: err.sqlMessage });
+        }
+
+        switch (err.message) {
           case "MissingCredentials":
             msg = "資料未填寫";
             break;
@@ -270,7 +298,7 @@ export default async function userApiInit() {
             break;
 
           default:
-            console.error(error);
+            console.error(err);
             return res.status(500).json({ error: true, message: "伺服器錯誤" });
         }
       }

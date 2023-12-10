@@ -13,7 +13,7 @@ export async function createDb(element: string): Promise<boolean> {
     if (response.data) {
       return response.data;
     } else {
-      throw Error;
+      throw new Error(response.message);
     }
   } catch (err) {
     console.error("There was an error fetching the DBs and Tables: ", err);
@@ -23,7 +23,7 @@ export async function createDb(element: string): Promise<boolean> {
 
 // 將 element.columns 中 { key : value } 的 value 轉成要給後端執行的 Array
 function refactorCreateDataParams(element: TableData) {
-  console.log("refactorCreateDataParams處理前: ", element);
+  // console.log("refactorCreateDataParams處理前: ", element);
   // 額外從 input 資料拉出 PK 資料來處理
   const primaryKeys = (element.columns as ColumnData[])
     .filter((column: ColumnData) => column.isPrimaryKey)
@@ -52,7 +52,11 @@ function refactorCreateDataParams(element: TableData) {
         name: column.columnName,
         type:
           column.columnType +
-          (column.columnSizeLimit ? `(${column.columnSizeLimit})` : ""),
+          (column.columnSizeLimit
+            ? `(${column.columnSizeLimit}${
+                column.precisionLimit ? "," + String(column.precisionLimit) : ""
+              })`
+            : ""),
         options: options,
       };
     })
@@ -67,16 +71,16 @@ function refactorCreateDataParams(element: TableData) {
     });
   }
 
-  console.log("refactorCreateDataParams: ", element);
+  // console.log("refactorCreateDataParams: ", element);
   return element;
 }
 
 // 新建 Table
 export async function createTable(element: TableData): Promise<boolean> {
   try {
-    console.log(element);
+    // console.log(element);
     const refactorCreateData = refactorCreateDataParams(element);
-    console.log(refactorCreateData);
+    // console.log(refactorCreateData);
     const response = await fetchPackager({
       urlFetch: "/api/createTable",
       methodFetch: "POST",
@@ -86,7 +90,7 @@ export async function createTable(element: TableData): Promise<boolean> {
     if (response.data) {
       return response.data;
     } else {
-      throw Error;
+      throw new Error(response.message);
     }
   } catch (err) {
     console.error("There was an error fetching the DBs and Tables: ", err);

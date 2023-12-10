@@ -12,7 +12,7 @@ export async function deleteData(element: any): Promise<any> {
     if (response.data) {
       return response.data;
     } else {
-      throw Error;
+      throw new Error(response.message);
     }
   } catch (err) {
     console.error(`There was an error in the delete operation: `, err);
@@ -32,7 +32,7 @@ export async function deleteTable(element: any): Promise<any> {
     if (response.data) {
       return response.data;
     } else {
-      throw Error;
+      throw new Error(response.message);
     }
   } catch (err) {
     console.error("There was an error dropping the table: ", err);
@@ -52,7 +52,7 @@ export async function deleteDb(element: any): Promise<any> {
     if (response.data) {
       return response.data;
     } else {
-      throw Error;
+      throw new Error(response.message);
     }
   } catch (err) {
     console.error("There was an error dropping the database: ", err);

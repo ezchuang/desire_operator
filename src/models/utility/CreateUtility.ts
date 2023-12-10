@@ -7,13 +7,14 @@ class CreateUtility extends DbUtilityBase {
   async createDb(userId: string, obj: CreateDbObj) {
     const { dbName, groupSigninUser } = obj;
     // 主要新增
-    let queryStr = `CREATE DATABASE IF NOT EXISTS \`${dbName}\``;
+    // let queryStr = `CREATE DATABASE IF NOT EXISTS \`${dbName}\``; // 重複創建不會跳 Error
+    let queryStr = `CREATE DATABASE \`${dbName}\``;
 
     console.log(queryStr, []);
     await this.execute(queryStr, []);
 
     // Guest 路徑，因為只有超級使用者能創建Database，所以跳過刷新行為
-    if (userId.startsWith("G")) {
+    if (String(userId).startsWith("G")) {
       return true;
     }
 
@@ -32,7 +33,7 @@ class CreateUtility extends DbUtilityBase {
     await this.execute(queryStr, []);
 
     // 因為跟其他函式結構不同，這邊在成功後 return true
-    // 失敗理應會由 this.execute() throw error
+    // 失敗理應會由 this.execute() throw new Error
     return true;
   }
 

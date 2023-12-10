@@ -11,7 +11,7 @@ export default async function addHistory(
   values: string[]
 ) {
   try {
-    if (userId.startsWith("G")) {
+    if (String(userId).startsWith("G")) {
       return;
     }
 

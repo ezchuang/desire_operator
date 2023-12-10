@@ -143,9 +143,9 @@ const QueryCombineTool: React.FC = () => {
     try {
       formState.limit = Number(formState.limit);
       formState.offset = Number(formState.offset);
-    } catch (err) {
+    } catch (error) {
       setSeverity("error");
-      setMessage("輸入異常");
+      setMessage(`輸入異常: ${error}`);
       setOpenSnackbar(true);
       return;
     }
@@ -179,7 +179,7 @@ const QueryCombineTool: React.FC = () => {
       selected: true,
     }));
 
-    console.log(columnNames);
+    // console.log(columnNames);
 
     setColumnDataElement(columnNamesWithSelected);
     setColumnOnShowElement(columnNames);

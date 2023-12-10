@@ -50,7 +50,9 @@ class UpdateUtility extends DBUtilityBase {
   // 新增新的 Row
   async insert(userId: string, obj: InsertObj) {
     const { dbName, table, data } = obj;
-    const columns = Object.keys(data[0]).join(", ");
+    const columns = Object.keys(data[0])
+      .map((column) => `\`${column}\``)
+      .join(", ");
     const insertData = data
       .map(() => `(${Object.keys(data[0]).fill("?").join(", ")})`)
       .join(", ");

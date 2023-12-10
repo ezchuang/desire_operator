@@ -2,6 +2,7 @@ export interface ColumnData {
   columnName: string;
   columnType: string;
   columnSizeLimit?: number;
+  precisionLimit?: number;
   defaultValue?: string;
 
   isPrimaryKey: boolean;

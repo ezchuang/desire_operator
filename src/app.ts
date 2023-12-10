@@ -6,7 +6,7 @@ import swaggerUi from "swagger-ui-express";
 import * as swaggerDocument from "./swagger-output.json";
 
 import Database from "./models/dbConstructor/Database";
-import ioConstructor from "./controllers/routes/socketEntry";
+import { socketManager } from "./controllers/routes/socketManager";
 import userApi from "./controllers/routes/userApi";
 import createApi from "./controllers/routes/createApi";
 import readApi from "./controllers/routes/readApi";
@@ -29,7 +29,8 @@ async function appInit() {
   const app: Express = express();
   const port: number = Number(process.env.PORT) || 5252;
   const server = http.createServer(app);
-  ioConstructor(server);
+  // 建立 websocket instance，利用 .getIo() 獲取此 instance
+  socketManager.initialize(server);
 
   // middleware
   app.set("view engine", "ejs");
@@ -54,8 +55,6 @@ async function appInit() {
   app.get("/main", (req: Request, res: Response) => {
     return res.render("main");
   });
-
-  // import * as jwt from "jsonwebtoken";
 
   server.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
