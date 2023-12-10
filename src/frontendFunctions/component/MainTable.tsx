@@ -22,6 +22,7 @@ import {
   useColumnOnShow,
 } from "../types/ColumnOnShowContext";
 import { useRefreshDataFlag } from "../types/RefreshDataFlagContext";
+import { useSocket } from "../types/SocketContext";
 import { readTableData } from "../models/readData";
 import { updateData } from "../models/updateData";
 import { deleteData } from "../models/deleteData";
@@ -62,6 +63,7 @@ const MainTable: React.FC = () => {
   const { columnDataElement } = useColumnData();
   const { columnOnShowElement } = useColumnOnShow();
   const { refreshDataFlag, setRefreshDataFlag } = useRefreshDataFlag();
+  const { socket } = useSocket();
 
   const [data, setData] = useState<any[]>([]);
   const [edit, setEdit] = useState<EditState>({ row: -1, cell: "" });
@@ -75,6 +77,12 @@ const MainTable: React.FC = () => {
   ) => {
     setEdit({ row: rowId, cell: cellId });
     setEditValue(currentValue);
+    // if (socket) {
+    //   socket.emit('cell-updated', (updateInfo: IRowUpdate) => {
+    //     // 根據接收到的數據更新 UI
+    //     // ...更新邏輯...
+    //   });
+    // }
   };
 
   // 處理輸入變更
@@ -172,6 +180,9 @@ const MainTable: React.FC = () => {
           ...editingRow, // 展開該列複製
           [editingColumn.id]: editValue, // 將該列該值更新
         };
+
+        socket?.emit("refreshHistory");
+        console.log("refreshHistory");
 
         setData(updatedData); // 刷新
         setRefreshDataFlag([]);

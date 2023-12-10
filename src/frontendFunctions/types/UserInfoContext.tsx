@@ -1,15 +1,28 @@
 import React, { createContext, useState, useContext, ReactNode } from "react";
 
+export interface UserListElement {
+  userName: string;
+  userColor: string;
+}
+
 interface UserInfoElement {
   userName: string;
   groupName: string;
   invitationCode: string;
+  userList?: UserListElement[]; // 裝所有 User 的簡易資訊(包含自己)
 }
 
 interface UserInfoContextType {
   userInfo: UserInfoElement;
   setUserInfo: React.Dispatch<React.SetStateAction<UserInfoElement>>;
 }
+
+const defaultUserInfoElement: UserInfoElement = {
+  userName: "",
+  groupName: "",
+  invitationCode: "",
+  userList: [],
+};
 
 const UserInfoContext = createContext<UserInfoContextType | null>(null);
 
@@ -28,11 +41,9 @@ interface UserInfoProviderProps {
 export const UserInfoProvider: React.FC<UserInfoProviderProps> = ({
   children,
 }) => {
-  const [userInfo, setUserInfo] = useState({
-    userName: "",
-    groupName: "",
-    invitationCode: "",
-  });
+  const [userInfo, setUserInfo] = useState<UserInfoElement>(
+    defaultUserInfoElement
+  );
 
   return (
     <UserInfoContext.Provider value={{ userInfo, setUserInfo }}>

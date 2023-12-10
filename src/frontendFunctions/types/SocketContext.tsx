@@ -22,6 +22,14 @@ const defaultSocketContext: ISocketContext = {
 
 const SocketContext = createContext<ISocketContext>(defaultSocketContext);
 
+export const useSocket = () => {
+  const context = useContext(SocketContext);
+  if (!context) {
+    throw new Error("useSocket 必須在 SocketProvider 內使用");
+  }
+  return context;
+};
+
 interface SocketProviderProps {
   children: ReactNode;
 }
@@ -34,10 +42,12 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       query: { token },
     });
 
-    newSocket.on("connect", () => console.log("Connected to server"));
-    newSocket.on("disconnect", () => console.log("Disconnected from server"));
+    newSocket.on("connect", () => {
+      console.log("Connected to server");
+      setSocket(newSocket);
+    });
 
-    setSocket(newSocket);
+    newSocket.on("disconnect", () => console.log("Disconnected from server"));
   };
 
   const disconnectSocket = () => {
@@ -63,5 +73,3 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
     </SocketContext.Provider>
   );
 };
-
-export const useSocket = () => useContext(SocketContext);

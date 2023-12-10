@@ -17,9 +17,8 @@ const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
     }) as jwt.JwtPayload;
     req.user = decoded;
 
+    // boolean 紀錄是否是 Guest
     if (req.user.isGuest) {
-      // 建一個 boolean 紀錄是否是 Guest
-
       // 是否撈的到 userGroup(dbUser)，撈不到則丟出 Error 到 無效 Token
       let userGroup = global.userGroupMap.get(req.user!.userId) as string;
       if (!userGroup) {

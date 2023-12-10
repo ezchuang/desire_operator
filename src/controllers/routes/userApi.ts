@@ -153,7 +153,7 @@ export default async function userApiInit() {
   });
 
   // 已登入驗證
-  userApi.get("/auth", (req: Request, res: Response) => {
+  userApi.get("/auth", async (req: Request, res: Response) => {
     try {
       const token = req.headers.authorization?.split(" ")[1];
       if (!token) {
@@ -179,6 +179,20 @@ export default async function userApiInit() {
       }
 
       // 標準路徑
+      // 撈 userGroup(dbUser)
+      const userGroup = global.userGroupMap.get(req.user!.userId) as string;
+
+      // 若是伺服器有重啟，就需要走這裡，由 Token 建立 DB Connection
+      if (!userGroup) {
+        const [dbUser, groupDb] = await rootUtility.getUserDbByToken({
+          userId: req.user.userId,
+          userMail: req.user.userEmail,
+          dbUser: req.user.dbUser,
+        });
+        global.groupDbMap.set(dbUser, groupDb);
+        global.userGroupMap.set(req.user.userId, dbUser);
+      }
+
       const resData = {
         userName: req.user.userName,
         groupName: req.user.groupName,

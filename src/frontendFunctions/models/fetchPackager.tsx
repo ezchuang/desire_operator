@@ -1,10 +1,10 @@
 // 封裝 fetch 請求
 const requestCache = new Map();
-const cacheTimeout = 500; // 快取存在時限
+const cacheTimeout = 200; // 快取存在時限
 
 interface FetchPackagerConfig {
-  urlFetch: string;
-  methodFetch: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  urlFetch?: string;
+  methodFetch?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   headersFetch?: Record<string, string>;
   bodyFetch?: string | null;
 }

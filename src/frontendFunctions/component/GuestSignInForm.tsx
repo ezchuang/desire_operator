@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useVerification } from "../types/VerificationContext";
 import { useUserInfo } from "../types/UserInfoContext";
+import { useSocket } from "../types/SocketContext";
+import fetchPackager from "../models/fetchPackager";
 import GuestSignInInput, { SignInData } from "./GuestSignInInput";
 
 const GuestSignInForm: React.FC = () => {
   const { setUserInfo } = useUserInfo();
+  const { socket, initializeSocket } = useSocket();
   const { isVerified, setIsVerified } = useVerification();
 
   const [guestSignInVisible, setGuestSignInVisible] = useState(false);
@@ -84,22 +87,21 @@ const GuestSignInForm: React.FC = () => {
         return;
       }
 
-      const response = await fetch("/api/auth", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
+      const response = await fetchPackager({
+        urlFetch: "/api/auth",
       });
 
-      const result = await response.json();
+      if (response.data.groupName !== "Guest") {
+        return;
+      }
+
       setUserInfo({
-        userName: result.data.userName,
-        groupName: result.data.groupName,
-        invitationCode: result.data.invitationCode,
+        userName: response.data.userName,
+        groupName: response.data.groupName,
+        invitationCode: response.data.invitationCode,
       });
 
-      if (response.status === 200 && result.success) {
+      if (response.success) {
         setIsVerified(true);
 
         // 轉跳判斷
@@ -107,21 +109,23 @@ const GuestSignInForm: React.FC = () => {
           const url = "/main";
           linkToUrl(url);
         }
-      } else {
-        localStorage.removeItem("token");
 
-        setIsVerified(false);
+        initializeSocket(token);
+        if (socket) {
+          socket.on("connected", () => {
+            console.log("connected to server2");
+          });
+        }
 
-        // 轉跳判斷
-        // if (window.location.pathname !== "/") {
-        //   const url = "/";
-        //   linkToUrl(url);
-        // }
-
-        // 因為錯誤了，無論如何都轉跳
-        const url = "/";
-        linkToUrl(url);
+        return;
       }
+      localStorage.removeItem("token");
+
+      setIsVerified(false);
+
+      // 因為錯誤了，無論如何都轉跳
+      const url = "/";
+      linkToUrl(url);
     } catch (error) {
       console.error("Error verifying user:", error);
 

@@ -8,27 +8,30 @@ import { DbsAndTablesProvider } from "./types/DbsAndTablesContext";
 import { UserInfoProvider } from "./types/UserInfoContext";
 import { VerificationProvider } from "./types/VerificationContext";
 import { RefreshDataFlagProvider } from "./types/RefreshDataFlagContext";
+import { SocketProvider } from "./types/SocketContext";
 import MainLayout from "./component/MainLayout";
 
 const App: React.FC = () => {
   return (
-    <VerificationProvider>
-      <MessageProvider>
-        <UserInfoProvider>
-          <ReadDataProvider>
-            <DbsAndTablesProvider>
-              <ColumnDataProvider>
-                <ColumnOnShowProvider>
-                  <RefreshDataFlagProvider>
-                    <MainLayout />
-                  </RefreshDataFlagProvider>
-                </ColumnOnShowProvider>
-              </ColumnDataProvider>
-            </DbsAndTablesProvider>
-          </ReadDataProvider>
-        </UserInfoProvider>
-      </MessageProvider>
-    </VerificationProvider>
+    <SocketProvider>
+      <VerificationProvider>
+        <MessageProvider>
+          <UserInfoProvider>
+            <ReadDataProvider>
+              <DbsAndTablesProvider>
+                <ColumnDataProvider>
+                  <ColumnOnShowProvider>
+                    <RefreshDataFlagProvider>
+                      <MainLayout />
+                    </RefreshDataFlagProvider>
+                  </ColumnOnShowProvider>
+                </ColumnDataProvider>
+              </DbsAndTablesProvider>
+            </ReadDataProvider>
+          </UserInfoProvider>
+        </MessageProvider>
+      </VerificationProvider>
+    </SocketProvider>
   );
 };
 

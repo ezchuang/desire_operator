@@ -14,30 +14,39 @@ import { useReadData } from "../types/ReadDataContext";
 import { useDbsAndTables } from "../types/DbsAndTablesContext";
 import { useRefreshDataFlag } from "../types/RefreshDataFlagContext";
 import { readHistoryData } from "../models/readData";
+import { useSocket } from "../types/SocketContext";
 // import { useReadData } from "../types/ReadDataContext";
 
 const HistoryTable: React.FC = () => {
   const { dbsAndTablesElement } = useDbsAndTables();
   const { readDataElement } = useReadData();
   const { refreshDataFlag } = useRefreshDataFlag();
+  const { socket } = useSocket();
 
   const [records, setRecords] = useState<HistoryRecord[]>([]);
   // const { readDataElement } = useReadData();
 
-  useEffect(() => {
-    const fetchHistory = async () => {
-      try {
-        const historyData = await readHistoryData();
-        // console.log(historyData[0]);
+  const fetchHistory = async () => {
+    try {
+      const historyData = await readHistoryData();
+      // console.log(historyData[0]);
 
-        setRecords(historyData[0]);
-      } catch (error) {
-        console.error("錯誤獲取歷史記錄:", error);
-      }
-    };
+      setRecords(historyData[0]);
+    } catch (error) {
+      console.error("錯誤獲取歷史記錄:", error);
+    }
+  };
 
+  socket?.on("newHistoryAvailable", () => {
+    console.log("refreshHistory");
     fetchHistory();
-  }, [dbsAndTablesElement, readDataElement, refreshDataFlag]);
+  });
+
+  useEffect(() => {
+    fetchHistory();
+
+    console.log("socket his: ", socket);
+  }, [socket, dbsAndTablesElement, readDataElement, refreshDataFlag]);
 
   const convertTimestampToTaipeiTime = (timestamp: number) => {
     const date = new Date(timestamp);
