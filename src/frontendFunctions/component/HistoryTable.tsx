@@ -8,6 +8,7 @@ import {
   TableRow,
   Paper,
 } from "@mui/material";
+import * as moment from "moment-timezone";
 
 import { HistoryRecord } from "../types/Interfaces";
 import { useReadData } from "../types/ReadDataContext";
@@ -48,9 +49,13 @@ const HistoryTable: React.FC = () => {
     console.log("socket his: ", socket);
   }, [socket, dbsAndTablesElement, readDataElement, refreshDataFlag]);
 
-  const convertTimestampToTaipeiTime = (timestamp: number) => {
-    const date = new Date(timestamp);
-    return date.toLocaleString("zh-TW", { timeZone: "Asia/Taipei" });
+  const convertDatetimeToTaipeiTime = (datetime: number) => {
+    // const date = new Date(datetime);
+    // return date.toLocaleString("zh-TW", { timeZone: "Asia/Taipei" });
+    return moment
+      .default(datetime)
+      .tz("Asia/Taipei")
+      .format("YYYY-MM-DD HH:mm:ss");
   };
 
   return (
@@ -77,7 +82,8 @@ const HistoryTable: React.FC = () => {
                 {record.query}
               </TableCell>
               <TableCell size="small">
-                {`${convertTimestampToTaipeiTime(record.timestamp)}`}
+                {`${convertDatetimeToTaipeiTime(record.datetime)}`}
+                {/* {`${record.datetime}`} */}
               </TableCell>
             </TableRow>
           ))}

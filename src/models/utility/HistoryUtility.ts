@@ -21,12 +21,12 @@ class HistoryUtility extends DbUtilityBase {
 
   // 根據用戶的群組 ID 獲取歷史記錄
   async getHistoryByGroupId(groupName: string): Promise<HistoryRecord[]> {
-    // CONVERT_TZ(query_history.timestamp_data, '+00:00', 'Asia/Taipei') AS timestamp,    <- 此列從 Select 移除，將時區轉換移至前端
+    // CONVERT_TZ(query_history.datetime_data, '+00:00', 'Asia/Taipei') AS datetime,    <- 此列從 Select 移除，將時區轉換移至前端
     const queryStr = `
         SELECT
             query_history.action_type AS action,
             query_history.query_history AS query,
-            query_history.timestamp_data AS timestamp,
+            CONVERT_TZ(query_history.datetime_data, '+00:00', 'Asia/Taipei') AS datetime,
             users.user_name AS name
         FROM
           user_info.query_history
