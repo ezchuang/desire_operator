@@ -67,5 +67,5 @@ export interface HistoryRecord {
   name: string;
   action: string;
   query: string;
-  timestamp: number;
+  datetime: number;
 }
