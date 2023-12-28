@@ -147,7 +147,7 @@ const SignInUpInput: React.FC<SignInUpFormProps> = ({
             {isSignUp && !isNewUserOrInvited ? (
               <input
                 required
-                type="password"
+                type="text"
                 value={invitationCode}
                 onChange={(event) => setInvitationCode(event.target.value)}
                 placeholder="輸入群組邀請碼"

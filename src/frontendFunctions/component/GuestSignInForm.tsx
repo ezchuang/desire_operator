@@ -59,17 +59,6 @@ const GuestSignInForm: React.FC = () => {
     setGuestSignInVisible(false);
   };
 
-  // 登出按鈕，包含轉跳頁面
-  // const handleSignOut = () => {
-  //   localStorage.removeItem("token");
-  //   setIsVerified(false);
-
-  //   if (window.location.pathname !== "/") {
-  //     const url = "/";
-  //     linkToUrl(url);
-  //   }
-  // };
-
   // 抓取是否有 Token，有的話打去後端驗證
   // 順利的話 (在非 main 頁) 會轉跳到 /main
   const verifyUser = async () => {

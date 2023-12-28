@@ -64,7 +64,7 @@ const GuestSignInInput: React.FC<GuestSignInFormProps> = ({
             />
             <input
               required
-              type="account"
+              type="password"
               value={account}
               onChange={(event) => setAccount(event.target.value)}
               placeholder="輸入登入帳號 (伺服器不紀錄，僅做登入用)"
@@ -72,7 +72,7 @@ const GuestSignInInput: React.FC<GuestSignInFormProps> = ({
             />
             <input
               required
-              type="password"
+              type="text"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               placeholder="輸入密碼 (伺服器不紀錄，僅做登入用)"
@@ -80,7 +80,7 @@ const GuestSignInInput: React.FC<GuestSignInFormProps> = ({
             />
             <input
               required
-              type="host"
+              type="text"
               value={dbHost}
               onChange={(event) => setDbHost(event.target.value)}
               placeholder="輸入MySQL主機位置 (Port為3306，目前不開放變更)"
