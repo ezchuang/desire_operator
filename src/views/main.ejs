@@ -16,10 +16,12 @@
     />
     <link href="/css/mainOutput.css" rel="stylesheet" />
   </head>
-  <body class="bg-orange-100 min-h-screen">
-    <div class="flex flex-col">
+  <body class="bg-orange-100 min-h-screen flex flex-col">
+    <div class="flex flex-col flex-grow">
       <div id="app"></div>
     </div>
+    <div class="flex-grow"></div>
+    <%- include("partials/footer") %>
     <script src="/js/main.js"></script>
   </body>
 </html>

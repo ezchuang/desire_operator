@@ -16,9 +16,57 @@
     /> -->
     <link href="/css/indexOutput.css" rel="stylesheet" />
   </head>
-  <body class="bg-orange-100 min-h-screen">
-    <div class="flex flex-col">
-      <div id="app">視覺化操作 MySQL 資料</div>
+  <body class="bg-orange-100 min-h-screen flex flex-col">
+    <div class="flex flex-col flex-grow">
+      <div id="app"></div>
+      <div class="flex-grow flex flex-col justify-center items-center mt-16">
+        <div class="bg-white p-4 m-4">
+          <div class="p-4 mb-8">
+            <div class="text-xl font-bold text-center mb-3">測試用帳號密碼</div>
+            <div class="w-[570px] p-2 rounded border-2 border-neutral-300">
+              <ul class="list-disc pl-5">
+                <li>帳號: test111@test.com</li>
+                <li>密碼: test</li>
+              </ul>
+              <hr class="mt-2 mb-2" />
+              <ul class="list-disc pl-5">
+                <li>帳號: test222@test.com</li>
+                <li>密碼: test</li>
+              </ul>
+              <hr class="mt-2 mb-2" />
+              <ul class="list-disc pl-5">
+                <li>測試群組邀請碼: 7135535744591859712</li>
+              </ul>
+            </div>
+          </div>
+          <div class="p-4">
+            <div class="flex flex-col max-w-xl">
+              <div class="text-xl font-bold text-center mb-3">操作流程展示</div>
+              <ol class="list-decimal pl-5 mb-8">
+                <li>登入外部 MySQL 資料庫</li>
+                <ul class="list-disc pl-5">
+                  <li>此網站可以登入非本網站的 MySQL 資料庫</li>
+                </ul>
+                <li>透過登入帳號可以執行相應權限可變動的動作，如增刪修改等</li>
+                <li>透過登入帳號可以執行相應權限可變動的動作，如增刪修改等</li>
+                <li>透過登入帳號可以執行相應權限可變動的動作，如增刪修改等</li>
+                <li>透過登入帳號可以執行相應權限可變動的動作，如增刪修改等</li>
+                <li>透過登入帳號可以執行相應權限可變動的動作，如增刪修改等</li>
+                <li>透過登入帳號可以執行相應權限可變動的動作，如增刪修改等</li>
+              </ol>
+              <div class="text-xl font-bold text-center mb-3">操作流程展示</div>
+              <img
+                class="border-2 rounded border-neutral-300 mt-4 max-w-xl mb-8"
+                src="https://d2ndnbzl6dhb4z.cloudfront.net/mysqlSpeaker_introduction.gif"
+                alt="簡易操作圖示"
+              />
+            </div>
+          </div>
+          </div>
+        </div>
+        </div>
+      </div>
+      <%- include("partials/footer") %>
     </div>
     <script src="/js/index.js"></script>
   </body>
