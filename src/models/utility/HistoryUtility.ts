@@ -26,7 +26,7 @@ class HistoryUtility extends DbUtilityBase {
         SELECT
             query_history.action_type AS action,
             query_history.query_history AS query,
-            CONVERT_TZ(query_history.datetime_data, '+00:00', 'Asia/Taipei') AS datetime,
+            query_history.datetime_data AS datetime,
             users.user_name AS name
         FROM
           user_info.query_history
