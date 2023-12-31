@@ -7,7 +7,7 @@ export default async function deleteApiInit() {
   const deleteApi: IRouter = express.Router();
 
   // 刪除 Database
-  deleteApi.post(
+  deleteApi.delete(
     "/deleteDatabase",
     verifyToken,
     async (req: Request, res: Response) => {
@@ -33,7 +33,7 @@ export default async function deleteApiInit() {
   );
 
   // 刪除 Table
-  deleteApi.post(
+  deleteApi.delete(
     "/deleteTable",
     verifyToken,
     async (req: Request, res: Response) => {
@@ -60,7 +60,7 @@ export default async function deleteApiInit() {
   );
 
   // 刪除資料
-  deleteApi.post(
+  deleteApi.delete(
     "/deleteData",
     verifyToken,
     async (req: Request, res: Response) => {

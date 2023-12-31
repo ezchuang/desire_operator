@@ -7,7 +7,7 @@ import SignInUpInput, { SignInData, SignUpData } from "./SignInUpInput";
 
 const SignInUpForm: React.FC = () => {
   const { setUserInfo } = useUserInfo();
-  const { socket, initializeSocket } = useSocket();
+  const { initializeSocket } = useSocket();
   const { isVerified, setIsVerified } = useVerification();
 
   const [signInUpVisible, setSignInUpVisible] = useState(false);
@@ -155,7 +155,7 @@ const SignInUpForm: React.FC = () => {
         }
 
         initializeSocket(token);
-        console.log("socket2: ", socket);
+        // console.log("socket2: ", socket);
 
         return;
       }

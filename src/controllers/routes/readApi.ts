@@ -8,6 +8,7 @@ export default async function readApiInit() {
   const readApi: IRouter = express.Router();
 
   // 讀取 DBs or Tables
+  // 有帶 body 仍需用 POST
   readApi.post(
     "/readDbsOrTables",
     verifyToken,
@@ -37,6 +38,7 @@ export default async function readApiInit() {
   );
 
   // 取得全部的 DBs 跟 Tables
+  // 有帶 body 仍需用 POST
   readApi.post(
     "/readDbsAndTables",
     verifyToken,
@@ -89,6 +91,7 @@ export default async function readApiInit() {
   );
 
   // 讀取 Table 內部資料
+  // 有帶 body 仍需用 POST
   readApi.post(
     "/readData",
     verifyToken,

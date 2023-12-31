@@ -46,7 +46,7 @@ const HistoryTable: React.FC = () => {
   useEffect(() => {
     fetchHistory();
 
-    console.log("socket his: ", socket);
+    // console.log("socket his: ", socket);
   }, [socket, dbsAndTablesElement, readDataElement, refreshDataFlag]);
 
   const convertDatetimeToTaipeiTime = (datetime: number) => {

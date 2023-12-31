@@ -6,11 +6,12 @@ import {
 } from "../types/Interfaces";
 import fetchPackager from "./fetchPackager";
 
+// 更新個別資料
 export async function updateData(element: UpdateObj): Promise<any> {
   try {
     const response = await fetchPackager({
       urlFetch: "/api/updateData",
-      methodFetch: "POST",
+      methodFetch: "PUT",
       bodyFetch: JSON.stringify(element),
     });
 
@@ -25,11 +26,12 @@ export async function updateData(element: UpdateObj): Promise<any> {
   }
 }
 
+// 插入新的 Row
 export async function insertData(element: InsertObj): Promise<any> {
   try {
     const response = await fetchPackager({
       urlFetch: "/api/insertData",
-      methodFetch: "POST",
+      methodFetch: "PUT",
       bodyFetch: JSON.stringify(element),
     });
 
@@ -44,11 +46,12 @@ export async function insertData(element: InsertObj): Promise<any> {
   }
 }
 
+// 修改表格加入新的 Column
 export async function addColumn(element: AddColumnObj): Promise<any> {
   try {
     const response = await fetchPackager({
       urlFetch: "/api/addColumn",
-      methodFetch: "POST",
+      methodFetch: "PUT",
       bodyFetch: JSON.stringify(element),
     });
 
@@ -63,11 +66,12 @@ export async function addColumn(element: AddColumnObj): Promise<any> {
   }
 }
 
+// 修改表格刪除指定 Column
 export async function delColumn(element: delColumnObj): Promise<any> {
   try {
     const response = await fetchPackager({
       urlFetch: "/api/delColumn",
-      methodFetch: "POST",
+      methodFetch: "PUT",
       bodyFetch: JSON.stringify(element),
     });
 

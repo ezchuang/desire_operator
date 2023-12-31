@@ -11,7 +11,8 @@ import UpdateUtility from "../../models/utility/UpdateUtility";
 export default async function updateApiInit() {
   const updateApi: IRouter = express.Router();
 
-  updateApi.post(
+  // 更新個別資料
+  updateApi.put(
     "/updateData",
     verifyToken,
     async (req: Request, res: Response) => {
@@ -41,7 +42,8 @@ export default async function updateApiInit() {
     }
   );
 
-  updateApi.post(
+  // 插入新的 Row
+  updateApi.put(
     "/insertData",
     verifyToken,
     async (req: Request, res: Response) => {
@@ -82,7 +84,8 @@ export default async function updateApiInit() {
     }
   );
 
-  updateApi.post(
+  // 修改表格加入新的 Column
+  updateApi.put(
     "/addColumn",
     verifyToken,
     async (req: Request, res: Response) => {
@@ -130,7 +133,8 @@ export default async function updateApiInit() {
     }
   );
 
-  updateApi.post(
+  // 修改表格刪除指定 Column
+  updateApi.put(
     "/delColumn",
     verifyToken,
     async (req: Request, res: Response) => {

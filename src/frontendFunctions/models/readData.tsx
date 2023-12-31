@@ -12,8 +12,6 @@ export async function readDbsOrTables(
       bodyFetch: JSON.stringify(element),
     });
 
-    // console.log("rowData: ", result.data);
-    // console.log("columnData: ", result.structure);
     return [response.data, response.structure];
   } catch (err) {
     console.error("There was an error fetching the DBs and Tables: ", err);
@@ -30,8 +28,6 @@ export async function readDbsAndTables(): Promise<any[]> {
       bodyFetch: JSON.stringify({}),
     });
 
-    // console.log("rowData: ", result.data);
-    // console.log("columnData: ", result.structure);
     return [response.data, response.structure];
   } catch (err) {
     console.error("There was an error fetching the DBs and Tables: ", err);
@@ -39,6 +35,7 @@ export async function readDbsAndTables(): Promise<any[]> {
   }
 }
 
+// 讀取 Table 內部資料
 export async function readTableData(element: ReadDataElement): Promise<any[]> {
   try {
     const response = await fetchPackager({
@@ -47,9 +44,6 @@ export async function readTableData(element: ReadDataElement): Promise<any[]> {
       bodyFetch: JSON.stringify(element),
     });
 
-    // console.log(result.data);
-    // console.log(result.structure);
-
     return [response.data, response.structure];
   } catch (err) {
     console.error("There was an error fetching the Tables: ", err);
@@ -57,6 +51,7 @@ export async function readTableData(element: ReadDataElement): Promise<any[]> {
   }
 }
 
+// 讀取歷史資料
 export async function readHistoryData(): Promise<any[]> {
   try {
     const response = await fetchPackager({
