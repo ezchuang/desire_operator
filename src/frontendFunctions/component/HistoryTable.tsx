@@ -30,7 +30,6 @@ const HistoryTable: React.FC = () => {
   const fetchHistory = async () => {
     try {
       const historyData = await readHistoryData();
-      // console.log(historyData[0]);
 
       setRecords(historyData[0]);
     } catch (error) {
@@ -39,19 +38,14 @@ const HistoryTable: React.FC = () => {
   };
 
   socket?.on("newHistoryAvailable", () => {
-    console.log("refreshHistory");
     fetchHistory();
   });
 
   useEffect(() => {
     fetchHistory();
-
-    // console.log("socket his: ", socket);
-  }, [socket, dbsAndTablesElement, readDataElement, refreshDataFlag]);
+  }, [dbsAndTablesElement, readDataElement, refreshDataFlag]);
 
   const convertDatetimeToTaipeiTime = (datetime: number) => {
-    // const date = new Date(datetime);
-    // return date.toLocaleString("zh-TW", { timeZone: "Asia/Taipei" });
     return moment
       .default(datetime)
       .tz("Asia/Taipei")
@@ -83,7 +77,6 @@ const HistoryTable: React.FC = () => {
               </TableCell>
               <TableCell size="small">
                 {`${convertDatetimeToTaipeiTime(record.datetime)}`}
-                {/* {`${record.datetime}`} */}
               </TableCell>
             </TableRow>
           ))}
