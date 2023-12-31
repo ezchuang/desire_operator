@@ -91,7 +91,7 @@ const MainTable: React.FC = () => {
   };
 
   // 送出 delete row 的需求
-  const handleRemoveRow = async (row: any, index: number) => {
+  const handleRemoveRow = async (row: any) => {
     const whereCluster: WhereCluster[] = columnDataElement
       .filter((column) => row[column.id] !== "")
       .map((column) => ({
@@ -116,8 +116,8 @@ const MainTable: React.FC = () => {
         setMessage(`刪除成功`);
         setOpenSnackbar(true);
 
-        const rowData = data.filter((_, i) => i !== index);
-        setData(rowData);
+        socket?.emit("refreshHistory");
+        setRefreshDataFlag([]);
       }
     } catch (error) {
       console.error("資料刪除失敗:", error);
@@ -182,9 +182,6 @@ const MainTable: React.FC = () => {
         };
 
         socket?.emit("refreshHistory");
-        console.log("refreshHistory");
-
-        setData(updatedData); // 刷新
         setRefreshDataFlag([]);
       } catch (error) {
         console.error("Error updating data: ", error);
@@ -263,7 +260,7 @@ const MainTable: React.FC = () => {
                     <Button
                       variant="contained"
                       sx={{ padding: "2px" }}
-                      onClick={() => handleRemoveRow(row, index)}
+                      onClick={() => handleRemoveRow(row)}
                       color="secondary"
                     >
                       <RemoveCircleOutlineIcon />
