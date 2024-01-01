@@ -12,6 +12,7 @@ const useRenewDbsAndTables = () => {
 
       const dbsAndTablesData = response[0]; // 返回的資料結構是 DbsAndTablesElement[...]
 
+      // 深比較抑制重複驅動"useEffect 重新渲染"
       if (deepCompareArrays(dbsAndTablesData, dbsAndTablesElement)) {
         return;
       }
