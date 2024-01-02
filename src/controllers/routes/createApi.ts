@@ -11,10 +11,11 @@ export default async function createApiInit() {
 
   // 建立 Database
   createApi.post(
-    "/createDb",
+    "/database",
     verifyToken,
     async (req: Request, res: Response) => {
       console.log("createDb");
+
       try {
         const dbUser = req.userGroup;
         const userId = req.user!.userId;
@@ -45,33 +46,30 @@ export default async function createApiInit() {
   );
 
   // 建立 Table
-  createApi.post(
-    "/createTable",
-    verifyToken,
-    async (req: Request, res: Response) => {
-      console.log("createTable");
-      try {
-        const userCreateUtility = new CreateUtility(req.db);
-        const userId = req.user!.userId;
+  createApi.post("/table", verifyToken, async (req: Request, res: Response) => {
+    console.log("createTable");
 
-        const params: CreateObj = {
-          dbName: req.body.dbName,
-          table: req.body.table,
-          columns: req.body.columns,
-        };
-        const data = await userCreateUtility.create(userId, params);
+    try {
+      const userCreateUtility = new CreateUtility(req.db);
+      const userId = req.user!.userId;
 
-        return res.status(200).json({ data: data });
-      } catch (err: any) {
-        console.error("Error in createTable: ", err);
+      const params: CreateObj = {
+        dbName: req.body.dbName,
+        table: req.body.table,
+        columns: req.body.columns,
+      };
+      const data = await userCreateUtility.create(userId, params);
 
-        if ("sqlMessage" in err) {
-          return res.status(400).json({ error: true, message: err.sqlMessage });
-        }
-        return res.status(500).json({ error: true, message: err });
+      return res.status(200).json({ data: data });
+    } catch (err: any) {
+      console.error("Error in createTable: ", err);
+
+      if ("sqlMessage" in err) {
+        return res.status(400).json({ error: true, message: err.sqlMessage });
       }
+      return res.status(500).json({ error: true, message: err });
     }
-  );
+  });
 
   return createApi;
 }

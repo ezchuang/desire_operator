@@ -5,7 +5,7 @@ import { ColumnData, OutputColumnData, TableData } from "../types/Interfaces";
 export async function createDb(element: string): Promise<boolean> {
   try {
     const response = await fetchPackager({
-      urlFetch: "/api/createDb",
+      urlFetch: "/api/database",
       methodFetch: "POST",
       bodyFetch: JSON.stringify({ dbName: element }),
     });
@@ -82,7 +82,7 @@ export async function createTable(element: TableData): Promise<boolean> {
     const refactorCreateData = refactorCreateDataParams(element);
     // console.log(refactorCreateData);
     const response = await fetchPackager({
-      urlFetch: "/api/createTable",
+      urlFetch: "/api/table",
       methodFetch: "POST",
       bodyFetch: JSON.stringify(refactorCreateData),
     });

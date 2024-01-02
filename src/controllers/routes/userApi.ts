@@ -18,7 +18,9 @@ export default async function userApiInit() {
   const rootUtility = new UserUtility(rootDb);
 
   // 創建使用者
-  userApi.post("/createUser", async (req: Request, res: Response) => {
+  userApi.post("/user", async (req: Request, res: Response) => {
+    console.log("createUser");
+
     try {
       const params: CreateUserObj = {
         userMail: req.body.email,
@@ -80,7 +82,9 @@ export default async function userApiInit() {
   });
 
   // 登入
-  userApi.post("/signin", async (req: Request, res: Response) => {
+  userApi.put("/user/auth", async (req: Request, res: Response) => {
+    console.log("signin");
+
     try {
       const params: getUserDbObj = {
         userMail: req.body.email,
@@ -153,7 +157,9 @@ export default async function userApiInit() {
   });
 
   // 已登入驗證
-  userApi.get("/auth", async (req: Request, res: Response) => {
+  userApi.get("/user/auth", async (req: Request, res: Response) => {
+    console.log("auth");
+
     try {
       const token = req.headers.authorization?.split(" ")[1];
       if (!token) {
@@ -226,7 +232,9 @@ export default async function userApiInit() {
   });
 
   // 登入
-  userApi.post("/guestSignin", async (req: Request, res: Response) => {
+  userApi.put("/user/guestAuth", async (req: Request, res: Response) => {
+    console.log("guestSignin");
+
     try {
       const params: getUserDbObj = {
         userMail: req.body.account, // 減少更動區域，此項無直接作用

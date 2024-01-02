@@ -20,8 +20,8 @@ const SignInUpForm: React.FC = () => {
   // 登入
   const handleSignIn = async (data: SignInData) => {
     try {
-      const response = await fetch("/api/signin", {
-        method: "POST",
+      const response = await fetch("/api/user/auth", {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
@@ -59,7 +59,7 @@ const SignInUpForm: React.FC = () => {
   const handleSignUp = async (data: SignUpData) => {
     try {
       // 註冊驗證
-      const signUpResponse = await fetch("/api/createUser", {
+      const signUpResponse = await fetch("/api/user", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -131,7 +131,7 @@ const SignInUpForm: React.FC = () => {
       }
 
       const response = await fetchPackager({
-        urlFetch: "/api/auth",
+        urlFetch: "/api/user/auth",
       });
 
       // 之後要做避免使用者亂創群組的狀況

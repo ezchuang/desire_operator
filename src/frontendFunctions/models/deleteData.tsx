@@ -4,7 +4,7 @@ import fetchPackager from "./fetchPackager";
 export async function deleteData(element: any): Promise<any> {
   try {
     const response = await fetchPackager({
-      urlFetch: "/api/deleteData",
+      urlFetch: "/api/data",
       methodFetch: "DELETE",
       bodyFetch: JSON.stringify(element),
     });
@@ -24,7 +24,7 @@ export async function deleteData(element: any): Promise<any> {
 export async function deleteTable(element: any): Promise<any> {
   try {
     const response = await fetchPackager({
-      urlFetch: "/api/deleteTable",
+      urlFetch: "/api/table",
       methodFetch: "DELETE",
       bodyFetch: JSON.stringify(element),
     });
@@ -44,7 +44,7 @@ export async function deleteTable(element: any): Promise<any> {
 export async function deleteDb(element: any): Promise<any> {
   try {
     const response = await fetchPackager({
-      urlFetch: "/api/deleteDatabase",
+      urlFetch: "/api/database",
       methodFetch: "DELETE",
       bodyFetch: JSON.stringify(element),
     });

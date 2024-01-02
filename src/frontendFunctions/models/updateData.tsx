@@ -10,7 +10,7 @@ import fetchPackager from "./fetchPackager";
 export async function updateData(element: UpdateObj): Promise<any> {
   try {
     const response = await fetchPackager({
-      urlFetch: "/api/updateData",
+      urlFetch: "/api/data",
       methodFetch: "PUT",
       bodyFetch: JSON.stringify(element),
     });
@@ -30,8 +30,8 @@ export async function updateData(element: UpdateObj): Promise<any> {
 export async function insertData(element: InsertObj): Promise<any> {
   try {
     const response = await fetchPackager({
-      urlFetch: "/api/insertData",
-      methodFetch: "PUT",
+      urlFetch: "/api/data",
+      methodFetch: "POST",
       bodyFetch: JSON.stringify(element),
     });
 
@@ -50,7 +50,7 @@ export async function insertData(element: InsertObj): Promise<any> {
 export async function addColumn(element: AddColumnObj): Promise<any> {
   try {
     const response = await fetchPackager({
-      urlFetch: "/api/addColumn",
+      urlFetch: "/api/table/column",
       methodFetch: "PUT",
       bodyFetch: JSON.stringify(element),
     });
@@ -70,8 +70,8 @@ export async function addColumn(element: AddColumnObj): Promise<any> {
 export async function delColumn(element: delColumnObj): Promise<any> {
   try {
     const response = await fetchPackager({
-      urlFetch: "/api/delColumn",
-      methodFetch: "PUT",
+      urlFetch: "/api/table/column",
+      methodFetch: "DELETE",
       bodyFetch: JSON.stringify(element),
     });
 

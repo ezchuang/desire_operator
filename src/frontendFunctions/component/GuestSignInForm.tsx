@@ -20,8 +20,8 @@ const GuestSignInForm: React.FC = () => {
   // 登入
   const handleSignIn = async (data: SignInData) => {
     try {
-      const response = await fetch("/api/guestSignin", {
-        method: "POST",
+      const response = await fetch("/api/user/guestAuth", {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },

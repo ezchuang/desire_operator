@@ -7,40 +7,9 @@ import verifyToken from "../../controllers/verifyToken";
 export default async function readApiInit() {
   const readApi: IRouter = express.Router();
 
-  // 讀取 DBs or Tables
-  // 有帶 body 仍需用 POST
-  readApi.post(
-    "/readDbsOrTables",
-    verifyToken,
-    async (req: Request, res: Response) => {
-      console.log("readDbsOrTables");
-
-      try {
-        const readUtility = new ReadUtility(req.db);
-
-        const params: ReadDbsAndTablesObj = {
-          dbName: req.body.dbName,
-        };
-        const [data, structure] = await readUtility.readDbsOrTables(params);
-
-        // console.log(data);
-        // console.log(structure);
-        return res.status(200).json({ data: data, structure: structure });
-      } catch (err: any) {
-        console.error("Error in readDbsOrTables: ", err);
-
-        if ("sqlMessage" in err) {
-          return res.status(400).json({ error: true, message: err.sqlMessage });
-        }
-        return res.status(500).json({ error: true, message: err });
-      }
-    }
-  );
-
   // 取得全部的 DBs 跟 Tables
-  // 有帶 body 仍需用 POST
-  readApi.post(
-    "/readDbsAndTables",
+  readApi.get(
+    "/databases",
     verifyToken,
     async (req: Request, res: Response) => {
       console.log("readDbsAndTables");
@@ -93,7 +62,7 @@ export default async function readApiInit() {
   // 讀取 Table 內部資料
   // 有帶 body 仍需用 POST
   readApi.post(
-    "/readData",
+    "/data/query",
     verifyToken,
     async (req: Request, res: Response) => {
       console.log("readData");

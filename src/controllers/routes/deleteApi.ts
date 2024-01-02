@@ -8,9 +8,11 @@ export default async function deleteApiInit() {
 
   // 刪除 Database
   deleteApi.delete(
-    "/deleteDatabase",
+    "/database",
     verifyToken,
     async (req: Request, res: Response) => {
+      console.log("deleteDb");
+
       try {
         const deleteUtility = new DeleteUtility(req.db);
         const userId = req.user!.userId;
@@ -34,9 +36,11 @@ export default async function deleteApiInit() {
 
   // 刪除 Table
   deleteApi.delete(
-    "/deleteTable",
+    "/table",
     verifyToken,
     async (req: Request, res: Response) => {
+      console.log("deleteTable");
+
       try {
         const deleteUtility = new DeleteUtility(req.db);
         const userId = req.user!.userId;
@@ -61,7 +65,7 @@ export default async function deleteApiInit() {
 
   // 刪除資料
   deleteApi.delete(
-    "/deleteData",
+    "/data",
     verifyToken,
     async (req: Request, res: Response) => {
       console.log("deleteData");
