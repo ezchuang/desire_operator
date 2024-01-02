@@ -157,3 +157,9 @@ build
 
 # JWT Keys
 *.pem
+
+# autogenerate file
+mainOutput.css
+indexOutput.css
+index.js
+main.js
