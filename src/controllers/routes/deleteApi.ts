@@ -6,92 +6,82 @@ import verifyToken from "../../controllers/verifyToken";
 export default async function deleteApiInit() {
   const deleteApi: IRouter = express.Router();
 
+  deleteApi.use(verifyToken);
+
   // 刪除 Database
-  deleteApi.delete(
-    "/database",
-    verifyToken,
-    async (req: Request, res: Response) => {
-      console.log("deleteDb");
+  deleteApi.delete("/database", async (req: Request, res: Response) => {
+    console.log("deleteDb");
 
-      try {
-        const deleteUtility = new DeleteUtility(req.db);
-        const userId = req.user!.userId;
+    try {
+      const deleteUtility = new DeleteUtility(req.db);
+      const userId = req.user!.userId;
 
-        const params: DeleteObj = {
-          dbName: req.body.dbName,
-        };
-        const data = await deleteUtility.dropDatabase(userId, params);
+      const params: DeleteObj = {
+        dbName: req.body.dbName,
+      };
+      const data = await deleteUtility.dropDatabase(userId, params);
 
-        return res.status(200).json({ data: data });
-      } catch (err: any) {
-        console.error("Error in deleteDatabase: ", err);
+      return res.status(200).json({ data: data });
+    } catch (err: any) {
+      console.error("Error in deleteDatabase: ", err);
 
-        if ("sqlMessage" in err) {
-          return res.status(400).json({ error: true, message: err.sqlMessage });
-        }
-        return res.status(500).json({ error: true, message: err });
+      if ("sqlMessage" in err) {
+        return res.status(400).json({ error: true, message: err.sqlMessage });
       }
+      return res.status(500).json({ error: true, message: err });
     }
-  );
+  });
 
   // 刪除 Table
-  deleteApi.delete(
-    "/table",
-    verifyToken,
-    async (req: Request, res: Response) => {
-      console.log("deleteTable");
+  deleteApi.delete("/table", async (req: Request, res: Response) => {
+    console.log("deleteTable");
 
-      try {
-        const deleteUtility = new DeleteUtility(req.db);
-        const userId = req.user!.userId;
+    try {
+      const deleteUtility = new DeleteUtility(req.db);
+      const userId = req.user!.userId;
 
-        const params: DeleteObj = {
-          dbName: req.body.dbName,
-          table: req.body.table,
-        };
-        const data = await deleteUtility.dropTable(userId, params);
+      const params: DeleteObj = {
+        dbName: req.body.dbName,
+        table: req.body.table,
+      };
+      const data = await deleteUtility.dropTable(userId, params);
 
-        return res.status(200).json({ data: data });
-      } catch (err: any) {
-        console.error("Error in deleteTable: ", err);
+      return res.status(200).json({ data: data });
+    } catch (err: any) {
+      console.error("Error in deleteTable: ", err);
 
-        if ("sqlMessage" in err) {
-          return res.status(400).json({ error: true, message: err.sqlMessage });
-        }
-        return res.status(500).json({ error: true, message: err });
+      if ("sqlMessage" in err) {
+        return res.status(400).json({ error: true, message: err.sqlMessage });
       }
+      return res.status(500).json({ error: true, message: err });
     }
-  );
+  });
 
   // 刪除資料
-  deleteApi.delete(
-    "/data",
-    verifyToken,
-    async (req: Request, res: Response) => {
-      console.log("deleteData");
+  deleteApi.delete("/data", async (req: Request, res: Response) => {
+    console.log("deleteData");
 
-      try {
-        const deleteUtility = new DeleteUtility(req.db);
-        const userId = req.user!.userId;
+    try {
+      const deleteUtility = new DeleteUtility(req.db);
+      const userId = req.user!.userId;
 
-        const params: DeleteObj = {
-          dbName: req.body.dbName,
-          table: req.body.table,
-          where: req.body.where, // 若不需要此值，前端須給空 Array
-        };
-        const data = await deleteUtility.delete(userId, params);
+      const params: DeleteObj = {
+        dbName: req.body.dbName,
+        table: req.body.table,
+        where: req.body.where, // 若不需要此值，前端須給空 Array
+      };
+      const data = await deleteUtility.delete(userId, params);
 
-        return res.status(200).json({ data: data });
-      } catch (err: any) {
-        console.error("Error in deleteData: ", err);
+      return res.status(200).json({ data: data });
+    } catch (err: any) {
+      console.error("Error in deleteData: ", err);
 
-        if ("sqlMessage" in err) {
-          return res.status(400).json({ error: true, message: err.sqlMessage });
-        }
-        return res.status(500).json({ error: true, message: err });
+      if ("sqlMessage" in err) {
+        return res.status(400).json({ error: true, message: err.sqlMessage });
       }
+      return res.status(500).json({ error: true, message: err });
     }
-  );
+  });
 
   return deleteApi;
 }
