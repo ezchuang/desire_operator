@@ -77,7 +77,7 @@ const GuestSignInForm: React.FC = () => {
       }
 
       const response = await fetchPackager({
-        urlFetch: "/api/auth",
+        urlFetch: "/api/user/auth",
       });
 
       if (response.data.groupName !== "Guest") {
