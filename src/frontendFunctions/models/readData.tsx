@@ -7,7 +7,6 @@ export async function readDbsAndTables(): Promise<any[]> {
     const response = await fetchPackager({
       urlFetch: "/api/databases",
       methodFetch: "GET",
-      bodyFetch: JSON.stringify({}),
     });
 
     return [response.data, response.structure];
