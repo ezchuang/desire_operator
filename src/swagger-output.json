@@ -1,65 +1,23 @@
 {
-  "swagger": "2.0",
+  "openapi": "3.0.0",
   "info": {
-    "title": "My API",
-    "description": "API Documentation",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "title": "MySQL Speaker",
+    "description": "API Documentation of MySQL Speaker"
   },
-  "host": "localhost:5252",
-  "basePath": "/",
-  "schemes": [
-    "http"
+  "servers": [
+    {
+      "url": "https://mysqlspeaker.online/",
+      "description": ""
+    }
   ],
   "paths": {
-    "/": {
-      "get": {
-        "description": "",
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/main": {
-      "get": {
-        "description": "",
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
     "/api/user": {
       "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "email": {
-                  "example": "any"
-                },
-                "password": {
-                  "example": "any"
-                },
-                "name": {
-                  "example": "any"
-                },
-                "invitationCode": {
-                  "example": "any"
-                },
-                "newGroupName": {
-                  "example": "any"
-                }
-              }
-            }
-          }
+        "tags": [
+          "User"
         ],
+        "description": "Endpoint for user creation.",
         "responses": {
           "200": {
             "description": "OK"
@@ -69,30 +27,42 @@
           },
           "500": {
             "description": "Internal Server Error"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "example": "any"
+                  },
+                  "password": {
+                    "example": "any"
+                  },
+                  "name": {
+                    "example": "any"
+                  },
+                  "invitationCode": {
+                    "example": "any"
+                  },
+                  "newGroupName": {
+                    "example": "any"
+                  }
+                }
+              }
+            }
           }
         }
       }
     },
     "/api/user/auth": {
       "put": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "email": {
-                  "example": "any"
-                },
-                "password": {
-                  "example": "any"
-                }
-              }
-            }
-          }
+        "tags": [
+          "User"
         ],
+        "description": "Endpoint for user authentication.",
         "responses": {
           "200": {
             "description": "OK"
@@ -103,15 +73,37 @@
           "500": {
             "description": "Internal Server Error"
           }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "example": "any"
+                  },
+                  "password": {
+                    "example": "any"
+                  }
+                }
+              }
+            }
+          }
         }
       },
       "get": {
-        "description": "",
+        "tags": [
+          "User"
+        ],
+        "description": "Endpoint for verifying user authentication.",
         "parameters": [
           {
             "name": "authorization",
             "in": "header",
-            "type": "string"
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -127,35 +119,20 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/api/user/guestAuth": {
       "put": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "account": {
-                  "example": "any"
-                },
-                "password": {
-                  "example": "any"
-                },
-                "dbHost": {
-                  "example": "any"
-                },
-                "userName": {
-                  "example": "any"
-                }
-              }
-            }
-          }
+        "tags": [
+          "User"
         ],
+        "description": "Endpoint for guest user authentication.",
         "responses": {
           "200": {
             "description": "OK"
@@ -165,27 +142,39 @@
           },
           "500": {
             "description": "Internal Server Error"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "account": {
+                    "example": "any"
+                  },
+                  "password": {
+                    "example": "any"
+                  },
+                  "dbHost": {
+                    "example": "any"
+                  },
+                  "userName": {
+                    "example": "any"
+                  }
+                }
+              }
+            }
           }
         }
       }
     },
     "/api/database": {
       "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "dbName": {
-                  "example": "any"
-                }
-              }
-            }
-          }
+        "tags": [
+          "Create"
         ],
+        "description": "Endpoint for creating a database.",
         "responses": {
           "200": {
             "description": "OK"
@@ -193,27 +182,38 @@
           "400": {
             "description": "Bad Request"
           },
+          "401": {
+            "description": "Unauthorized access, no token provided or invalid token"
+          },
           "500": {
             "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "dbName": {
+                    "example": "any"
+                  }
+                }
+              }
+            }
           }
         }
       },
       "delete": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "dbName": {
-                  "example": "any"
-                }
-              }
-            }
-          }
+        "tags": [
+          "Delete"
         ],
+        "description": "Endpoint for deleting a database.",
         "responses": {
           "200": {
             "description": "OK"
@@ -221,35 +221,40 @@
           "400": {
             "description": "Bad Request"
           },
+          "401": {
+            "description": "Unauthorized access, no token provided or invalid token"
+          },
           "500": {
             "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "dbName": {
+                    "example": "any"
+                  }
+                }
+              }
+            }
           }
         }
       }
     },
     "/api/table": {
       "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "dbName": {
-                  "example": "any"
-                },
-                "table": {
-                  "example": "any"
-                },
-                "columns": {
-                  "example": "any"
-                }
-              }
-            }
-          }
+        "tags": [
+          "Create"
         ],
+        "description": "Endpoint for creating a table.",
         "responses": {
           "200": {
             "description": "OK"
@@ -257,30 +262,44 @@
           "400": {
             "description": "Bad Request"
           },
+          "401": {
+            "description": "Unauthorized access, no token provided or invalid token"
+          },
           "500": {
             "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "dbName": {
+                    "example": "any"
+                  },
+                  "table": {
+                    "example": "any"
+                  },
+                  "columns": {
+                    "example": "any"
+                  }
+                }
+              }
+            }
           }
         }
       },
       "delete": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "dbName": {
-                  "example": "any"
-                },
-                "table": {
-                  "example": "any"
-                }
-              }
-            }
-          }
+        "tags": [
+          "Delete"
         ],
+        "description": "Endpoint for deleting a table.",
         "responses": {
           "200": {
             "description": "OK"
@@ -288,8 +307,33 @@
           "400": {
             "description": "Bad Request"
           },
+          "401": {
+            "description": "Unauthorized access, no token provided or invalid token"
+          },
           "500": {
             "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "dbName": {
+                    "example": "any"
+                  },
+                  "table": {
+                    "example": "any"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -297,21 +341,21 @@
     "/api/databases": {
       "get": {
         "tags": [
-          "Database"
+          "Read"
         ],
         "description": "Endpoint to obtain all databases and their tables.",
         "responses": {
           "200": {
-            "description": "Database and tables data successfully obtained.",
-            "schema": {
-              "$ref": "#/definitions/Databases"
-            }
+            "description": "OK"
           },
           "400": {
             "description": "Bad Request"
           },
+          "401": {
+            "description": "Unauthorized access, no token provided or invalid token"
+          },
           "500": {
-            "description": "Server error"
+            "description": "Internal Server Error"
           }
         },
         "security": [
@@ -324,67 +368,74 @@
     "/api/data/query": {
       "post": {
         "tags": [
-          "Data"
+          "Read"
         ],
         "description": "Endpoint to query specific data from a table.",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "description": "Data query information.",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/QueryRequest"
-            }
-          }
-        ],
         "responses": {
           "200": {
-            "description": "Data successfully queried.",
-            "schema": {
-              "$ref": "#/definitions/QueryResponse"
-            }
+            "description": "OK"
           },
           "400": {
-            "description": "Bad request response"
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized access, no token provided or invalid token"
           },
           "500": {
-            "description": "Server error"
+            "description": "Internal Server Error"
           }
         },
         "security": [
           {
-            "Bearer": []
+            "bearerAuth": []
           }
-        ]
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "dbName": {
+                    "example": "any"
+                  },
+                  "table": {
+                    "example": "any"
+                  },
+                  "select": {
+                    "example": "any"
+                  },
+                  "where": {
+                    "example": "any"
+                  },
+                  "groupBy": {
+                    "example": "any"
+                  },
+                  "orderBy": {
+                    "example": "any"
+                  },
+                  "orderDirection": {
+                    "example": "any"
+                  },
+                  "offset": {
+                    "example": "any"
+                  },
+                  "limit": {
+                    "example": "any"
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/data": {
       "put": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "dbName": {
-                  "example": "any"
-                },
-                "table": {
-                  "example": "any"
-                },
-                "data": {
-                  "example": "any"
-                },
-                "where": {
-                  "example": "any"
-                }
-              }
-            }
-          }
+        "tags": [
+          "Update"
         ],
+        "description": "Endpoint to update individual data.",
         "responses": {
           "200": {
             "description": "OK"
@@ -392,33 +443,47 @@
           "400": {
             "description": "Bad Request"
           },
+          "401": {
+            "description": "Unauthorized access, no token provided or invalid token"
+          },
           "500": {
             "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "dbName": {
+                    "example": "any"
+                  },
+                  "table": {
+                    "example": "any"
+                  },
+                  "data": {
+                    "example": "any"
+                  },
+                  "where": {
+                    "example": "any"
+                  }
+                }
+              }
+            }
           }
         }
       },
       "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "dbName": {
-                  "example": "any"
-                },
-                "table": {
-                  "example": "any"
-                },
-                "values": {
-                  "example": "any"
-                }
-              }
-            }
-          }
+        "tags": [
+          "Update"
         ],
+        "description": "Endpoint to insert new row data.",
         "responses": {
           "200": {
             "description": "OK"
@@ -426,33 +491,44 @@
           "400": {
             "description": "Bad Request"
           },
+          "401": {
+            "description": "Unauthorized access, no token provided or invalid token"
+          },
           "500": {
             "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "dbName": {
+                    "example": "any"
+                  },
+                  "table": {
+                    "example": "any"
+                  },
+                  "values": {
+                    "example": "any"
+                  }
+                }
+              }
+            }
           }
         }
       },
       "delete": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "dbName": {
-                  "example": "any"
-                },
-                "table": {
-                  "example": "any"
-                },
-                "where": {
-                  "example": "any"
-                }
-              }
-            }
-          }
+        "tags": [
+          "Delete"
         ],
+        "description": "Endpoint for deleting specific data.",
         "responses": {
           "200": {
             "description": "OK"
@@ -460,44 +536,46 @@
           "400": {
             "description": "Bad Request"
           },
+          "401": {
+            "description": "Unauthorized access, no token provided or invalid token"
+          },
           "500": {
             "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "dbName": {
+                    "example": "any"
+                  },
+                  "table": {
+                    "example": "any"
+                  },
+                  "where": {
+                    "example": "any"
+                  }
+                }
+              }
+            }
           }
         }
       }
     },
     "/api/table/column": {
       "put": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "dbName": {
-                  "example": "any"
-                },
-                "table": {
-                  "example": "any"
-                },
-                "columnName": {
-                  "example": "any"
-                },
-                "columnType": {
-                  "example": "any"
-                },
-                "columnOption": {
-                  "example": "any"
-                },
-                "defaultValue": {
-                  "example": "any"
-                }
-              }
-            }
-          }
+        "tags": [
+          "Update"
         ],
+        "description": "Endpoint to add a new column to a table.",
         "responses": {
           "200": {
             "description": "OK"
@@ -505,33 +583,53 @@
           "400": {
             "description": "Bad Request"
           },
+          "401": {
+            "description": "Unauthorized access, no token provided or invalid token"
+          },
           "500": {
             "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "dbName": {
+                    "example": "any"
+                  },
+                  "table": {
+                    "example": "any"
+                  },
+                  "columnName": {
+                    "example": "any"
+                  },
+                  "columnType": {
+                    "example": "any"
+                  },
+                  "columnOption": {
+                    "example": "any"
+                  },
+                  "defaultValue": {
+                    "example": "any"
+                  }
+                }
+              }
+            }
           }
         }
       },
       "delete": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "dbName": {
-                  "example": "any"
-                },
-                "table": {
-                  "example": "any"
-                },
-                "columnName": {
-                  "example": "any"
-                }
-              }
-            }
-          }
+        "tags": [
+          "Update"
         ],
+        "description": "Endpoint to delete a specified column from a table.",
         "responses": {
           "200": {
             "description": "OK"
@@ -539,8 +637,36 @@
           "400": {
             "description": "Bad Request"
           },
+          "401": {
+            "description": "Unauthorized access, no token provided or invalid token"
+          },
           "500": {
             "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "dbName": {
+                    "example": "any"
+                  },
+                  "table": {
+                    "example": "any"
+                  },
+                  "columnName": {
+                    "example": "any"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -553,24 +679,35 @@
         "description": "Endpoint to get the history of a user based on their group ID.",
         "responses": {
           "200": {
-            "description": "History data successfully obtained.",
-            "schema": {
-              "$ref": "#/definitions/History"
-            }
+            "description": "OK"
           },
           "400": {
-            "description": "Bad request due to SQL error"
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized access, no token provided or invalid token"
           },
           "500": {
-            "description": "Server error"
+            "description": "Internal Server Error"
           }
         },
         "security": [
           {
-            "Bearer": []
+            "bearerAuth": []
           }
         ]
       }
     }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\""
+      }
+    },
+    "schemas": {}
   }
 }

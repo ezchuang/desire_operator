@@ -41,18 +41,71 @@ async function appInit() {
 
   // Routers
   app.use("/api", await userApi());
-  app.use("/api", await createApi());
-  app.use("/api", await readApi());
-  app.use("/api", await updateApi());
-  app.use("/api", await deleteApi());
-  app.use("/api", await historyApi());
+
+  app.use(
+    "/api",
+    await createApi()
+    /*  #swagger.security = [{
+          "bearerAuth": []
+        }]
+        #swagger.responses[401] = { 
+          description: "Unauthorized access, no token provided or invalid token"
+        }
+    */
+  );
+  app.use(
+    "/api",
+    await readApi()
+    /*  #swagger.security = [{
+          "bearerAuth": []
+        }]
+        #swagger.responses[401] = { 
+          description: "Unauthorized access, no token provided or invalid token"
+        }
+    */
+  );
+  app.use(
+    "/api",
+    await updateApi()
+    /*  #swagger.security = [{
+          "bearerAuth": []
+        }]
+        #swagger.responses[401] = { 
+          description: "Unauthorized access, no token provided or invalid token"
+        }
+    */
+  );
+  app.use(
+    "/api",
+    await deleteApi()
+    /*  #swagger.security = [{
+          "bearerAuth": []
+        }]
+        #swagger.responses[401] = { 
+          description: "Unauthorized access, no token provided or invalid token"
+        }
+    */
+  );
+  app.use(
+    "/api",
+    await historyApi()
+    /*  #swagger.security = [{
+          "bearerAuth": []
+        }]
+        #swagger.responses[401] = { 
+          description: "Unauthorized access, no token provided or invalid token"
+        }
+    */
+  );
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
   app.get("/", (req: Request, res: Response) => {
+    // #swagger.ignore = true
     return res.render("index");
   });
 
   app.get("/main", (req: Request, res: Response) => {
+    // #swagger.ignore = true
     return res.render("main");
   });
 

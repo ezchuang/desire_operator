@@ -13,7 +13,8 @@ export default async function createApiInit() {
 
   // 建立 Database
   createApi.post("/database", async (req: Request, res: Response) => {
-    console.log("createDb");
+    // #swagger.tags = ["Create"]
+    // #swagger.description = "Endpoint for creating a database."
 
     try {
       const dbUser = req.userGroup;
@@ -45,7 +46,8 @@ export default async function createApiInit() {
 
   // 建立 Table
   createApi.post("/table", async (req: Request, res: Response) => {
-    console.log("createTable");
+    // #swagger.tags = ["Create"]
+    // #swagger.description = "Endpoint for creating a table."
 
     try {
       const userCreateUtility = new CreateUtility(req.db);

@@ -10,7 +10,8 @@ export default async function deleteApiInit() {
 
   // 刪除 Database
   deleteApi.delete("/database", async (req: Request, res: Response) => {
-    console.log("deleteDb");
+    // #swagger.tags = ["Delete"]
+    // #swagger.description = "Endpoint for deleting a database."
 
     try {
       const deleteUtility = new DeleteUtility(req.db);
@@ -34,7 +35,8 @@ export default async function deleteApiInit() {
 
   // 刪除 Table
   deleteApi.delete("/table", async (req: Request, res: Response) => {
-    console.log("deleteTable");
+    // #swagger.tags = ["Delete"]
+    // #swagger.description = "Endpoint for deleting a table."
 
     try {
       const deleteUtility = new DeleteUtility(req.db);
@@ -59,7 +61,8 @@ export default async function deleteApiInit() {
 
   // 刪除資料
   deleteApi.delete("/data", async (req: Request, res: Response) => {
-    console.log("deleteData");
+    // #swagger.tags = ["Delete"]
+    // #swagger.description = "Endpoint for deleting specific data."
 
     try {
       const deleteUtility = new DeleteUtility(req.db);

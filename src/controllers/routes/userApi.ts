@@ -19,7 +19,8 @@ export default async function userApiInit() {
 
   // 創建使用者
   userApi.post("/user", async (req: Request, res: Response) => {
-    console.log("createUser");
+    // #swagger.tags = ["User"]
+    // #swagger.description = "Endpoint for user creation."
 
     try {
       const params: CreateUserObj = {
@@ -83,7 +84,8 @@ export default async function userApiInit() {
 
   // 登入
   userApi.put("/user/auth", async (req: Request, res: Response) => {
-    console.log("signin");
+    // #swagger.tags = ["User"]
+    // #swagger.description = "Endpoint for user authentication."
 
     try {
       const params: getUserDbObj = {
@@ -158,7 +160,9 @@ export default async function userApiInit() {
 
   // 已登入驗證
   userApi.get("/user/auth", async (req: Request, res: Response) => {
-    console.log("auth");
+    // #swagger.tags = ["User"]
+    // #swagger.description = "Endpoint for verifying user authentication."
+    // #swagger.security = [{ "bearerAuth": [] }]
 
     try {
       const token = req.headers.authorization?.split(" ")[1];
@@ -233,7 +237,8 @@ export default async function userApiInit() {
 
   // 登入
   userApi.put("/user/guestAuth", async (req: Request, res: Response) => {
-    console.log("guestSignin");
+    // #swagger.tags = ["User"]
+    // #swagger.description = "Endpoint for guest user authentication."
 
     try {
       const params: getUserDbObj = {

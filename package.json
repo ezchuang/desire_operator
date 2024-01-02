@@ -10,7 +10,7 @@
     "renewcss_index": "npx tailwindcss -i ./src/public/css/index.css  -o ./src/public/css/indexOutput.css --watch",
     "renewcss_main": "npx tailwindcss -i ./src/public/css/main.css  -o ./src/public/css/mainOutput.css --watch",
     "webpack": "npx webpack --mode development --watch",
-    "swagger-autogen": "ts-node ./swagger.ts"
+    "swagger-autogen": "node ./swagger.js"
   },
   "keywords": [],
   "author": "",

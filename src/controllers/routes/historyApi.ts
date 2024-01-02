@@ -12,22 +12,8 @@ export default async function historyApiInit() {
 
   historyApi.get("/history", async (req: Request, res: Response) => {
     console.log("getHistoryByUser");
-    /*  #swagger.tags = ['History']
-        #swagger.description = 'Endpoint to get the history of a user based on their group ID.'
-        #swagger.security = [{
-               "Bearer": []
-        }]
-        #swagger.responses[200] = { 
-               description: 'History data successfully obtained.',
-               schema: { $ref: '#/definitions/History' } 
-        }
-        #swagger.responses[400] = { 
-               description: 'Bad request due to SQL error'
-        }
-        #swagger.responses[500] = { 
-               description: 'Server error'
-        }
-    */
+    // #swagger.tags = ["History"]
+    // #swagger.description = "Endpoint to get the history of a user based on their group ID."
 
     try {
       let userGroup = global.userGroupMap.get(req.user!.userId) as string;

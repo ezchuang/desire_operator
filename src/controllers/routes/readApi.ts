@@ -11,7 +11,8 @@ export default async function readApiInit() {
 
   // 取得全部的 DBs 跟 Tables
   readApi.get("/databases", async (req: Request, res: Response) => {
-    console.log("readDbsAndTables");
+    // #swagger.tags = ["Read"]
+    // #swagger.description = "Endpoint to obtain all databases and their tables."
 
     try {
       const readUtility = new ReadUtility(req.db);
@@ -57,7 +58,8 @@ export default async function readApiInit() {
   // 讀取 Table 內部資料
   // 有帶 body 仍需用 POST
   readApi.post("/data/query", async (req: Request, res: Response) => {
-    console.log("readData");
+    // #swagger.tags = ["Read"]
+    // #swagger.description = "Endpoint to query specific data from a table."
 
     try {
       const readUtility = new ReadUtility(req.db);

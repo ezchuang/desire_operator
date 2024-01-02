@@ -15,7 +15,8 @@ export default async function updateApiInit() {
 
   // 更新個別資料
   updateApi.put("/data", async (req: Request, res: Response) => {
-    console.log("updateData");
+    // #swagger.tags = ["Update"]
+    // #swagger.description = "Endpoint to update individual data."
 
     try {
       const updateUtility = new UpdateUtility(req.db);
@@ -42,7 +43,8 @@ export default async function updateApiInit() {
 
   // 插入新的 Row
   updateApi.post("/data", async (req: Request, res: Response) => {
-    console.log("insertData");
+    // #swagger.tags = ["Update"]
+    // #swagger.description = "Endpoint to insert new row data."
 
     try {
       const [dbName, table, values] = [
@@ -78,7 +80,8 @@ export default async function updateApiInit() {
 
   // 修改表格加入新的 Column
   updateApi.put("/table/column", async (req: Request, res: Response) => {
-    console.log("addColumn");
+    // #swagger.tags = ["Update"]
+    // #swagger.description = "Endpoint to add a new column to a table."
 
     try {
       const {
@@ -121,7 +124,8 @@ export default async function updateApiInit() {
 
   // 修改表格刪除指定 Column
   updateApi.delete("/table/column", async (req: Request, res: Response) => {
-    console.log("delColumn");
+    // #swagger.tags = ["Update"]
+    // #swagger.description = "Endpoint to delete a specified column from a table."
 
     try {
       const { dbName, table, columnName } = req.body as delColumnObj;
