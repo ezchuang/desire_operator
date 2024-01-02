@@ -159,7 +159,7 @@ build
 *.pem
 
 # autogenerate file
-mainOutput.css
 indexOutput.css
+mainOutput.css
 index.js
 main.js
