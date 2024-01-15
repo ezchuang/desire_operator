@@ -3,7 +3,6 @@ import HistoryUtility from "../models/utility/HistoryUtility";
 
 const historyUtility = new HistoryUtility(rootDb);
 
-// 應該不用 async
 export default async function addHistory(
   userId: string,
   actionType: string,
